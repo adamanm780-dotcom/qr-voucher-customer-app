@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="color-scheme" content="dark">
+    <title>Lila Wiesbaden — Pass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@700&family=Sohne:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Color System — Dark Luxury */
+            --color-primary: #3b82f6;
+            --color-primary-light: #60a5fa;
+            --color-accent: #0ea5e9;
+            --color-background: #0a0a0a;
+            --color-background-secondary: #121212;
+            --color-surface: #161616;
+            --color-text: #f5f5f5;
+            --color-text-secondary: #a0a0a0;
+            --color-text-tertiary: #707070;
+            --color-border: #262626;
+            --color-success: #34d399;
+            --color-error: #f87171;
+
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+
+            /* Typography */
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Sohne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.16);
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            background-color: var(--color-background);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            font-size: 16px;
+            overflow: hidden;
+        }
+
+        .app-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+        }
+
+        /* ===== PAGE STRUCTURE ===== */
+        .page {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ===== SCANNER PAGE ===== */
+        .scanner-page {
+            background: var(--color-background);
+        }
+
+        .scanner-header {
+            flex-shrink: 0;
+            padding: var(--space-lg) var(--space-lg) 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .scanner-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 8vw, 32px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-sm);
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .scanner-header p {
+            font-size: 15px;
+            color: var(--color-text-secondary);
+            animation: fadeInDown 0.6s ease-out 0.1s both;
+        }
+
+        .scanner-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-background-secondary);
+        }
+
+        video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        video.active {
+            opacity: 1;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        /* Animated Scan Frame */
+        .scan-frame {
+            position: relative;
+            width: min(320px, 80vw);
+            aspect-ratio: 1;
+            z-index: 5;
+        }
+
+        .frame-border {
+            position: absolute;
+            inset: 0;
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            animation: scanPulse 2s ease-in-out infinite;
+        }
+
+        .frame-corner {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-primary-light);
+            pointer-events: none;
+        }
+
+        .frame-corner.top-left {
+            top: -6px;
+            left: -6px;
+            border-right: none;
+            border-bottom: none;
+            border-radius: var(--radius-lg) 0 0 0;
+        }
+
+        .frame-corner.top-right {
+            top: -6px;
+            right: -6px;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 var(--radius-lg) 0 0;
+        }
+
+        .frame-corner.bottom-left {
+            bottom: -6px;
+            left: -6px;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 0 var(--radius-lg);
+        }
+
+        .frame-corner.bottom-right {
+            bottom: -6px;
+            right: -6px;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 var(--radius-lg) 0;
+        }
+
+        .frame-scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+            animation: scanLine 2s ease-in-out infinite;
+        }
+
+        @keyframes scanPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+        }
+
+        @keyframes scanLine {
+            0%, 100% { top: 0%; }
+            50% { top: 100%; }
+        }
+
+        .scanner-footer {
+            flex-shrink: 0;
+            padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+            text-align: center;
+        }
+
+        .scanner-instruction {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .scanner-actions {
+            display: flex;
+            gap: var(--space-md);
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        /* ===== CONFIRMATION PAGE ===== */
+        .confirmation-page {
+            background: var(--color-background);
+            padding: var(--space-2xl) var(--space-lg);
+            justify-content: space-between;
+        }
+
+        .confirmation-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            animation: checkmarkBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes checkmarkBounce {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .confirmation-title {
+            font-family: var(--font-display);
+            font-size: clamp(20px, 6vw, 28px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-md);
+            animation: fadeInDown 0.6s ease-out 0.1s both;
+        }
+
+        .confirmation-subtitle {
+            font-size: 15px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2xl);
+            animation: fadeInDown 0.6s ease-out 0.2s both;
+        }
+
+        .voucher-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            animation: slideUpFade 0.6s ease-out 0.3s both;
+            box-shadow: var(--shadow-md);
+        }
+
+        .voucher-business {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-md);
+        }
+
+        .voucher-offer {
+            font-family: var(--font-display);
+            font-size: clamp(20px, 5vw, 26px);
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.2;
+        }
+
+        .voucher-code {
+            background: var(--color-background-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            color: var(--color-text-secondary);
+            word-break: break-all;
+            user-select: all;
+        }
+
+        .error-state {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: var(--radius-xl);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            color: var(--color-error);
+            font-size: 14px;
+            animation: slideUpFade 0.6s ease-out 0.3s both;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            animation: slideUpFade 0.6s ease-out 0.4s both;
+        }
+
+        /* ===== BUTTONS ===== */
+        button {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width var(--transition-fast), height var(--transition-fast);
+        }
+
+        .btn-primary:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:active {
+            background: var(--color-background-secondary);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-height: 600px) {
+            .scanner-header {
+                padding: var(--space-md) var(--space-lg) 0;
+            }
+
+            .scanner-header h1 {
+                font-size: 20px;
+                margin-bottom: var(--space-xs);
+            }
+
+            .scanner-header p {
+                font-size: 13px;
+            }
+
+            .scan-frame {
+                width: min(260px, 70vw);
+            }
+
+            .scanner-footer {
+                padding: var(--space-lg) var(--space-lg) var(--space-md);
+            }
+
+            .scanner-instruction {
+                font-size: 13px;
+                margin-bottom: var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scanner-header {
+                padding: var(--space-lg) var(--space-md) 0;
+            }
+
+            .scanner-footer {
+                padding: var(--space-xl) var(--space-md) var(--space-md);
+            }
+
+            .confirmation-page {
+                padding: var(--space-xl) var(--space-md);
+            }
+
+            button {
+                padding: var(--space-md) var(--space-lg);
+                font-size: 14px;
+            }
+
+            .voucher-card {
+                padding: var(--space-lg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SCANNER PAGE -->
+        <div class="page scanner-page active" id="scannerPage">
+            <div class="scanner-header">
+                <h1>QR Code scannen</h1>
+                <p>Halte deinen Pass in den Rahmen</p>
+            </div>
+
+            <div class="scanner-viewport">
+                <video id="video" autoplay playsinline webkit-playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div class="scan-frame">
+                    <div class="frame-border">
+                        <div class="frame-scan-line"></div>
+                    </div>
+                    <div class="frame-corner top-left"></div>
+                    <div class="frame-corner top-right"></div>
+                    <div class="frame-corner bottom-left"></div>
+                    <div class="frame-corner bottom-right"></div>
+                </div>
+            </div>
+
+            <div class="scanner-footer">
+                <p class="scanner-instruction">Platziere den QR-Code in der Mitte</p>
+                <div class="scanner-actions">
+                    <button class="btn-primary" id="startBtn">Kamera starten</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFIRMATION PAGE -->
+        <div class="page confirmation-page" id="confirmationPage">
+            <div class="confirmation-content">
+                <div class="confirmation-icon" id="confirmIcon">⏳</div>
+                <h2 class="confirmation-title" id="confirmTitle">Wird verarbeitet...</h2>
+                <p class="confirmation-subtitle" id="confirmSubtitle">Bitte warten</p>
+
+                <div id="voucherCard" class="voucher-card hidden">
+                    <div class="voucher-business" id="voucherBusiness"></div>
+                    <div class="voucher-offer" id="voucherOffer"></div>
+                    <div class="voucher-code" id="voucherCode"></div>
+                </div>
+
+                <div id="errorContainer" class="error-state hidden"></div>
+            </div>
+
+            <div class="confirmation-actions">
+                <button class="btn-primary" id="downloadBtn" style="display: none;">Zu Wallet hinzufügen</button>
+                <button class="btn-secondary" id="backBtn">Neuer QR-Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>

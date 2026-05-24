@@ -1,0 +1,19 @@
+{
+  "name": "qr-voucher-customer-app",
+  "version": "1.0.0",
+  "description": "Premium QR Voucher Scanner App for Lila Wiesbaden",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "qr-code",
+    "scanner",
+    "voucher",
+    "wallet",
+    "apple-pass"
+  ],
+  "author": "FlowState Agency",
+  "license": "MIT"
+}
