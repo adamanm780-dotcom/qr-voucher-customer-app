@@ -50,10 +50,16 @@ function logout() {
 
 // ===== PAGE ROUTING =====
 function showPage(pageId) {
-    document.querySelectorAll('[id$="Page"]').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
+    const loginPage = document.getElementById('loginPage');
+    const appPage = document.getElementById('appPage');
+
+    if (pageId === 'loginPage') {
+        if (loginPage) loginPage.classList.add('active');
+        if (appPage) appPage.classList.remove('active');
+    } else {
+        if (loginPage) loginPage.classList.remove('active');
+        if (appPage) appPage.classList.add('active');
+    }
 }
 
 function goToPage(pageName) {
@@ -357,17 +363,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Login form
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-        if (login(email, password)) {
-            document.getElementById('loginError').textContent = '';
-        } else {
-            document.getElementById('loginError').textContent = 'Invalid credentials';
-        }
-    });
+            console.log('Login attempt:', email, password);
+
+            if (email && password) {
+                store.user = {
+                    email,
+                    name: 'Demo Business',
+                    id: 'user_' + Date.now()
+                };
+                store.save();
+                console.log('Login successful');
+                showPage('appPage');
+                goToPage('dashboard');
+                updateUI();
+            } else {
+                document.getElementById('loginError').textContent = 'Please enter email and password';
+            }
+        });
+    }
 
     // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
