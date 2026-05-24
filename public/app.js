@@ -1,317 +1,450 @@
 // ===== STATE MANAGEMENT =====
-let scanning = false;
-let cameraStream = null;
-let isProcessing = false;
+const store = {
+    user: null,
+    vouchers: [],
+    currentVoucher: null,
+    currentPage: 'dashboard',
 
-// ===== DOM ELEMENTS =====
-const scannerPage = document.getElementById('scannerPage');
-const confirmationPage = document.getElementById('confirmationPage');
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const startBtn = document.getElementById('startBtn');
-const backBtn = document.getElementById('backBtn');
-const downloadBtn = document.getElementById('downloadBtn');
+    // Initialize from localStorage
+    init() {
+        const saved = localStorage.getItem('voucher_store');
+        if (saved) {
+            const data = JSON.parse(saved);
+            this.vouchers = data.vouchers || [];
+            this.user = data.user;
+        }
+    },
 
-const confirmIcon = document.getElementById('confirmIcon');
-const confirmTitle = document.getElementById('confirmTitle');
-const confirmSubtitle = document.getElementById('confirmSubtitle');
-const voucherCard = document.getElementById('voucherCard');
-const voucherBusiness = document.getElementById('voucherBusiness');
-const voucherOffer = document.getElementById('voucherOffer');
-const voucherCode = document.getElementById('voucherCode');
-const errorContainer = document.getElementById('errorContainer');
+    save() {
+        localStorage.setItem('voucher_store', JSON.stringify({
+            user: this.user,
+            vouchers: this.vouchers
+        }));
+    }
+};
 
-// ===== INITIALIZATION =====
-startBtn.addEventListener('click', startCamera);
-backBtn.addEventListener('click', goBackToScanner);
-downloadBtn.addEventListener('click', downloadPass);
-
-// Check if URL has code parameter (deep link)
-const urlParams = new URLSearchParams(window.location.search);
-const codeFromUrl = urlParams.get('code');
-if (codeFromUrl) {
-    processVoucherCode(codeFromUrl);
+// ===== AUTH =====
+function login(email, password) {
+    // Simple demo auth
+    if (email && password) {
+        store.user = {
+            email,
+            name: 'Demo Business',
+            id: 'user_' + Date.now()
+        };
+        store.save();
+        showPage('appPage');
+        goToPage('dashboard');
+        updateUI();
+        return true;
+    }
+    return false;
 }
 
-// Request camera permission on page load for faster UX
-if (navigator.permissions && navigator.permissions.query) {
-    navigator.permissions.query({ name: 'camera' }).then(result => {
-        if (result.state === 'prompt') {
-            // Camera permission not yet granted, user will grant on button click
+function logout() {
+    store.user = null;
+    store.save();
+    showPage('loginPage');
+    clearForm('loginForm');
+}
+
+// ===== PAGE ROUTING =====
+function showPage(pageId) {
+    document.querySelectorAll('[id$="Page"]').forEach(page => {
+        page.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
+}
+
+function goToPage(pageName) {
+    store.currentPage = pageName;
+
+    // Hide all content pages
+    document.querySelectorAll('.content > .page').forEach(page => {
+        page.classList.remove('active');
+    });
+
+    // Show the selected page
+    const pageId = pageName + 'Page';
+    if (document.getElementById(pageId)) {
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    // Update nav highlighting
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === pageName) {
+            item.classList.add('active');
         }
     });
+
+    // Update page title
+    const titles = {
+        dashboard: 'Dashboard',
+        vouchers: 'All Vouchers',
+        analytics: 'Analytics',
+        settings: 'Settings'
+    };
+    document.getElementById('pageTitle').textContent = titles[pageName] || pageName;
+
+    updateUI();
 }
 
-// ===== CAMERA FUNCTIONS =====
-async function startCamera() {
-    try {
-        startBtn.disabled = true;
-        startBtn.textContent = '● Starte Kamera...';
+// ===== VOUCHER MANAGEMENT =====
+function createVoucher(data) {
+    const voucher = {
+        id: 'v_' + Date.now(),
+        code: data.code,
+        offer: data.offer,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        maxUses: parseInt(data.maxUses) || 0,
+        redeemedCount: 0,
+        status: 'active',
+        createdAt: new Date().toISOString()
+    };
 
-        const constraints = {
-            video: {
-                facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
-            },
-            audio: false
-        };
+    store.vouchers.push(voucher);
+    store.save();
+    closeModal('voucherModal');
+    updateUI();
+}
 
-        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+function updateVoucher(id, data) {
+    const voucher = store.vouchers.find(v => v.id === id);
+    if (voucher) {
+        voucher.code = data.code;
+        voucher.offer = data.offer;
+        voucher.validFrom = data.validFrom;
+        voucher.validUntil = data.validUntil;
+        voucher.maxUses = parseInt(data.maxUses) || 0;
+        store.save();
+        closeModal('voucherModal');
+        updateUI();
+    }
+}
 
-        video.srcObject = cameraStream;
-        video.onloadedmetadata = () => {
-            video.classList.add('active');
-            video.play().then(() => {
-                startScanning();
-                startBtn.style.display = 'none';
-            });
-        };
-    } catch (err) {
-        console.error('Camera error:', err);
-        let errorMsg = 'Kamerazugriff nicht möglich';
-        if (err.name === 'NotAllowedError') {
-            errorMsg = 'Kamerazugriff verweigert. Bitte Einstellungen überprüfen.';
-        } else if (err.name === 'NotFoundError') {
-            errorMsg = 'Keine Kamera gefunden.';
+function deleteVoucher(id) {
+    if (confirm('Are you sure you want to delete this voucher?')) {
+        store.vouchers = store.vouchers.filter(v => v.id !== id);
+        store.save();
+        updateUI();
+    }
+}
+
+function redeemVoucher(id) {
+    const voucher = store.vouchers.find(v => v.id === id);
+    if (voucher) {
+        if (voucher.maxUses === 0 || voucher.redeemedCount < voucher.maxUses) {
+            voucher.redeemedCount++;
+            store.save();
+            updateUI();
+        } else {
+            alert('This voucher has reached its maximum uses');
         }
-
-        showError(errorMsg);
-        startBtn.disabled = false;
-        startBtn.textContent = 'Kamera starten';
     }
 }
 
-function startScanning() {
-    if (scanning) return;
-    scanning = true;
+// ===== UI UPDATES =====
+function updateUI() {
+    if (!store.user) return;
 
-    const canvasContext = canvas.getContext('2d', { willReadFrequently: true });
+    // Update user info
+    document.getElementById('userName').textContent = store.user.name;
+    document.getElementById('userEmail').textContent = store.user.email;
 
-    function scan() {
-        if (!scanning) return;
+    // Update stats
+    updateStats();
 
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            canvasContext.drawImage(video, 0, 0);
-            const imageData = canvasContext.getImageData(
-                0, 0, canvas.width, canvas.height
-            );
-
-            try {
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-                if (code && !isProcessing) {
-                    const qrData = code.data;
-                    let voucherCode = extractCode(qrData);
-
-                    if (voucherCode) {
-                        isProcessing = true;
-                        stopCamera();
-                        processVoucherCode(voucherCode);
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.error('QR scan error:', err);
-            }
-        }
-
-        requestAnimationFrame(scan);
+    // Update voucher tables
+    if (store.currentPage === 'dashboard') {
+        renderRecentVouchers();
+    } else if (store.currentPage === 'vouchers') {
+        renderAllVouchers();
+    } else if (store.currentPage === 'analytics') {
+        renderAnalytics();
     }
 
-    scan();
+    // Update settings form
+    document.getElementById('businessName').value = store.user.name;
+    document.getElementById('businessEmail').value = store.user.email;
 }
 
-function extractCode(qrData) {
-    // Try different formats
-    if (qrData.includes('code=')) {
-        try {
-            const url = new URL(qrData, window.location.origin);
-            return url.searchParams.get('code');
-        } catch {}
-    }
+function updateStats() {
+    const total = store.vouchers.length;
+    const today = new Date().toISOString().split('T')[0];
+    const activeToday = store.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
+    const redeemed = store.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
+    const conversionRate = total > 0 ? Math.round((redeemed / (total * Math.max(1, store.vouchers[0]?.maxUses || 1))) * 100) : 0;
 
-    if (qrData.includes('?') || qrData.includes('&')) {
-        try {
-            const url = new URL(qrData, window.location.origin);
-            return url.searchParams.get('code');
-        } catch {}
-    }
-
-    // Direct code (alphanumeric)
-    if (/^[A-Z0-9]{6,}$/.test(qrData)) {
-        return qrData;
-    }
-
-    return null;
+    document.getElementById('totalVouchers').textContent = total;
+    document.getElementById('activeToday').textContent = activeToday;
+    document.getElementById('totalRedeemed').textContent = redeemed;
+    document.getElementById('conversionRate').textContent = conversionRate + '%';
 }
 
-function stopCamera() {
-    scanning = false;
-    if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        cameraStream = null;
-    }
-}
+function renderRecentVouchers() {
+    const tbody = document.getElementById('recentVouchersTable');
+    const recent = store.vouchers.slice(-5).reverse();
 
-// ===== VOUCHER PROCESSING =====
-async function processVoucherCode(code) {
-    transitionToConfirmation();
-    setLoadingState();
-
-    try {
-        // Call API to get pass data
-        const response = await fetch(`/api/pass?code=${encodeURIComponent(code)}`, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.error || 'Gutschein konnte nicht verarbeitet werden');
-        }
-
-        // Success
-        setSuccessState(data.voucher);
-        window.currentPassData = {
-            passUrl: data.passUrl,
-            code: code
-        };
-
-        // Auto-trigger download after brief delay for UX
-        downloadBtn.style.display = 'block';
-
-        // Haptic feedback (if available)
-        if (navigator.vibrate) {
-            navigator.vibrate(200);
-        }
-
-    } catch (err) {
-        console.error('Processing error:', err);
-        setErrorState(err.message);
-    }
-}
-
-async function downloadPass() {
-    if (!window.currentPassData) {
-        setErrorState('Pass-Datei nicht verfügbar');
+    if (recent.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No vouchers yet. Create your first one!</td></tr>';
         return;
     }
 
-    try {
-        downloadBtn.disabled = true;
-        downloadBtn.textContent = '⏳ Wird heruntergeladen...';
+    tbody.innerHTML = recent.map(v => `
+        <tr>
+            <td><span class="voucher-code">${v.code}</span></td>
+            <td>${v.offer}</td>
+            <td><span class="voucher-status status-${getStatus(v)}">${getStatus(v)}</span></td>
+            <td>${v.redeemedCount} / ${v.maxUses || '∞'}</td>
+            <td>${formatDate(v.validUntil)}</td>
+            <td>
+                <div class="actions-cell">
+                    <button class="btn-icon btn-sm" onclick="showQRCode('${v.id}')" title="View QR">📱</button>
+                    <button class="btn-icon btn-sm" onclick="openEditVoucher('${v.id}')" title="Edit">✏️</button>
+                    <button class="btn-icon btn-sm" onclick="deleteVoucher('${v.id}')" title="Delete">🗑️</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
 
-        const { passUrl, code } = window.currentPassData;
+function renderAllVouchers() {
+    const tbody = document.getElementById('allVouchersTable');
 
-        if (passUrl.startsWith('data:') || passUrl.startsWith('blob:')) {
-            downloadFromUrl(passUrl, `lila-${code}.pkpass`);
+    if (store.vouchers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vouchers yet. Create your first one!</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = store.vouchers.map(v => `
+        <tr>
+            <td><span class="voucher-code">${v.code}</span></td>
+            <td>${v.offer}</td>
+            <td><span class="voucher-status status-${getStatus(v)}">${getStatus(v)}</span></td>
+            <td>${v.redeemedCount}</td>
+            <td>${v.maxUses || '∞'}</td>
+            <td>${formatDate(v.validUntil)}</td>
+            <td>
+                <div class="actions-cell">
+                    <button class="btn-icon btn-sm" onclick="showQRCode('${v.id}')" title="View QR">📱</button>
+                    <button class="btn-icon btn-sm" onclick="openEditVoucher('${v.id}')" title="Edit">✏️</button>
+                    <button class="btn-icon btn-sm" onclick="deleteVoucher('${v.id}')" title="Delete">🗑️</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderAnalytics() {
+    if (store.vouchers.length === 0) return;
+
+    // Top vouchers
+    const topVouchers = store.vouchers
+        .sort((a, b) => b.redeemedCount - a.redeemedCount)
+        .slice(0, 5);
+
+    const topHtml = topVouchers.map(v => `
+        <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between;">
+            <span>${v.code}: ${v.offer}</span>
+            <span style="color: var(--color-primary);">${v.redeemedCount} redeemed</span>
+        </div>
+    `).join('');
+    document.getElementById('topVouchersAnalytics').innerHTML = topHtml || '<div class="empty-state">No data yet</div>';
+
+    // Performance metrics
+    const totalRedeemed = store.vouchers.reduce((s, v) => s + v.redeemedCount, 0);
+    const avgRedeemed = store.vouchers.length > 0 ? (totalRedeemed / store.vouchers.length).toFixed(1) : 0;
+
+    const metricsHtml = `
+        <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
+                <span>Total Redeemed</span>
+                <span style="color: var(--color-success); font-weight: 600;">${totalRedeemed}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Avg per Voucher</span>
+                <span style="color: var(--color-primary); font-weight: 600;">${avgRedeemed}</span>
+            </div>
+        </div>
+    `;
+    document.getElementById('performanceMetrics').innerHTML = metricsHtml;
+}
+
+// ===== UTILITY FUNCTIONS =====
+function getStatus(voucher) {
+    const today = new Date().toISOString().split('T')[0];
+    if (voucher.validUntil < today) return 'expired';
+    if (voucher.validFrom > today) return 'inactive';
+    return 'active';
+}
+
+function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('de-DE');
+}
+
+function clearForm(formId) {
+    document.getElementById(formId).reset();
+}
+
+function openCreateVoucher() {
+    store.currentVoucher = null;
+    document.getElementById('modalTitle').textContent = 'Create Voucher';
+    clearVoucherForm();
+    openModal('voucherModal');
+}
+
+function openEditVoucher(id) {
+    const voucher = store.vouchers.find(v => v.id === id);
+    if (!voucher) return;
+
+    store.currentVoucher = voucher;
+    document.getElementById('modalTitle').textContent = 'Edit Voucher';
+    document.getElementById('voucherCode').value = voucher.code;
+    document.getElementById('voucherOffer').value = voucher.offer;
+    document.getElementById('voucherFrom').value = voucher.validFrom;
+    document.getElementById('voucherUntil').value = voucher.validUntil;
+    document.getElementById('voucherMaxUses').value = voucher.maxUses;
+    openModal('voucherModal');
+}
+
+function clearVoucherForm() {
+    document.getElementById('voucherCode').value = '';
+    document.getElementById('voucherOffer').value = '';
+    document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
+    document.getElementById('voucherUntil').value = '';
+    document.getElementById('voucherMaxUses').value = '0';
+}
+
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+function showQRCode(voucherId) {
+    const voucher = store.vouchers.find(v => v.id === voucherId);
+    if (!voucher) return;
+
+    store.currentVoucher = voucher;
+    const qrValue = `${window.location.origin}/?code=${voucher.code}`;
+    document.getElementById('qrCodeValue').textContent = qrValue;
+
+    // Generate QR Code
+    const qrContainer = document.getElementById('qrCodePlaceholder');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+        text: qrValue,
+        width: 250,
+        height: 250,
+        colorDark: '#000',
+        colorLight: '#fff'
+    });
+
+    openModal('qrModal');
+}
+
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', () => {
+    store.init();
+
+    if (store.user) {
+        showPage('appPage');
+        updateUI();
+    }
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (login(email, password)) {
+            document.getElementById('loginError').textContent = '';
         } else {
-            const response = await fetch(passUrl);
-            if (!response.ok) throw new Error('Download failed');
+            document.getElementById('loginError').textContent = 'Invalid credentials';
+        }
+    });
 
-            const blob = await response.blob();
-            downloadBlob(blob, `lila-${code}.pkpass`);
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            goToPage(item.dataset.page);
+        });
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Voucher modals
+    document.getElementById('createVoucherBtn').addEventListener('click', openCreateVoucher);
+    document.getElementById('createVoucherBtn2').addEventListener('click', openCreateVoucher);
+    document.getElementById('modalCloseBtn').addEventListener('click', () => closeModal('voucherModal'));
+    document.getElementById('modalCancelBtn').addEventListener('click', () => closeModal('voucherModal'));
+    document.getElementById('qrModalCloseBtn').addEventListener('click', () => closeModal('qrModal'));
+
+    // Save voucher
+    document.getElementById('modalSaveBtn').addEventListener('click', () => {
+        const data = {
+            code: document.getElementById('voucherCode').value,
+            offer: document.getElementById('voucherOffer').value,
+            validFrom: document.getElementById('voucherFrom').value,
+            validUntil: document.getElementById('voucherUntil').value,
+            maxUses: document.getElementById('voucherMaxUses').value
+        };
+
+        if (!data.code || !data.offer || !data.validFrom || !data.validUntil) {
+            alert('Please fill all fields');
+            return;
         }
 
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = 'Zu Wallet hinzufügen';
+        if (store.currentVoucher) {
+            updateVoucher(store.currentVoucher.id, data);
+        } else {
+            createVoucher(data);
+        }
+    });
 
-    } catch (err) {
-        console.error('Download error:', err);
-        setErrorState('Fehler beim Download');
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = 'Zu Wallet hinzufügen';
-    }
-}
+    // QR Code actions
+    document.getElementById('downloadQrBtn').addEventListener('click', () => {
+        const canvas = document.querySelector('#qrCodePlaceholder canvas');
+        if (canvas) {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL();
+            link.download = `${store.currentVoucher.code}-qr.png`;
+            link.click();
+        }
+    });
 
-function downloadFromUrl(url, filename) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
+    document.getElementById('printQrBtn').addEventListener('click', () => {
+        const canvas = document.querySelector('#qrCodePlaceholder canvas');
+        if (canvas) {
+            const printWindow = window.open();
+            printWindow.document.write(`
+                <html>
+                <head><title>Print QR Code</title></head>
+                <body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+                    <div style="text-align: center;">
+                        <h1>${store.currentVoucher.code}</h1>
+                        <p>${store.currentVoucher.offer}</p>
+                        <img src="${canvas.toDataURL()}" style="width: 300px; height: 300px;">
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    });
 
-function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    downloadFromUrl(url, filename);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-}
-
-// ===== UI STATE TRANSITIONS =====
-function transitionToConfirmation() {
-    scannerPage.classList.remove('active');
-    confirmationPage.classList.add('active');
-}
-
-function goBackToScanner() {
-    confirmationPage.classList.remove('active');
-    scannerPage.classList.add('active');
-
-    // Reset confirmation page
-    voucherCard.classList.add('hidden');
-    errorContainer.classList.add('hidden');
-    downloadBtn.style.display = 'none';
-    downloadBtn.disabled = false;
-    downloadBtn.textContent = 'Zu Wallet hinzufügen';
-
-    // Reset scanner
-    startBtn.style.display = 'block';
-    startBtn.disabled = false;
-    startBtn.textContent = 'Kamera starten';
-    isProcessing = false;
-    window.currentPassData = null;
-
-    startCamera();
-}
-
-function setLoadingState() {
-    confirmIcon.textContent = '⏳';
-    confirmTitle.textContent = 'Wird verarbeitet...';
-    confirmSubtitle.textContent = 'Bitte warten';
-    voucherCard.classList.add('hidden');
-    errorContainer.classList.add('hidden');
-}
-
-function setSuccessState(voucher) {
-    confirmIcon.innerHTML = '✓';
-    confirmIcon.style.color = 'var(--color-success)';
-    confirmTitle.textContent = 'Fertig!';
-    confirmSubtitle.textContent = 'Dein Pass ist bereit';
-
-    voucherBusiness.textContent = voucher.businessName || 'Business';
-    voucherOffer.textContent = voucher.offer || 'Gutschein';
-    voucherCode.textContent = voucher.code || '';
-
-    voucherCard.classList.remove('hidden');
-    errorContainer.classList.add('hidden');
-}
-
-function setErrorState(message) {
-    confirmIcon.textContent = '✕';
-    confirmIcon.style.color = 'var(--color-error)';
-    confirmTitle.textContent = 'Fehler';
-    confirmSubtitle.textContent = 'Gutschein konnte nicht geladen werden';
-
-    voucherCard.classList.add('hidden');
-    errorContainer.textContent = message;
-    errorContainer.classList.remove('hidden');
-}
-
-function showError(message) {
-    alert(message);
-    scannerPage.classList.add('active');
-    confirmationPage.classList.remove('active');
-    isProcessing = false;
-}
+    // Settings
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        store.user.name = document.getElementById('businessName').value;
+        store.user.email = document.getElementById('businessEmail').value;
+        store.save();
+        alert('Settings saved!');
+    });
+});

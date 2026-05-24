@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0a">
     <meta name="color-scheme" content="dark">
-    <title>Lila Wiesbaden — Pass</title>
+    <title>Voucher Dashboard — Business</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@700&family=Sohne:wght@400;600&display=swap" rel="stylesheet">
@@ -20,15 +20,18 @@
             /* Color System — Dark Luxury */
             --color-primary: #3b82f6;
             --color-primary-light: #60a5fa;
+            --color-primary-dark: #1e40af;
             --color-accent: #0ea5e9;
             --color-background: #0a0a0a;
             --color-background-secondary: #121212;
             --color-surface: #161616;
+            --color-surface-secondary: #1f1f1f;
             --color-text: #f5f5f5;
             --color-text-secondary: #a0a0a0;
             --color-text-tertiary: #707070;
             --color-border: #262626;
             --color-success: #34d399;
+            --color-warning: #fbbf24;
             --color-error: #f87171;
 
             /* Spacing */
@@ -51,10 +54,10 @@
             --radius-xl: 24px;
 
             /* Shadows */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
-            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.16);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
 
             /* Transitions */
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -75,339 +78,280 @@
             overflow: hidden;
         }
 
-        .app-container {
-            position: fixed;
-            inset: 0;
+        /* ===== LAYOUT ===== */
+        .app {
             display: flex;
-            flex-direction: column;
             height: 100dvh;
+            flex-direction: row;
         }
 
-        /* ===== PAGE STRUCTURE ===== */
-        .page {
-            position: absolute;
-            inset: 0;
+        .sidebar {
+            width: 280px;
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
             display: flex;
             flex-direction: column;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-base);
+            padding: var(--space-lg);
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--space-2xl);
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-logo span {
+            color: var(--color-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--color-text-secondary);
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            color: var(--color-text);
+            background: var(--color-background-secondary);
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--color-primary);
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--color-border);
+            padding-top: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .user-card {
+            padding: var(--space-md);
+            background: var(--color-background-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+        }
+
+        .user-card-name {
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+
+        .user-card-email {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+        }
+
+        .logout-btn {
+            padding: var(--space-md);
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            color: var(--color-error);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(248, 113, 113, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-xl);
+        }
+
+        /* ===== PAGES ===== */
+        .page {
+            display: none;
+            animation: fadeIn var(--transition-base);
         }
 
         .page.active {
-            opacity: 1;
-            pointer-events: auto;
+            display: block;
         }
 
-        /* ===== SCANNER PAGE ===== */
-        .scanner-page {
-            background: var(--color-background);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .scanner-header {
-            flex-shrink: 0;
-            padding: var(--space-lg) var(--space-lg) 0;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .scanner-header h1 {
-            font-family: var(--font-display);
-            font-size: clamp(24px, 8vw, 32px);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            margin-bottom: var(--space-sm);
-            animation: fadeInDown 0.6s ease-out;
-        }
-
-        .scanner-header p {
-            font-size: 15px;
-            color: var(--color-text-secondary);
-            animation: fadeInDown 0.6s ease-out 0.1s both;
-        }
-
-        .scanner-viewport {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
+        /* ===== LOGIN PAGE ===== */
+        .login-container {
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-background-secondary);
+            background: var(--color-background);
+            padding: var(--space-lg);
         }
 
-        video {
-            position: absolute;
-            inset: 0;
+        .login-box {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity var(--transition-base);
-        }
-
-        video.active {
-            opacity: 1;
-        }
-
-        canvas {
-            display: none;
-        }
-
-        /* Animated Scan Frame */
-        .scan-frame {
-            position: relative;
-            width: min(320px, 80vw);
-            aspect-ratio: 1;
-            z-index: 5;
-        }
-
-        .frame-border {
-            position: absolute;
-            inset: 0;
-            border: 2px solid var(--color-primary);
-            border-radius: var(--radius-lg);
-            animation: scanPulse 2s ease-in-out infinite;
-        }
-
-        .frame-corner {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--color-primary-light);
-            pointer-events: none;
-        }
-
-        .frame-corner.top-left {
-            top: -6px;
-            left: -6px;
-            border-right: none;
-            border-bottom: none;
-            border-radius: var(--radius-lg) 0 0 0;
-        }
-
-        .frame-corner.top-right {
-            top: -6px;
-            right: -6px;
-            border-left: none;
-            border-bottom: none;
-            border-radius: 0 var(--radius-lg) 0 0;
-        }
-
-        .frame-corner.bottom-left {
-            bottom: -6px;
-            left: -6px;
-            border-right: none;
-            border-top: none;
-            border-radius: 0 0 0 var(--radius-lg);
-        }
-
-        .frame-corner.bottom-right {
-            bottom: -6px;
-            right: -6px;
-            border-left: none;
-            border-top: none;
-            border-radius: 0 0 var(--radius-lg) 0;
-        }
-
-        .frame-scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
-            animation: scanLine 2s ease-in-out infinite;
-        }
-
-        @keyframes scanPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.3); }
-            50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
-        }
-
-        @keyframes scanLine {
-            0%, 100% { top: 0%; }
-            50% { top: 100%; }
-        }
-
-        .scanner-footer {
-            flex-shrink: 0;
-            padding: var(--space-2xl) var(--space-lg) var(--space-lg);
-            text-align: center;
-        }
-
-        .scanner-instruction {
-            font-size: 14px;
-            color: var(--color-text-secondary);
-            margin-bottom: var(--space-lg);
-            animation: fadeInUp 0.6s ease-out 0.2s both;
-        }
-
-        .scanner-actions {
-            display: flex;
-            gap: var(--space-md);
-            animation: fadeInUp 0.6s ease-out 0.3s both;
-        }
-
-        /* ===== CONFIRMATION PAGE ===== */
-        .confirmation-page {
-            background: var(--color-background);
-            padding: var(--space-2xl) var(--space-lg);
-            justify-content: space-between;
-        }
-
-        .confirmation-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .confirmation-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: var(--space-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            animation: checkmarkBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes checkmarkBounce {
-            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-            70% { transform: scale(1.1); }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .confirmation-title {
-            font-family: var(--font-display);
-            font-size: clamp(20px, 6vw, 28px);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            margin-bottom: var(--space-md);
-            animation: fadeInDown 0.6s ease-out 0.1s both;
-        }
-
-        .confirmation-subtitle {
-            font-size: 15px;
-            color: var(--color-text-secondary);
-            margin-bottom: var(--space-2xl);
-            animation: fadeInDown 0.6s ease-out 0.2s both;
-        }
-
-        .voucher-card {
+            max-width: 420px;
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-xl);
-            animation: slideUpFade 0.6s ease-out 0.3s both;
-            box-shadow: var(--shadow-md);
+            padding: var(--space-2xl);
+            animation: slideUp var(--transition-slow);
         }
 
-        .voucher-business {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: var(--space-md);
+        @keyframes slideUp {
+            from { transform: translateY(24px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .voucher-offer {
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .login-header h1 {
             font-family: var(--font-display);
-            font-size: clamp(20px, 5vw, 26px);
+            font-size: 28px;
             font-weight: 700;
-            color: var(--color-primary);
-            margin-bottom: var(--space-lg);
-            line-height: 1.2;
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.02em;
         }
 
-        .voucher-code {
-            background: var(--color-background-secondary);
-            border-radius: var(--radius-md);
-            padding: var(--space-md);
-            font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            letter-spacing: 0.05em;
+        .login-header p {
             color: var(--color-text-secondary);
-            word-break: break-all;
-            user-select: all;
-        }
-
-        .error-state {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: var(--radius-xl);
-            padding: var(--space-lg);
-            margin-bottom: var(--space-lg);
-            color: var(--color-error);
             font-size: 14px;
-            animation: slideUpFade 0.6s ease-out 0.3s both;
         }
 
-        .confirmation-actions {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-md);
-            animation: slideUpFade 0.6s ease-out 0.4s both;
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-background-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-error {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: var(--space-sm);
         }
 
         /* ===== BUTTONS ===== */
         button {
-            padding: var(--space-md) var(--space-lg);
             border: none;
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: var(--radius-lg);
             cursor: pointer;
             transition: all var(--transition-fast);
+            font-weight: 600;
+            font-size: 14px;
+            font-family: var(--font-body);
             user-select: none;
             -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
             background: var(--color-primary);
             color: white;
             position: relative;
             overflow: hidden;
         }
 
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width var(--transition-fast), height var(--transition-fast);
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-light);
         }
 
-        .btn-primary:active::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn-primary:active {
+        .btn-primary:active:not(:disabled) {
             transform: scale(0.98);
         }
 
         .btn-secondary {
-            background: var(--color-surface);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-background-secondary);
             color: var(--color-text);
             border: 1px solid var(--color-border);
         }
 
-        .btn-secondary:active {
+        .btn-secondary:hover {
+            background: var(--color-surface);
+        }
+
+        .btn-sm {
+            padding: var(--space-sm) var(--space-md);
+            font-size: 12px;
+        }
+
+        .btn-icon {
+            padding: var(--space-md);
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-icon:hover {
             background: var(--color-background-secondary);
         }
 
@@ -416,166 +360,598 @@
             cursor: not-allowed;
         }
 
-        /* ===== LOADING SPINNER ===== */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--color-border);
-            border-top-color: var(--color-primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        /* ===== DASHBOARD ===== */
+        .dashboard-grid {
+            display: grid;
+            gap: var(--space-lg);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
         }
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-lg);
+            animation: slideUp var(--transition-slow);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-sm);
         }
 
-        @keyframes slideUpFade {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .vouchers-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* ===== VOUCHER TABLE ===== */
+        .voucher-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .voucher-table thead {
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .voucher-table th {
+            text-align: left;
+            padding: var(--space-lg);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-secondary);
+        }
+
+        .voucher-table td {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+
+        .voucher-table tbody tr:hover {
+            background: var(--color-background-secondary);
+        }
+
+        .voucher-code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .voucher-status {
+            display: inline-block;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--color-success);
+        }
+
+        .status-expired {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-error);
+        }
+
+        .status-inactive {
+            background: rgba(160, 160, 160, 0.1);
+            color: var(--color-text-secondary);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn var(--transition-base);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp var(--transition-base);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: var(--space-xl);
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .modal-close:hover {
+            color: var(--color-text);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            border-top: 1px solid var(--color-border);
+            padding-top: var(--space-xl);
+        }
+
+        .modal-footer button {
+            flex: 1;
+        }
+
+        /* ===== QR CODE DISPLAY ===== */
+        .qr-display {
+            background: var(--color-background-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            text-align: center;
+        }
+
+        .qr-code-placeholder {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border-radius: var(--radius-lg);
+            margin: 0 auto var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .qr-code-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* ===== ANALYTICS ===== */
+        .chart-placeholder {
+            background: var(--color-background-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-height: 600px) {
-            .scanner-header {
-                padding: var(--space-md) var(--space-lg) 0;
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
             }
 
-            .scanner-header h1 {
-                font-size: 20px;
-                margin-bottom: var(--space-xs);
-            }
-
-            .scanner-header p {
-                font-size: 13px;
-            }
-
-            .scan-frame {
-                width: min(260px, 70vw);
-            }
-
-            .scanner-footer {
-                padding: var(--space-lg) var(--space-lg) var(--space-md);
-            }
-
-            .scanner-instruction {
-                font-size: 13px;
-                margin-bottom: var(--space-md);
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        @media (max-width: 480px) {
-            .scanner-header {
-                padding: var(--space-lg) var(--space-md) 0;
+        @media (max-width: 768px) {
+            .app {
+                flex-direction: column;
             }
 
-            .scanner-footer {
-                padding: var(--space-xl) var(--space-md) var(--space-md);
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: var(--space-lg);
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+                flex-direction: row;
+                align-items: center;
+                overflow-x: auto;
             }
 
-            .confirmation-page {
-                padding: var(--space-xl) var(--space-md);
+            .nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: var(--space-md);
             }
 
-            button {
-                padding: var(--space-md) var(--space-lg);
-                font-size: 14px;
+            .sidebar-footer {
+                margin-left: auto;
+                border: none;
+                border-left: 1px solid var(--color-border);
+                padding-left: var(--space-lg);
+                padding-top: 0;
+                flex-direction: row;
+                gap: var(--space-lg);
             }
 
-            .voucher-card {
+            .header {
                 padding: var(--space-lg);
             }
+
+            .content {
+                padding: var(--space-lg);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .voucher-table {
+                font-size: 12px;
+            }
+
+            .voucher-table th,
+            .voucher-table td {
+                padding: var(--space-md);
+            }
+
+            .modal {
+                width: 95%;
+                padding: var(--space-xl);
+            }
         }
 
+        /* ===== UTILITY ===== */
         .hidden {
             display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt {
+            margin-top: var(--space-lg);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-2xl);
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- SCANNER PAGE -->
-        <div class="page scanner-page active" id="scannerPage">
-            <div class="scanner-header">
-                <h1>QR Code scannen</h1>
-                <p>Halte deinen Pass in den Rahmen</p>
-            </div>
-
-            <div class="scanner-viewport">
-                <video id="video" autoplay playsinline webkit-playsinline></video>
-                <canvas id="canvas"></canvas>
-                <div class="scan-frame">
-                    <div class="frame-border">
-                        <div class="frame-scan-line"></div>
+    <div class="app">
+        <!-- LOGIN PAGE -->
+        <div id="loginPage" class="page active">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <h1>Voucher System</h1>
+                        <p>Business Dashboard</p>
                     </div>
-                    <div class="frame-corner top-left"></div>
-                    <div class="frame-corner top-right"></div>
-                    <div class="frame-corner bottom-left"></div>
-                    <div class="frame-corner bottom-right"></div>
-                </div>
-            </div>
-
-            <div class="scanner-footer">
-                <p class="scanner-instruction">Platziere den QR-Code in der Mitte</p>
-                <div class="scanner-actions">
-                    <button class="btn-primary" id="startBtn">Kamera starten</button>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+                            <div class="form-error" id="emailError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                            <div class="form-error" id="passwordError"></div>
+                        </div>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+                    <div class="form-error text-center mt" id="loginError"></div>
+                    <p style="text-align: center; font-size: 12px; color: var(--color-text-tertiary); margin-top: var(--space-lg);">
+                        Demo: any@email.com / password
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- CONFIRMATION PAGE -->
-        <div class="page confirmation-page" id="confirmationPage">
-            <div class="confirmation-content">
-                <div class="confirmation-icon" id="confirmIcon">⏳</div>
-                <h2 class="confirmation-title" id="confirmTitle">Wird verarbeitet...</h2>
-                <p class="confirmation-subtitle" id="confirmSubtitle">Bitte warten</p>
-
-                <div id="voucherCard" class="voucher-card hidden">
-                    <div class="voucher-business" id="voucherBusiness"></div>
-                    <div class="voucher-offer" id="voucherOffer"></div>
-                    <div class="voucher-code" id="voucherCode"></div>
+        <!-- MAIN APP -->
+        <div id="appPage" class="page">
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <div class="sidebar-logo">Voucher<span>.</span></div>
+                <nav class="nav-menu">
+                    <div class="nav-item active" data-page="dashboard">📊 Dashboard</div>
+                    <div class="nav-item" data-page="vouchers">🎟️ Vouchers</div>
+                    <div class="nav-item" data-page="analytics">📈 Analytics</div>
+                    <div class="nav-item" data-page="settings">⚙️ Settings</div>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="user-card">
+                        <div class="user-card-name" id="userName">Business Name</div>
+                        <div class="user-card-email" id="userEmail">user@email.com</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
                 </div>
+            </aside>
 
-                <div id="errorContainer" class="error-state hidden"></div>
-            </div>
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <header class="header">
+                    <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                </header>
 
-            <div class="confirmation-actions">
-                <button class="btn-primary" id="downloadBtn" style="display: none;">Zu Wallet hinzufügen</button>
-                <button class="btn-secondary" id="backBtn">Neuer QR-Code</button>
+                <div class="content">
+                    <!-- DASHBOARD PAGE -->
+                    <div id="dashboardPage" class="page active">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Vouchers</div>
+                                <div class="stat-value" id="totalVouchers">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Active Today</div>
+                                <div class="stat-value" id="activeToday">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Redeemed</div>
+                                <div class="stat-value" id="totalRedeemed">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Conversion Rate</div>
+                                <div class="stat-value" id="conversionRate">0%</div>
+                            </div>
+                        </div>
+
+                        <div class="vouchers-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Recent Vouchers</h2>
+                                <button class="btn-primary" id="createVoucherBtn" style="width: auto;">+ New Voucher</button>
+                            </div>
+                            <div id="recentVouchersContainer">
+                                <table class="voucher-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Offer</th>
+                                            <th>Status</th>
+                                            <th>Redeemed</th>
+                                            <th>Expires</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentVouchersTable">
+                                        <tr>
+                                            <td colspan="6" class="empty-state">No vouchers yet. Create your first one!</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VOUCHERS PAGE -->
+                    <div id="vouchersPage" class="page">
+                        <div class="vouchers-section">
+                            <div class="section-header">
+                                <h2 class="section-title">All Vouchers</h2>
+                                <button class="btn-primary" id="createVoucherBtn2" style="width: auto;">+ New Voucher</button>
+                            </div>
+                            <div id="allVouchersContainer">
+                                <table class="voucher-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Offer</th>
+                                            <th>Status</th>
+                                            <th>Redeemed</th>
+                                            <th>Max Uses</th>
+                                            <th>Expires</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="allVouchersTable">
+                                        <tr>
+                                            <td colspan="7" class="empty-state">No vouchers yet. Create your first one!</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ANALYTICS PAGE -->
+                    <div id="analyticsPage" class="page">
+                        <div class="analytics-grid">
+                            <div class="vouchers-section" style="grid-column: 1 / -1;">
+                                <h2 class="section-title" style="margin-bottom: var(--space-xl);">Redemption Trend</h2>
+                                <div class="chart-placeholder">📊 Chart will display redemption trends</div>
+                            </div>
+                            <div class="vouchers-section">
+                                <h3 style="margin-bottom: var(--space-lg);">Top Vouchers</h3>
+                                <div id="topVouchersAnalytics">
+                                    <div class="empty-state">Create vouchers to see analytics</div>
+                                </div>
+                            </div>
+                            <div class="vouchers-section">
+                                <h3 style="margin-bottom: var(--space-lg);">Performance Metrics</h3>
+                                <div id="performanceMetrics">
+                                    <div class="empty-state">Create vouchers to see metrics</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SETTINGS PAGE -->
+                    <div id="settingsPage" class="page">
+                        <div class="vouchers-section" style="max-width: 500px;">
+                            <h2 class="section-title" style="margin-bottom: var(--space-xl);">Business Settings</h2>
+
+                            <div class="form-group">
+                                <label class="form-label">Business Name</label>
+                                <input type="text" class="form-input" id="businessName" placeholder="Your Business Name">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="businessEmail" placeholder="business@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-input" id="businessPhone" placeholder="+49 ...">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-input" id="businessWebsite" placeholder="https://...">
+                            </div>
+
+                            <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <!-- CREATE/EDIT VOUCHER MODAL -->
+    <div id="voucherModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Create Voucher</h2>
+                <button class="modal-close" id="modalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Code</label>
+                    <input type="text" class="form-input" id="voucherCode" placeholder="e.g., SUMMER20" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Offer Description</label>
+                    <input type="text" class="form-input" id="voucherOffer" placeholder="e.g., 20% Discount" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Valid From</label>
+                    <input type="date" class="form-input" id="voucherFrom" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Valid Until</label>
+                    <input type="date" class="form-input" id="voucherUntil" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Uses (0 = Unlimited)</label>
+                    <input type="number" class="form-input" id="voucherMaxUses" placeholder="0" min="0" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modalCancelBtn">Cancel</button>
+                <button class="btn-primary" id="modalSaveBtn">Save Voucher</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR CODE MODAL -->
+    <div id="qrModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">QR Code</h2>
+                <button class="modal-close" id="qrModalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="qr-display">
+                    <div class="qr-code-placeholder" id="qrCodePlaceholder">
+                        [QR Code]
+                    </div>
+                    <p id="qrCodeValue" style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: var(--space-lg);"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="printQrBtn">🖨️ Print</button>
+                <button class="btn-primary" id="downloadQrBtn">⬇️ Download</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
     <script src="./app.js"></script>
 </body>
 </html>
