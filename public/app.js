@@ -1,470 +1,405 @@
-// ===== STATE MANAGEMENT =====
-const store = {
+// Simple Business Dashboard App
+console.log('App.js loaded');
+
+const app = {
     user: null,
     vouchers: [],
-    currentVoucher: null,
     currentPage: 'dashboard',
+    currentVoucher: null,
 
-    // Initialize from localStorage
     init() {
-        const saved = localStorage.getItem('voucher_store');
-        if (saved) {
-            const data = JSON.parse(saved);
-            this.vouchers = data.vouchers || [];
-            this.user = data.user;
+        console.log('Initializing app');
+        this.loadFromStorage();
+        this.attachEventListeners();
+
+        if (this.user) {
+            this.showDashboard();
+        } else {
+            this.showLogin();
+        }
+    },
+
+    loadFromStorage() {
+        const data = localStorage.getItem('app_data');
+        if (data) {
+            const parsed = JSON.parse(data);
+            this.user = parsed.user;
+            this.vouchers = parsed.vouchers || [];
         }
     },
 
     save() {
-        localStorage.setItem('voucher_store', JSON.stringify({
+        localStorage.setItem('app_data', JSON.stringify({
             user: this.user,
             vouchers: this.vouchers
         }));
-    }
-};
+    },
 
-// ===== AUTH =====
-function login(email, password) {
-    // Simple demo auth
-    if (email && password) {
-        store.user = {
-            email,
-            name: 'Demo Business',
-            id: 'user_' + Date.now()
-        };
-        store.save();
-        showPage('appPage');
-        goToPage('dashboard');
-        updateUI();
-        return true;
-    }
-    return false;
-}
-
-function logout() {
-    store.user = null;
-    store.save();
-    showPage('loginPage');
-    clearForm('loginForm');
-}
-
-// ===== PAGE ROUTING =====
-function showPage(pageId) {
-    const loginPage = document.getElementById('loginPage');
-    const appPage = document.getElementById('appPage');
-
-    if (pageId === 'loginPage') {
-        if (loginPage) loginPage.classList.add('active');
-        if (appPage) appPage.classList.remove('active');
-    } else {
-        if (loginPage) loginPage.classList.remove('active');
-        if (appPage) appPage.classList.add('active');
-    }
-}
-
-function goToPage(pageName) {
-    store.currentPage = pageName;
-
-    // Hide all content pages
-    document.querySelectorAll('.content > .page').forEach(page => {
-        page.classList.remove('active');
-    });
-
-    // Show the selected page
-    const pageId = pageName + 'Page';
-    if (document.getElementById(pageId)) {
-        document.getElementById(pageId).classList.add('active');
-    }
-
-    // Update nav highlighting
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.page === pageName) {
-            item.classList.add('active');
+    attachEventListeners() {
+        // Login
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                this.handleLogin(email, password);
+            });
         }
-    });
 
-    // Update page title
-    const titles = {
-        dashboard: 'Dashboard',
-        vouchers: 'All Vouchers',
-        analytics: 'Analytics',
-        settings: 'Settings'
-    };
-    document.getElementById('pageTitle').textContent = titles[pageName] || pageName;
-
-    updateUI();
-}
-
-// ===== VOUCHER MANAGEMENT =====
-function createVoucher(data) {
-    const voucher = {
-        id: 'v_' + Date.now(),
-        code: data.code,
-        offer: data.offer,
-        validFrom: data.validFrom,
-        validUntil: data.validUntil,
-        maxUses: parseInt(data.maxUses) || 0,
-        redeemedCount: 0,
-        status: 'active',
-        createdAt: new Date().toISOString()
-    };
-
-    store.vouchers.push(voucher);
-    store.save();
-    closeModal('voucherModal');
-    updateUI();
-}
-
-function updateVoucher(id, data) {
-    const voucher = store.vouchers.find(v => v.id === id);
-    if (voucher) {
-        voucher.code = data.code;
-        voucher.offer = data.offer;
-        voucher.validFrom = data.validFrom;
-        voucher.validUntil = data.validUntil;
-        voucher.maxUses = parseInt(data.maxUses) || 0;
-        store.save();
-        closeModal('voucherModal');
-        updateUI();
-    }
-}
-
-function deleteVoucher(id) {
-    if (confirm('Are you sure you want to delete this voucher?')) {
-        store.vouchers = store.vouchers.filter(v => v.id !== id);
-        store.save();
-        updateUI();
-    }
-}
-
-function redeemVoucher(id) {
-    const voucher = store.vouchers.find(v => v.id === id);
-    if (voucher) {
-        if (voucher.maxUses === 0 || voucher.redeemedCount < voucher.maxUses) {
-            voucher.redeemedCount++;
-            store.save();
-            updateUI();
-        } else {
-            alert('This voucher has reached its maximum uses');
-        }
-    }
-}
-
-// ===== UI UPDATES =====
-function updateUI() {
-    if (!store.user) return;
-
-    // Update user info
-    document.getElementById('userName').textContent = store.user.name;
-    document.getElementById('userEmail').textContent = store.user.email;
-
-    // Update stats
-    updateStats();
-
-    // Update voucher tables
-    if (store.currentPage === 'dashboard') {
-        renderRecentVouchers();
-    } else if (store.currentPage === 'vouchers') {
-        renderAllVouchers();
-    } else if (store.currentPage === 'analytics') {
-        renderAnalytics();
-    }
-
-    // Update settings form
-    document.getElementById('businessName').value = store.user.name;
-    document.getElementById('businessEmail').value = store.user.email;
-}
-
-function updateStats() {
-    const total = store.vouchers.length;
-    const today = new Date().toISOString().split('T')[0];
-    const activeToday = store.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
-    const redeemed = store.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
-    const conversionRate = total > 0 ? Math.round((redeemed / (total * Math.max(1, store.vouchers[0]?.maxUses || 1))) * 100) : 0;
-
-    document.getElementById('totalVouchers').textContent = total;
-    document.getElementById('activeToday').textContent = activeToday;
-    document.getElementById('totalRedeemed').textContent = redeemed;
-    document.getElementById('conversionRate').textContent = conversionRate + '%';
-}
-
-function renderRecentVouchers() {
-    const tbody = document.getElementById('recentVouchersTable');
-    const recent = store.vouchers.slice(-5).reverse();
-
-    if (recent.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No vouchers yet. Create your first one!</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = recent.map(v => `
-        <tr>
-            <td><span class="voucher-code">${v.code}</span></td>
-            <td>${v.offer}</td>
-            <td><span class="voucher-status status-${getStatus(v)}">${getStatus(v)}</span></td>
-            <td>${v.redeemedCount} / ${v.maxUses || '∞'}</td>
-            <td>${formatDate(v.validUntil)}</td>
-            <td>
-                <div class="actions-cell">
-                    <button class="btn-icon btn-sm" onclick="showQRCode('${v.id}')" title="View QR">📱</button>
-                    <button class="btn-icon btn-sm" onclick="openEditVoucher('${v.id}')" title="Edit">✏️</button>
-                    <button class="btn-icon btn-sm" onclick="deleteVoucher('${v.id}')" title="Delete">🗑️</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderAllVouchers() {
-    const tbody = document.getElementById('allVouchersTable');
-
-    if (store.vouchers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vouchers yet. Create your first one!</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = store.vouchers.map(v => `
-        <tr>
-            <td><span class="voucher-code">${v.code}</span></td>
-            <td>${v.offer}</td>
-            <td><span class="voucher-status status-${getStatus(v)}">${getStatus(v)}</span></td>
-            <td>${v.redeemedCount}</td>
-            <td>${v.maxUses || '∞'}</td>
-            <td>${formatDate(v.validUntil)}</td>
-            <td>
-                <div class="actions-cell">
-                    <button class="btn-icon btn-sm" onclick="showQRCode('${v.id}')" title="View QR">📱</button>
-                    <button class="btn-icon btn-sm" onclick="openEditVoucher('${v.id}')" title="Edit">✏️</button>
-                    <button class="btn-icon btn-sm" onclick="deleteVoucher('${v.id}')" title="Delete">🗑️</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function renderAnalytics() {
-    if (store.vouchers.length === 0) return;
-
-    // Top vouchers
-    const topVouchers = store.vouchers
-        .sort((a, b) => b.redeemedCount - a.redeemedCount)
-        .slice(0, 5);
-
-    const topHtml = topVouchers.map(v => `
-        <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between;">
-            <span>${v.code}: ${v.offer}</span>
-            <span style="color: var(--color-primary);">${v.redeemedCount} redeemed</span>
-        </div>
-    `).join('');
-    document.getElementById('topVouchersAnalytics').innerHTML = topHtml || '<div class="empty-state">No data yet</div>';
-
-    // Performance metrics
-    const totalRedeemed = store.vouchers.reduce((s, v) => s + v.redeemedCount, 0);
-    const avgRedeemed = store.vouchers.length > 0 ? (totalRedeemed / store.vouchers.length).toFixed(1) : 0;
-
-    const metricsHtml = `
-        <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
-                <span>Total Redeemed</span>
-                <span style="color: var(--color-success); font-weight: 600;">${totalRedeemed}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Avg per Voucher</span>
-                <span style="color: var(--color-primary); font-weight: 600;">${avgRedeemed}</span>
-            </div>
-        </div>
-    `;
-    document.getElementById('performanceMetrics').innerHTML = metricsHtml;
-}
-
-// ===== UTILITY FUNCTIONS =====
-function getStatus(voucher) {
-    const today = new Date().toISOString().split('T')[0];
-    if (voucher.validUntil < today) return 'expired';
-    if (voucher.validFrom > today) return 'inactive';
-    return 'active';
-}
-
-function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('de-DE');
-}
-
-function clearForm(formId) {
-    document.getElementById(formId).reset();
-}
-
-function openCreateVoucher() {
-    store.currentVoucher = null;
-    document.getElementById('modalTitle').textContent = 'Create Voucher';
-    clearVoucherForm();
-    openModal('voucherModal');
-}
-
-function openEditVoucher(id) {
-    const voucher = store.vouchers.find(v => v.id === id);
-    if (!voucher) return;
-
-    store.currentVoucher = voucher;
-    document.getElementById('modalTitle').textContent = 'Edit Voucher';
-    document.getElementById('voucherCode').value = voucher.code;
-    document.getElementById('voucherOffer').value = voucher.offer;
-    document.getElementById('voucherFrom').value = voucher.validFrom;
-    document.getElementById('voucherUntil').value = voucher.validUntil;
-    document.getElementById('voucherMaxUses').value = voucher.maxUses;
-    openModal('voucherModal');
-}
-
-function clearVoucherForm() {
-    document.getElementById('voucherCode').value = '';
-    document.getElementById('voucherOffer').value = '';
-    document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
-    document.getElementById('voucherUntil').value = '';
-    document.getElementById('voucherMaxUses').value = '0';
-}
-
-function openModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-}
-
-function showQRCode(voucherId) {
-    const voucher = store.vouchers.find(v => v.id === voucherId);
-    if (!voucher) return;
-
-    store.currentVoucher = voucher;
-    const qrValue = `${window.location.origin}/?code=${voucher.code}`;
-    document.getElementById('qrCodeValue').textContent = qrValue;
-
-    // Generate QR Code
-    const qrContainer = document.getElementById('qrCodePlaceholder');
-    qrContainer.innerHTML = '';
-    new QRCode(qrContainer, {
-        text: qrValue,
-        width: 250,
-        height: 250,
-        colorDark: '#000',
-        colorLight: '#fff'
-    });
-
-    openModal('qrModal');
-}
-
-// ===== EVENT LISTENERS =====
-document.addEventListener('DOMContentLoaded', () => {
-    store.init();
-
-    if (store.user) {
-        showPage('appPage');
-        updateUI();
-    }
-
-    // Login form
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            console.log('Login attempt:', email, password);
-
-            if (email && password) {
-                store.user = {
-                    email,
-                    name: 'Demo Business',
-                    id: 'user_' + Date.now()
-                };
-                store.save();
-                console.log('Login successful');
-                showPage('appPage');
-                goToPage('dashboard');
-                updateUI();
-            } else {
-                document.getElementById('loginError').textContent = 'Please enter email and password';
-            }
+        // Nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                this.goToPage(page);
+            });
         });
-    }
 
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            goToPage(item.dataset.page);
-        });
-    });
+        // Logout
+        document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
 
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', logout);
+        // Voucher buttons
+        document.getElementById('createVoucherBtn')?.addEventListener('click', () => this.openCreateModal());
+        document.getElementById('createVoucherBtn2')?.addEventListener('click', () => this.openCreateModal());
+        document.getElementById('modalCloseBtn')?.addEventListener('click', () => this.closeModal('voucherModal'));
+        document.getElementById('modalCancelBtn')?.addEventListener('click', () => this.closeModal('voucherModal'));
+        document.getElementById('qrModalCloseBtn')?.addEventListener('click', () => this.closeModal('qrModal'));
 
-    // Voucher modals
-    document.getElementById('createVoucherBtn').addEventListener('click', openCreateVoucher);
-    document.getElementById('createVoucherBtn2').addEventListener('click', openCreateVoucher);
-    document.getElementById('modalCloseBtn').addEventListener('click', () => closeModal('voucherModal'));
-    document.getElementById('modalCancelBtn').addEventListener('click', () => closeModal('voucherModal'));
-    document.getElementById('qrModalCloseBtn').addEventListener('click', () => closeModal('qrModal'));
+        // Save voucher
+        document.getElementById('modalSaveBtn')?.addEventListener('click', () => this.saveVoucher());
 
-    // Save voucher
-    document.getElementById('modalSaveBtn').addEventListener('click', () => {
-        const data = {
-            code: document.getElementById('voucherCode').value,
-            offer: document.getElementById('voucherOffer').value,
-            validFrom: document.getElementById('voucherFrom').value,
-            validUntil: document.getElementById('voucherUntil').value,
-            maxUses: document.getElementById('voucherMaxUses').value
-        };
+        // QR actions
+        document.getElementById('downloadQrBtn')?.addEventListener('click', () => this.downloadQR());
+        document.getElementById('printQrBtn')?.addEventListener('click', () => this.printQR());
 
-        if (!data.code || !data.offer || !data.validFrom || !data.validUntil) {
-            alert('Please fill all fields');
+        // Settings
+        document.getElementById('saveSettingsBtn')?.addEventListener('click', () => this.saveSettings());
+    },
+
+    handleLogin(email, password) {
+        console.log('Login:', email, password);
+
+        if (!email || !password) {
+            document.getElementById('loginError').textContent = 'Email and password required';
             return;
         }
 
-        if (store.currentVoucher) {
-            updateVoucher(store.currentVoucher.id, data);
+        this.user = {
+            id: 'user_' + Date.now(),
+            name: 'Demo Business',
+            email: email
+        };
+
+        this.save();
+        console.log('User logged in:', this.user);
+
+        // Hide login, show app
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appPage').style.display = 'flex';
+
+        this.showDashboard();
+    },
+
+    logout() {
+        this.user = null;
+        this.vouchers = [];
+        this.save();
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('appPage').style.display = 'none';
+        document.getElementById('loginForm').reset();
+    },
+
+    showLogin() {
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('appPage').style.display = 'none';
+    },
+
+    showDashboard() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appPage').style.display = 'flex';
+        this.updateUserInfo();
+        this.goToPage('dashboard');
+    },
+
+    updateUserInfo() {
+        if (this.user) {
+            document.getElementById('userName').textContent = this.user.name;
+            document.getElementById('userEmail').textContent = this.user.email;
+        }
+    },
+
+    goToPage(page) {
+        console.log('Going to:', page);
+        this.currentPage = page;
+
+        // Hide all content pages
+        document.querySelectorAll('.content > .page').forEach(p => {
+            p.style.display = 'none';
+        });
+
+        // Show selected page
+        const pageEl = document.getElementById(page + 'Page');
+        if (pageEl) {
+            pageEl.style.display = 'block';
+        }
+
+        // Update nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            if (item.dataset.page === page) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        // Update title
+        const titles = {
+            dashboard: 'Dashboard',
+            vouchers: 'All Vouchers',
+            analytics: 'Analytics',
+            settings: 'Settings'
+        };
+        document.getElementById('pageTitle').textContent = titles[page] || page;
+
+        // Render content
+        if (page === 'dashboard') {
+            this.renderDashboard();
+        } else if (page === 'vouchers') {
+            this.renderVouchers();
+        } else if (page === 'analytics') {
+            this.renderAnalytics();
+        } else if (page === 'settings') {
+            this.renderSettings();
+        }
+    },
+
+    renderDashboard() {
+        const today = new Date().toISOString().split('T')[0];
+        const active = this.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
+        const redeemed = this.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
+
+        document.getElementById('totalVouchers').textContent = this.vouchers.length;
+        document.getElementById('activeToday').textContent = active;
+        document.getElementById('totalRedeemed').textContent = redeemed;
+        document.getElementById('conversionRate').textContent = this.vouchers.length > 0 ? Math.round(redeemed / this.vouchers.length * 100) + '%' : '0%';
+
+        this.renderRecentVouchers();
+    },
+
+    renderRecentVouchers() {
+        const tbody = document.getElementById('recentVouchersTable');
+        const recent = this.vouchers.slice(-5).reverse();
+
+        if (recent.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No vouchers yet</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = recent.map(v => `
+            <tr>
+                <td><span class="voucher-code">${v.code}</span></td>
+                <td>${v.offer}</td>
+                <td><span class="voucher-status status-${this.getStatus(v)}">${this.getStatus(v)}</span></td>
+                <td>${v.redeemedCount}/${v.maxUses || '∞'}</td>
+                <td>${new Date(v.validUntil).toLocaleDateString('de-DE')}</td>
+                <td><button onclick="app.showQR('${v.id}')" class="btn-icon btn-sm">📱</button></td>
+            </tr>
+        `).join('');
+    },
+
+    renderVouchers() {
+        const tbody = document.getElementById('allVouchersTable');
+
+        if (this.vouchers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vouchers yet</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = this.vouchers.map(v => `
+            <tr>
+                <td><span class="voucher-code">${v.code}</span></td>
+                <td>${v.offer}</td>
+                <td><span class="voucher-status status-${this.getStatus(v)}">${this.getStatus(v)}</span></td>
+                <td>${v.redeemedCount}</td>
+                <td>${v.maxUses || '∞'}</td>
+                <td>${new Date(v.validUntil).toLocaleDateString('de-DE')}</td>
+                <td>
+                    <button onclick="app.showQR('${v.id}')" class="btn-icon btn-sm">📱</button>
+                    <button onclick="app.editVoucher('${v.id}')" class="btn-icon btn-sm">✏️</button>
+                    <button onclick="app.deleteVoucher('${v.id}')" class="btn-icon btn-sm">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    },
+
+    renderAnalytics() {
+        if (this.vouchers.length === 0) {
+            document.getElementById('topVouchersAnalytics').innerHTML = '<div class="empty-state">No data yet</div>';
+            return;
+        }
+
+        const top = this.vouchers.sort((a, b) => b.redeemedCount - a.redeemedCount).slice(0, 5);
+        const total = this.vouchers.reduce((s, v) => s + v.redeemedCount, 0);
+
+        document.getElementById('topVouchersAnalytics').innerHTML = top.map(v => `
+            <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between;">
+                <span>${v.code}</span>
+                <span style="color: var(--color-primary);">${v.redeemedCount}</span>
+            </div>
+        `).join('');
+
+        document.getElementById('performanceMetrics').innerHTML = `
+            <div style="padding: var(--space-md);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
+                    <span>Total Redeemed</span>
+                    <span style="color: var(--color-success); font-weight: 600;">${total}</span>
+                </div>
+            </div>
+        `;
+    },
+
+    renderSettings() {
+        document.getElementById('businessName').value = this.user.name;
+        document.getElementById('businessEmail').value = this.user.email;
+    },
+
+    getStatus(v) {
+        const today = new Date().toISOString().split('T')[0];
+        if (v.validUntil < today) return 'expired';
+        if (v.validFrom > today) return 'inactive';
+        return 'active';
+    },
+
+    openCreateModal() {
+        this.currentVoucher = null;
+        document.getElementById('modalTitle').textContent = 'Create Voucher';
+        document.getElementById('voucherCode').value = '';
+        document.getElementById('voucherOffer').value = '';
+        document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
+        document.getElementById('voucherUntil').value = '';
+        document.getElementById('voucherMaxUses').value = '0';
+        this.openModal('voucherModal');
+    },
+
+    editVoucher(id) {
+        this.currentVoucher = this.vouchers.find(v => v.id === id);
+        if (!this.currentVoucher) return;
+
+        document.getElementById('modalTitle').textContent = 'Edit Voucher';
+        document.getElementById('voucherCode').value = this.currentVoucher.code;
+        document.getElementById('voucherOffer').value = this.currentVoucher.offer;
+        document.getElementById('voucherFrom').value = this.currentVoucher.validFrom;
+        document.getElementById('voucherUntil').value = this.currentVoucher.validUntil;
+        document.getElementById('voucherMaxUses').value = this.currentVoucher.maxUses;
+        this.openModal('voucherModal');
+    },
+
+    deleteVoucher(id) {
+        if (!confirm('Delete this voucher?')) return;
+        this.vouchers = this.vouchers.filter(v => v.id !== id);
+        this.save();
+        this.goToPage(this.currentPage);
+    },
+
+    saveVoucher() {
+        const code = document.getElementById('voucherCode').value;
+        const offer = document.getElementById('voucherOffer').value;
+        const from = document.getElementById('voucherFrom').value;
+        const until = document.getElementById('voucherUntil').value;
+        const max = parseInt(document.getElementById('voucherMaxUses').value) || 0;
+
+        if (!code || !offer || !from || !until) {
+            alert('Fill all fields');
+            return;
+        }
+
+        if (this.currentVoucher) {
+            this.currentVoucher.code = code;
+            this.currentVoucher.offer = offer;
+            this.currentVoucher.validFrom = from;
+            this.currentVoucher.validUntil = until;
+            this.currentVoucher.maxUses = max;
         } else {
-            createVoucher(data);
+            this.vouchers.push({
+                id: 'v_' + Date.now(),
+                code, offer, validFrom: from, validUntil: until,
+                maxUses: max,
+                redeemedCount: 0,
+                createdAt: new Date().toISOString()
+            });
         }
-    });
 
-    // QR Code actions
-    document.getElementById('downloadQrBtn').addEventListener('click', () => {
+        this.save();
+        this.closeModal('voucherModal');
+        this.goToPage(this.currentPage);
+    },
+
+    showQR(id) {
+        this.currentVoucher = this.vouchers.find(v => v.id === id);
+        if (!this.currentVoucher) return;
+
+        const qrValue = this.currentVoucher.code;
+        document.getElementById('qrCodeValue').textContent = qrValue;
+
+        const container = document.getElementById('qrCodePlaceholder');
+        container.innerHTML = '';
+
+        try {
+            new QRCode(container, {
+                text: qrValue,
+                width: 250,
+                height: 250,
+                colorDark: '#fff',
+                colorLight: '#000'
+            });
+        } catch (e) {
+            container.textContent = 'QR: ' + qrValue;
+        }
+
+        this.openModal('qrModal');
+    },
+
+    downloadQR() {
         const canvas = document.querySelector('#qrCodePlaceholder canvas');
         if (canvas) {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL();
-            link.download = `${store.currentVoucher.code}-qr.png`;
-            link.click();
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL();
+            a.download = this.currentVoucher.code + '.png';
+            a.click();
         }
-    });
+    },
 
-    document.getElementById('printQrBtn').addEventListener('click', () => {
+    printQR() {
+        const w = window.open();
+        w.document.write(`<h1>${this.currentVoucher.code}</h1><p>${this.currentVoucher.offer}</p>`);
         const canvas = document.querySelector('#qrCodePlaceholder canvas');
         if (canvas) {
-            const printWindow = window.open();
-            printWindow.document.write(`
-                <html>
-                <head><title>Print QR Code</title></head>
-                <body style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-                    <div style="text-align: center;">
-                        <h1>${store.currentVoucher.code}</h1>
-                        <p>${store.currentVoucher.offer}</p>
-                        <img src="${canvas.toDataURL()}" style="width: 300px; height: 300px;">
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL();
+            img.style.width = '300px';
+            w.document.body.appendChild(img);
         }
-    });
+        w.print();
+    },
 
-    // Settings
-    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-        store.user.name = document.getElementById('businessName').value;
-        store.user.email = document.getElementById('businessEmail').value;
-        store.save();
-        alert('Settings saved!');
-    });
+    saveSettings() {
+        this.user.name = document.getElementById('businessName').value;
+        this.user.email = document.getElementById('businessEmail').value;
+        this.save();
+        alert('Saved!');
+    },
+
+    openModal(id) {
+        document.getElementById(id).classList.add('active');
+    },
+
+    closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+};
+
+// Start app
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded');
+    app.init();
 });
