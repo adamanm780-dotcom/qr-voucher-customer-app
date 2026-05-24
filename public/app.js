@@ -1,6 +1,19 @@
 // Simple Business Dashboard App
 console.log('App.js loaded');
 
+// Global login handlers
+function handleLoginClick() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    console.log('Login clicked:', email, password);
+    app.handleLogin(email, password);
+}
+
+function handleLoginSubmit(e) {
+    e.preventDefault();
+    handleLoginClick();
+}
+
 const app = {
     user: null,
     vouchers: [],
