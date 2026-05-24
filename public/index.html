@@ -3,791 +3,867 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Voucher Dashboard</title>
+    <title>Voucher Pro — Business Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #1e40af;
-            --primary-light: #60a5fa;
-            --accent: #0ea5e9;
-            --bg-dark: #0f1117;
-            --bg-card: #1a1f2e;
-            --bg-hover: #252d3d;
-            --text-primary: #ffffff;
-            --text-secondary: #8b92aa;
-            --text-tertiary: #5d6477;
-            --border: #2d3544;
+            --bg: #ffffff;
+            --bg-secondary: #fafbfc;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #0a0a0a;
+            --text-secondary: #65676b;
+            --text-tertiary: #8a8d91;
+            --primary: #2563eb;
+            --accent: #1e40af;
+            --border: #e5e7eb;
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1117;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #252d3d;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-tertiary: #718096;
+            --border: #2d3544;
         }
 
         html, body {
             width: 100%;
             height: 100%;
             overflow: hidden;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
             color: var(--text-primary);
-            line-height: 1.5;
-            font-size: 16px;
+            transition: background 200ms ease, color 200ms ease;
         }
 
-        .app-container {
+        .container {
             width: 100%;
+            max-width: 390px;
             height: 100%;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
+            background: var(--bg);
+            position: relative;
         }
 
-        /* ===== LOGIN SCREEN ===== */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 300px;
+            background: linear-gradient(135deg, #f0f4ff 0%, #fff5f0 50%, #f0fff4 100%);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        [data-theme="dark"] .bg-pattern {
+            background: linear-gradient(135deg, #1a3a5c 0%, #3d1f2c 50%, #1a3d2a 100%);
+            opacity: 0.15;
+        }
+
+        @keyframes slideInFromBottom { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDelayed { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* LOGIN */
         .login-screen {
+            display: flex;
+            flex-direction: column;
             width: 100%;
             height: 100%;
+            justify-content: space-between;
+            padding: 48px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-screen.hidden { display: none; }
+
+        .login-header { animation: fadeInDelayed 0.6s ease; }
+        .login-header h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .login-header p { font-size: 14px; color: var(--text-tertiary); font-weight: 500; }
+
+        .login-content {
+            flex: 1;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2332 100%);
+            animation: slideInFromBottom 0.8s ease;
         }
 
-        .login-card {
-            width: 100%;
-            max-width: 360px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-        }
-
-        .login-header {
-            margin-bottom: 32px;
-            text-align: center;
-        }
-
-        .login-header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #60a5fa, #0ea5e9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .login-header p {
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-hover);
+            padding: 14px 16px;
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Sora', sans-serif;
             color: var(--text-primary);
-            font-family: inherit;
-            font-size: 14px;
-            transition: all 200ms;
+            transition: all 200ms ease;
         }
+        .form-group input:focus { outline: none; background: var(--bg); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08); }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: var(--bg-dark);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn {
+        .login-btn {
             width: 100%;
             padding: 14px;
+            background: var(--primary);
+            color: white;
             border: none;
             border-radius: 12px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 200ms;
-            user-select: none;
+            transition: all 200ms ease;
+            font-family: 'Sora', sans-serif;
         }
+        .login-btn:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-            margin-top: 8px;
-        }
+        /* APP */
+        .app-screen { display: none; flex-direction: column; width: 100%; height: 100%; position: relative; z-index: 1; }
+        .app-screen.active { display: flex; }
 
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .login-footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-tertiary);
-        }
-
-        /* ===== DASHBOARD ===== */
-        .dashboard {
-            width: 100%;
-            height: 100%;
+        .app-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            flex-direction: column;
-        }
-
-        /* STATUS BAR SIMULATION */
-        .status-bar {
-            height: 44px;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--border);
+            align-items: center;
+            background: var(--bg-secondary);
+        }
+
+        .app-header-left h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+        .app-header-left p { font-size: 11px; color: var(--text-tertiary); }
+
+        .app-header-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .theme-toggle, .logout-btn {
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
             font-size: 12px;
-            background: var(--bg-card);
+            font-family: 'Sora', sans-serif;
+            transition: all 150ms ease;
         }
 
-        .status-time {
-            font-weight: 600;
+        .theme-toggle:hover, .logout-btn:hover {
+            background: var(--bg);
+            border-color: var(--primary);
         }
 
-        /* HEADER */
-        .header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-card);
+        .search-bar {
+            padding: 0 20px;
+            margin: 12px 0;
         }
 
-        .header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 4px;
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Sora', sans-serif;
+            color: var(--text-primary);
+            transition: all 200ms ease;
         }
 
-        .header p {
-            color: var(--text-secondary);
-            font-size: 13px;
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
         }
 
-        /* CONTENT */
         .content {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            -webkit-overflow-scrolling: touch;
+            padding-bottom: 90px;
         }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
+        .page { display: none; animation: fadeInDelayed 0.3s ease; }
+        .page.active { display: block; }
 
-        .content::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        .page-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.3px; }
 
-        .content::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 2px;
-        }
-
-        /* PAGES */
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 300ms ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* STATS */
-        .stats-grid {
+        /* DASHBOARD */
+        .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, var(--bg-hover) 0%, var(--bg-card) 100%);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
+        .dashboard-card {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(16, 185, 129, 0.03) 100%);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            border-radius: 12px;
+            padding: 16px;
             position: relative;
             overflow: hidden;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-            opacity: 0.05;
-            pointer-events: none;
-        }
+        .dashboard-card-title { font-size: 11px; color: var(--text-tertiary); font-weight: 600; margin-bottom: 6px; }
+        .dashboard-card-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .dashboard-card-trend { font-size: 10px; color: var(--success); margin-top: 4px; }
 
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .stat-value {
-            font-family: 'Poppins', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* SECTION */
-        .section {
-            background: var(--bg-card);
+        .chart-container {
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            overflow: hidden;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            height: 200px;
+            position: relative;
         }
 
-        .section-header {
+        /* VOUCHER CARDS */
+        .voucher-grid { display: flex; flex-direction: column; gap: 12px; }
+
+        .voucher-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .btn-secondary {
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            font-size: 12px;
-            border-radius: 8px;
-        }
-
-        /* TABLE */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        .voucher-code {
-            font-family: 'Courier New', monospace;
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .badge-active {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .badge-expired {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-        }
-
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        /* BOTTOM NAV */
-        .bottom-nav {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            padding: 12px;
-            border-top: 1px solid var(--border);
-            background: var(--bg-card);
-        }
-
-        .nav-btn {
-            padding: 12px;
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-size: 12px;
+            transition: all 200ms ease;
             cursor: pointer;
-            transition: all 200ms;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voucher-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 200ms ease;
+        }
+
+        .voucher-card:hover {
+            border-color: var(--primary);
+            background: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .voucher-card:hover::before {
+            opacity: 1;
+        }
+
+        .voucher-info { flex: 1; }
+        .voucher-code { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+        .voucher-meta { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
+        .voucher-status { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: var(--success); color: white; }
+
+        .voucher-actions {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             gap: 6px;
         }
 
-        .nav-btn.active {
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 150ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
         }
 
-        .nav-btn:active {
-            transform: scale(0.95);
+        /* BUTTONS */
+        .btn {
+            padding: 14px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 200ms ease;
+            font-family: 'Sora', sans-serif;
         }
 
-        .nav-icon {
-            font-size: 20px;
-        }
+        .btn:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .btn-full { width: 100%; margin-bottom: 16px; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
 
         /* MODAL */
         .modal {
             display: none;
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(2px);
             justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(4px);
+            align-items: flex-end;
+            z-index: 1000;
         }
 
-        .modal.show {
-            display: flex;
-        }
+        .modal.active { display: flex; animation: slideInFromBottom 0.3s ease; }
 
         .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 28px;
+            background: var(--bg);
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
             width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            border-bottom: none;
         }
 
-        .modal-header {
+        .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons .btn { flex: 1; padding: 12px; }
+
+        .qr-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        /* NAVIGATION */
+        .nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
+            gap: 0;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
         }
 
-        .modal-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
+        .nav-btn {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 200ms ease;
+            font-family: 'Sora', sans-serif;
         }
 
-        .modal-footer {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
+        .nav-btn-icon { font-size: 24px; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn:hover { color: var(--text-primary); }
 
-        .modal-footer .btn {
-            flex: 1;
-            padding: 12px;
-        }
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-tertiary); }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+        .empty-text { font-size: 14px; line-height: 1.5; }
 
-        /* RESPONSIVE */
-        @media (max-width: 480px) {
-            .login-card {
-                max-width: 100%;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                max-width: 100%;
-            }
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
+        <div class="bg-pattern"></div>
+
         <!-- LOGIN -->
-        <div id="loginPage" class="login-screen">
-            <div class="login-card">
-                <div class="login-header">
-                    <h1>Voucher</h1>
-                    <p>Business Dashboard</p>
-                </div>
+        <div class="login-screen" id="loginScreen">
+            <div class="login-header">
+                <h1>Voucher Pro</h1>
+                <p>Enterprise Voucher Management</p>
+            </div>
+
+            <div class="login-content">
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" id="email" value="test@test.de" placeholder="your@email.com">
+                    <label>Email Address</label>
+                    <input type="email" id="email" value="test@test.de" placeholder="you@example.com">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="text" id="password" value="test" placeholder="••••••••">
+                    <input type="password" id="password" value="test" placeholder="••••••••">
                 </div>
-                <button class="btn btn-primary" onclick="login()">Login</button>
-                <div class="login-footer">Demo: any email/password works</div>
+                <button class="login-btn" onclick="handleLogin()">Sign In</button>
+            </div>
+
+            <div style="text-align: center; font-size: 12px; color: var(--text-tertiary);">
+                © 2024 Voucher Pro
             </div>
         </div>
 
-        <!-- DASHBOARD -->
-        <div id="dashboard" style="display: none; width: 100%; height: 100%; flex-direction: column;">
-            <div class="status-bar">
-                <span class="status-time" id="currentTime">9:41</span>
-                <span>iPhone</span>
+        <!-- APP -->
+        <div class="app-screen" id="appScreen">
+            <div class="app-header">
+                <div class="app-header-left">
+                    <h1>Dashboard</h1>
+                    <p id="userEmail">test@test.de</p>
+                </div>
+                <div class="app-header-right">
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                    <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+                </div>
             </div>
 
-            <div class="header">
-                <h1 id="pageTitle">Dashboard</h1>
-                <p id="pageSubtitle">Welcome back</p>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search vouchers..." onkeyup="searchVouchers()">
             </div>
 
             <div class="content">
                 <!-- DASHBOARD PAGE -->
-                <div id="dashboardPage" class="page active">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Vouchers</div>
-                            <div class="stat-value" id="totalVouchers">0</div>
+                <div class="page active" id="dashboardPage">
+                    <div class="page-title">Overview</div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-title">Total Vouchers</div>
+                            <div class="dashboard-card-value" id="totalVouchers">0</div>
+                            <div class="dashboard-card-trend">Active campaigns</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Redeemed</div>
-                            <div class="stat-value" id="totalRedeemed">0</div>
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-title">Total Redeemed</div>
+                            <div class="dashboard-card-value" id="totalRedeemed">0</div>
+                            <div class="dashboard-card-trend">This month</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-title">Redemption Rate</div>
+                            <div class="dashboard-card-value" id="redemptionRate">0%</div>
+                            <div class="dashboard-card-trend">Conversion rate</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-title">Active Today</div>
+                            <div class="dashboard-card-value" id="activeToday">0</div>
+                            <div class="dashboard-card-trend">Live vouchers</div>
                         </div>
                     </div>
 
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="section-title">Recent</div>
-                            <button class="btn-secondary" onclick="openCreateModal()">+</button>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Offer</th>
-                                    <th style="text-align: right;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentTable">
-                                <tr><td colspan="3" class="empty">No vouchers yet</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="chart-container">
+                        <canvas id="redemptionchart"></canvas>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Recent Activity</h3>
+                        <div class="voucher-grid" id="dashboardVouchers"></div>
                     </div>
                 </div>
 
                 <!-- VOUCHERS PAGE -->
-                <div id="vouchersPage" class="page">
-                    <div class="section">
-                        <div class="section-header">
-                            <div class="section-title">All Vouchers</div>
-                            <button class="btn-secondary" onclick="openCreateModal()">+</button>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Offer</th>
-                                    <th style="text-align: right;">Used</th>
-                                </tr>
-                            </thead>
-                            <tbody id="allTable">
-                                <tr><td colspan="3" class="empty">No vouchers yet</td></tr>
-                            </tbody>
-                        </table>
+                <div class="page" id="vouchersPage">
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <button class="btn btn-full" onclick="openCreateModal()" style="flex: 1; margin: 0;">✨ New Voucher</button>
                     </div>
+                    <div class="voucher-grid" id="vouchersList"></div>
                 </div>
 
                 <!-- ANALYTICS PAGE -->
-                <div id="analyticsPage" class="page">
-                    <div class="section">
-                        <div class="section-title" style="margin-bottom: 20px;">Analytics</div>
-                        <div id="analyticsContent" class="empty">Create vouchers to see data</div>
-                    </div>
+                <div class="page" id="analyticsPage">
+                    <div class="page-title">Performance</div>
+                    <div class="voucher-grid" id="analyticsContent"></div>
                 </div>
 
                 <!-- SETTINGS PAGE -->
-                <div id="settingsPage" class="page">
-                    <div class="section">
-                        <div class="section-title" style="margin-bottom: 24px;">Settings</div>
-                        <div class="form-group">
-                            <label>Business Name</label>
-                            <input type="text" id="businessName">
-                        </div>
-                        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
-                        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
-                            <button class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--error);" onclick="logout()">Logout</button>
-                        </div>
+                <div class="page" id="settingsPage">
+                    <div class="page-title">Settings</div>
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="businessName" placeholder="Your business" style="width: 100%; padding: 12px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-family: Sora, sans-serif; color: var(--text-primary);">
                     </div>
+                    <button class="btn btn-full" onclick="saveSettings()">Save</button>
                 </div>
             </div>
 
-            <!-- BOTTOM NAVIGATION -->
-            <div class="bottom-nav">
+            <!-- NAVIGATION -->
+            <div class="nav">
                 <button class="nav-btn active" onclick="switchPage('dashboard')">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-btn-icon">🏠</span>
                     <span>Home</span>
                 </button>
                 <button class="nav-btn" onclick="switchPage('vouchers')">
-                    <span class="nav-icon">🎟️</span>
+                    <span class="nav-btn-icon">🎁</span>
                     <span>Vouchers</span>
                 </button>
                 <button class="nav-btn" onclick="switchPage('analytics')">
-                    <span class="nav-icon">📈</span>
-                    <span>Stats</span>
+                    <span class="nav-btn-icon">📊</span>
+                    <span>Analytics</span>
                 </button>
                 <button class="nav-btn" onclick="switchPage('settings')">
-                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-btn-icon">⚡</span>
                     <span>Settings</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CREATE VOUCHER MODAL -->
-    <div id="modal" class="modal">
+    <!-- MODAL -->
+    <div class="modal" id="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">New Voucher</div>
-                <button class="modal-close" onclick="closeModal()">✕</button>
-            </div>
+            <div class="modal-title">✨ Create Voucher</div>
+
             <div class="form-group">
                 <label>Code</label>
-                <input type="text" id="voucherCode" placeholder="e.g., SUMMER20">
+                <input type="text" id="voucherCode" placeholder="SUMMER2024" class="search-input">
             </div>
+
             <div class="form-group">
-                <label>Offer</label>
-                <input type="text" id="voucherOffer" placeholder="e.g., 20% Discount">
+                <label>Offer Description</label>
+                <input type="text" id="voucherOffer" placeholder="20% Off Everything" class="search-input">
             </div>
+
+            <div class="form-group">
+                <label>Valid From</label>
+                <input type="date" id="voucherFrom" class="search-input">
+            </div>
+
             <div class="form-group">
                 <label>Valid Until</label>
-                <input type="date" id="voucherUntil">
+                <input type="date" id="voucherUntil" class="search-input">
             </div>
+
             <div class="form-group">
                 <label>Max Uses (0 = unlimited)</label>
-                <input type="number" id="voucherMax" value="0" min="0">
+                <input type="number" id="voucherMaxUses" placeholder="100" class="search-input">
             </div>
-            <div class="modal-footer">
-                <button class="btn" style="background: var(--bg-hover);" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveVoucher()">Create</button>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="saveVoucher()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR MODAL -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <div class="modal-title" id="qrModalTitle">Voucher QR Code</div>
+            <div class="qr-container" id="qrContainer"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('qrModal')">Close</button>
+                <button class="btn" onclick="downloadQR()">Download</button>
             </div>
         </div>
     </div>
 
     <script>
-        let user = null;
-        let vouchers = [];
-        let currentPage = 'dashboard';
+        const app = {
+            user: null,
+            vouchers: [],
+            theme: localStorage.getItem('theme') || 'light',
 
-        function login() {
+            init() {
+                this.loadData();
+                document.documentElement.setAttribute('data-theme', this.theme);
+
+                if (this.user) {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('appScreen').classList.add('active');
+                    this.renderDashboard();
+                    this.renderChart();
+                }
+            },
+
+            loadData() {
+                const data = localStorage.getItem('app_data');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    this.user = parsed.user;
+                    this.vouchers = parsed.vouchers || [];
+                }
+            },
+
+            save() {
+                localStorage.setItem('app_data', JSON.stringify({
+                    user: this.user,
+                    vouchers: this.vouchers
+                }));
+            },
+
+            renderDashboard() {
+                const total = this.vouchers.length;
+                const redeemed = this.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
+                const rate = total > 0 ? Math.round((redeemed / total) * 100) : 0;
+                const today = new Date().toISOString().split('T')[0];
+                const active = this.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
+
+                document.getElementById('totalVouchers').textContent = total;
+                document.getElementById('totalRedeemed').textContent = redeemed;
+                document.getElementById('redemptionRate').textContent = rate + '%';
+                document.getElementById('activeToday').textContent = active;
+                document.getElementById('userEmail').textContent = this.user.email;
+
+                const emojis = ['🎉', '🌟', '💝', '🎁', '✨', '🔥', '🚀', '💎'];
+                const html = this.vouchers.slice(-5).reverse().map((v, i) => `
+                    <div class="voucher-card">
+                        <div class="voucher-info">
+                            <div class="voucher-code">${v.code}</div>
+                            <div class="voucher-meta">${v.offer} • ${v.redeemedCount} redeemed</div>
+                            <span class="voucher-status">Active</span>
+                        </div>
+                        <div class="voucher-actions">
+                            <button class="action-btn" onclick="app.showQR('${v.id}')" title="QR Code">📱</button>
+                            <button class="action-btn" onclick="app.editVoucher('${v.id}')" title="Edit">✏️</button>
+                            <button class="action-btn" onclick="app.deleteVoucher('${v.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('dashboardVouchers').innerHTML = html || '<div class="empty-state"><span class="empty-icon">📭</span><div class="empty-text">No vouchers yet</div></div>';
+            },
+
+            renderChart() {
+                const ctx = document.getElementById('redemptionchart');
+                if (!ctx) return;
+
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const data = [12, 19, 8, 15, 22, 18, 10];
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: 'Redemptions',
+                            data: data,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            },
+
+            showQR(id) {
+                const voucher = this.vouchers.find(v => v.id === id);
+                if (!voucher) return;
+
+                document.getElementById('qrModalTitle').textContent = `${voucher.code} - QR Code`;
+                const container = document.getElementById('qrContainer');
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: voucher.code,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#2563eb',
+                    colorLight: '#ffffff'
+                });
+                document.getElementById('qrModal').classList.add('active');
+            },
+
+            editVoucher(id) {
+                const voucher = this.vouchers.find(v => v.id === id);
+                if (!voucher) return;
+                document.getElementById('voucherCode').value = voucher.code;
+                document.getElementById('voucherOffer').value = voucher.offer;
+                document.getElementById('voucherFrom').value = voucher.validFrom;
+                document.getElementById('voucherUntil').value = voucher.validUntil;
+                document.getElementById('voucherMaxUses').value = voucher.maxUses || 0;
+                document.getElementById('modal').classList.add('active');
+            },
+
+            deleteVoucher(id) {
+                if (confirm('Delete this voucher?')) {
+                    this.vouchers = this.vouchers.filter(v => v.id !== id);
+                    this.save();
+                    this.render();
+                }
+            },
+
+            render() {
+                this.renderDashboard();
+                const html = this.vouchers.map((v, i) => `
+                    <div class="voucher-card">
+                        <div class="voucher-info">
+                            <div class="voucher-code">${v.code}</div>
+                            <div class="voucher-meta">${v.offer}</div>
+                            <span class="voucher-status">Active</span>
+                        </div>
+                        <div class="voucher-actions">
+                            <button class="action-btn" onclick="app.showQR('${v.id}')">📱</button>
+                            <button class="action-btn" onclick="app.editVoucher('${v.id}')">✏️</button>
+                            <button class="action-btn" onclick="app.deleteVoucher('${v.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('vouchersList').innerHTML = html || '<div class="empty-state"><span class="empty-icon">📭</span><div class="empty-text">No vouchers yet</div></div>';
+
+                const analyticsHtml = this.vouchers.map(v => `
+                    <div class="voucher-card">
+                        <div class="voucher-info">
+                            <div class="voucher-code">${v.code}</div>
+                            <div class="voucher-meta">${v.redeemedCount}/${v.maxUses || '∞'} redeemed</div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('analyticsContent').innerHTML = analyticsHtml || '<div class="empty-state"><span class="empty-icon">📊</span><div class="empty-text">No data yet</div></div>';
+            }
+        };
+
+        function handleLogin() {
             const email = document.getElementById('email').value;
-            if (!email) { alert('Enter email'); return; }
-
-            user = { name: 'Demo Business', email };
-            localStorage.setItem('user', JSON.stringify(user));
-            localStorage.setItem('vouchers', JSON.stringify(vouchers));
-
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
-            document.getElementById('businessName').value = user.name;
-            render();
+            const password = document.getElementById('password').value;
+            if (email && password) {
+                app.user = { id: 'u_' + Date.now(), email };
+                app.save();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.add('active');
+                app.renderDashboard();
+                app.renderChart();
+            }
         }
 
-        function logout() {
-            user = null;
-            localStorage.clear();
-            location.reload();
+        function handleLogout() {
+            app.user = null;
+            app.vouchers = [];
+            app.save();
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.remove('active');
+        }
+
+        function toggleTheme() {
+            app.theme = app.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', app.theme);
+            localStorage.setItem('theme', app.theme);
         }
 
         function switchPage(page) {
-            currentPage = page;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page + 'Page').classList.add('active');
-
-            const titles = { dashboard: 'Dashboard', vouchers: 'Vouchers', analytics: 'Analytics', settings: 'Settings' };
-            document.getElementById('pageTitle').textContent = titles[page];
-
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             event.target.closest('.nav-btn').classList.add('active');
-
-            render();
         }
 
         function openCreateModal() {
-            document.getElementById('modal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('show');
             document.getElementById('voucherCode').value = '';
             document.getElementById('voucherOffer').value = '';
+            document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
             document.getElementById('voucherUntil').value = '';
-            document.getElementById('voucherMax').value = '0';
+            document.getElementById('voucherMaxUses').value = '';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal(id = 'modal') {
+            document.getElementById(id).classList.remove('active');
         }
 
         function saveVoucher() {
             const code = document.getElementById('voucherCode').value;
             const offer = document.getElementById('voucherOffer').value;
+            const from = document.getElementById('voucherFrom').value;
             const until = document.getElementById('voucherUntil').value;
+            const maxUses = parseInt(document.getElementById('voucherMaxUses').value) || 0;
 
-            if (!code || !offer || !until) { alert('Fill all fields'); return; }
-
-            vouchers.push({ id: Date.now(), code, offer, until, max: parseInt(document.getElementById('voucherMax').value) || 0, redeemed: 0 });
-            localStorage.setItem('vouchers', JSON.stringify(vouchers));
-            closeModal();
-            render();
-        }
-
-        function deleteVoucher(id) {
-            if (confirm('Delete?')) {
-                vouchers = vouchers.filter(v => v.id !== id);
-                localStorage.setItem('vouchers', JSON.stringify(vouchers));
-                render();
-            }
-        }
-
-        function render() {
-            document.getElementById('totalVouchers').textContent = vouchers.length;
-            document.getElementById('totalRedeemed').textContent = vouchers.reduce((s, v) => s + v.redeemed, 0);
-
-            const recentHTML = vouchers.slice(-3).reverse().map(v => `
-                <tr>
-                    <td><span class="voucher-code">${v.code}</span></td>
-                    <td style="font-size: 13px;">${v.offer}</td>
-                    <td style="text-align: right;">
-                        <button style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 16px;" onclick="deleteVoucher(${v.id})">×</button>
-                    </td>
-                </tr>
-            `).join('');
-            document.getElementById('recentTable').innerHTML = recentHTML || '<tr><td colspan="3" class="empty">No vouchers</td></tr>';
-
-            const allHTML = vouchers.map(v => `
-                <tr>
-                    <td><span class="voucher-code">${v.code}</span></td>
-                    <td style="font-size: 13px;">${v.offer}</td>
-                    <td style="text-align: right;">${v.redeemed}/${v.max || '∞'}</td>
-                </tr>
-            `).join('');
-            document.getElementById('allTable').innerHTML = allHTML || '<tr><td colspan="3" class="empty">No vouchers</td></tr>';
-
-            if (vouchers.length > 0) {
-                const total = vouchers.reduce((s, v) => s + v.redeemed, 0);
-                document.getElementById('analyticsContent').innerHTML = `<div style="text-align: left;">Total Redeemed: <strong>${total}</strong></div>`;
+            if (code && offer && from && until) {
+                app.vouchers.push({
+                    id: 'v_' + Date.now(),
+                    code, offer,
+                    validFrom: from,
+                    validUntil: until,
+                    maxUses,
+                    redeemedCount: 0
+                });
+                app.save();
+                app.render();
+                closeModal();
             }
         }
 
         function saveSettings() {
-            user.name = document.getElementById('businessName').value;
-            localStorage.setItem('user', JSON.stringify(user));
+            app.user.name = document.getElementById('businessName').value;
+            app.save();
             alert('Saved!');
         }
 
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('user');
-            const saved_vouchers = localStorage.getItem('vouchers');
+        function searchVouchers() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = app.vouchers.filter(v => v.code.toLowerCase().includes(query) || v.offer.toLowerCase().includes(query));
 
-            if (saved) {
-                user = JSON.parse(saved);
-                vouchers = saved_vouchers ? JSON.parse(saved_vouchers) : [];
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'flex';
-                document.getElementById('businessName').value = user.name;
-                render();
+            const html = filtered.map(v => `
+                <div class="voucher-card">
+                    <div class="voucher-info">
+                        <div class="voucher-code">${v.code}</div>
+                        <div class="voucher-meta">${v.offer}</div>
+                        <span class="voucher-status">Active</span>
+                    </div>
+                    <div class="voucher-actions">
+                        <button class="action-btn" onclick="app.showQR('${v.id}')">📱</button>
+                        <button class="action-btn" onclick="app.editVoucher('${v.id}')">✏️</button>
+                        <button class="action-btn" onclick="app.deleteVoucher('${v.id}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('vouchersList').innerHTML = html || '<div class="empty-state">No results found</div>';
+        }
+
+        function downloadQR() {
+            const canvas = document.querySelector('#qrContainer canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL();
+                link.download = 'qrcode.png';
+                link.click();
             }
+        }
 
-            setInterval(() => {
-                const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const mins = String(now.getMinutes()).padStart(2, '0');
-                document.getElementById('currentTime').textContent = hours + ':' + mins;
-            }, 60000);
-        });
+        document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
 </body>
 </html>
