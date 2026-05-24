@@ -2,266 +2,323 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Voucher Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@700&family=Sohne:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --color-primary: #3b82f6;
-            --color-primary-light: #60a5fa;
-            --color-accent: #0ea5e9;
-            --color-background: #0a0a0a;
-            --color-background-secondary: #121212;
-            --color-surface: #161616;
-            --color-text: #f5f5f5;
-            --color-text-secondary: #a0a0a0;
-            --color-border: #262626;
-            --color-success: #34d399;
-            --color-error: #f87171;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            --font-display: 'Clash Display', sans-serif;
-            --font-body: 'Sohne', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --primary-light: #60a5fa;
+            --accent: #0ea5e9;
+            --bg-dark: #0f1117;
+            --bg-card: #1a1f2e;
+            --bg-hover: #252d3d;
+            --text-primary: #ffffff;
+            --text-secondary: #8b92aa;
+            --text-tertiary: #5d6477;
+            --border: #2d3544;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
-            font-family: var(--font-body);
-            background-color: var(--color-background);
-            color: var(--color-text);
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 16px;
         }
 
-        .app {
-            display: flex;
-            height: 100dvh;
-        }
-
-        /* LOGIN */
-        .login-page {
+        .app-container {
             width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--space-lg);
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2332 100%);
         }
 
-        .login-box {
+        .login-card {
             width: 100%;
-            max-width: 420px;
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
+            max-width: 360px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 24px;
-            padding: var(--space-2xl);
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .login-box h1 {
-            font-family: var(--font-display);
+        .login-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-family: 'Poppins', sans-serif;
             font-size: 28px;
-            margin-bottom: var(--space-md);
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #60a5fa, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .login-box p {
-            color: var(--color-text-secondary);
-            font-size: 14px;
-            margin-bottom: var(--space-2xl);
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 13px;
         }
 
         .form-group {
-            margin-bottom: var(--space-lg);
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: var(--space-md);
-            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group input {
             width: 100%;
-            padding: var(--space-md);
-            background: var(--color-background-secondary);
-            border: 1px solid var(--color-border);
+            padding: 12px 16px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            color: var(--color-text);
-            font-family: var(--font-body);
+            color: var(--text-primary);
+            font-family: inherit;
             font-size: 14px;
+            transition: all 200ms;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: var(--primary);
+            background: var(--bg-dark);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        button {
+        .btn {
             width: 100%;
-            padding: var(--space-md);
-            background: var(--color-primary);
-            color: white;
+            padding: 14px;
             border: none;
             border-radius: 12px;
+            font-family: inherit;
             font-weight: 600;
-            cursor: pointer;
             font-size: 14px;
-            transition: all 150ms;
+            cursor: pointer;
+            transition: all 200ms;
+            user-select: none;
         }
 
-        button:hover {
-            background: var(--color-primary-light);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            margin-top: 8px;
         }
 
-        button:active {
+        .btn-primary:active {
             transform: scale(0.98);
         }
 
-        /* DASHBOARD */
-        .sidebar {
-            width: 280px;
-            background: var(--color-surface);
-            border-right: 1px solid var(--color-border);
-            padding: var(--space-lg);
-            display: none;
-            flex-direction: column;
+        .login-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-tertiary);
         }
 
-        .sidebar.show {
-            display: flex;
-        }
-
-        .sidebar-logo {
-            font-family: var(--font-display);
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: var(--space-2xl);
-        }
-
-        .nav-menu {
-            flex: 1;
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            gap: var(--space-md);
         }
 
-        .nav-item {
-            padding: var(--space-md);
-            border-radius: 12px;
-            cursor: pointer;
-            color: var(--color-text-secondary);
-            border: 1px solid transparent;
-            background: transparent;
-            text-align: left;
+        /* STATUS BAR SIMULATION */
+        .status-bar {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            background: var(--bg-card);
+        }
+
+        .status-time {
             font-weight: 600;
         }
 
-        .nav-item:hover {
-            background: var(--color-background-secondary);
-        }
-
-        .nav-item.active {
-            color: var(--color-primary);
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--color-primary);
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            display: none;
-        }
-
-        .main-content.show {
-            display: flex;
-        }
-
+        /* HEADER */
         .header {
-            border-bottom: 1px solid var(--color-border);
-            padding: var(--space-xl);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
         }
 
         .header h1 {
-            font-family: var(--font-display);
-            font-size: 28px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
         }
 
+        .header p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* CONTENT */
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: var(--space-xl);
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
         }
 
+        .content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        /* PAGES */
         .page {
             display: none;
         }
 
         .page.active {
             display: block;
+            animation: fadeIn 300ms ease;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* STATS */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-lg);
-            margin-bottom: var(--space-2xl);
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
+            background: linear-gradient(135deg, var(--bg-hover) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: var(--space-lg);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.05;
+            pointer-events: none;
         }
 
         .stat-label {
-            color: var(--color-text-secondary);
-            font-size: 12px;
+            color: var(--text-secondary);
+            font-size: 11px;
             text-transform: uppercase;
-            margin-bottom: var(--space-md);
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-family: var(--font-display);
+            font-family: 'Poppins', sans-serif;
             font-size: 32px;
-            font-weight: 700;
-            color: var(--color-primary);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
+        /* SECTION */
         .section {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 16px;
-            padding: var(--space-xl);
-            margin-bottom: var(--space-xl);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            overflow: hidden;
         }
 
-        .section h2 {
-            font-family: var(--font-display);
-            font-size: 20px;
-            margin-bottom: var(--space-xl);
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
         }
 
-        .btn-primary {
-            width: auto;
-            padding: var(--space-md) var(--space-lg);
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
         }
 
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        /* TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -269,41 +326,89 @@
 
         th {
             text-align: left;
-            padding: var(--space-lg);
-            border-bottom: 2px solid var(--color-border);
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
             font-weight: 600;
-            font-size: 12px;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            color: var(--color-text-secondary);
+            letter-spacing: 0.5px;
         }
 
         td {
-            padding: var(--space-lg);
-            border-bottom: 1px solid var(--color-border);
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
         }
 
         .voucher-code {
-            font-family: monospace;
-            color: var(--color-primary);
+            font-family: 'Courier New', monospace;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 11px;
             font-weight: 600;
+        }
+
+        .badge-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
         }
 
         .empty {
             text-align: center;
-            padding: var(--space-2xl);
-            color: var(--color-text-secondary);
+            padding: 40px 20px;
+            color: var(--text-secondary);
         }
 
-        .logout-btn {
-            background: rgba(248, 113, 113, 0.1);
-            color: var(--color-error);
-            border: 1px solid rgba(248, 113, 113, 0.2);
-            width: 100%;
-            margin-top: auto;
+        /* BOTTOM NAV */
+        .bottom-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
         }
 
-        .logout-btn:hover {
-            background: rgba(248, 113, 113, 0.2);
+        .nav-btn {
+            padding: 12px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 200ms;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon {
+            font-size: 20px;
         }
 
         /* MODAL */
@@ -311,10 +416,12 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            padding: 20px;
+            backdrop-filter: blur(4px);
         }
 
         .modal.show {
@@ -322,169 +429,203 @@
         }
 
         .modal-content {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 16px;
-            padding: var(--space-2xl);
-            width: 90%;
-            max-width: 500px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .modal-content h2 {
-            font-family: var(--font-display);
-            font-size: 20px;
-            margin-bottom: var(--space-xl);
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 24px;
         }
 
-        .close-btn {
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-close {
             background: none;
-            width: auto;
-            padding: 0;
-            color: var(--color-text-secondary);
+            border: none;
+            color: var(--text-secondary);
             font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @media (max-width: 768px) {
-            .app {
-                flex-direction: column;
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            padding: 12px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .login-card {
+                max-width: 100%;
             }
 
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--color-border);
-                flex-direction: row;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
 
-            .nav-menu {
-                flex-direction: row;
-            }
-
-            .main-content {
-                height: calc(100% - 100px);
+            .modal-content {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app">
+    <div class="app-container">
         <!-- LOGIN -->
-        <div id="loginPage" class="login-page">
-            <div class="login-box">
-                <h1>Voucher Dashboard</h1>
-                <p>Business Admin Panel</p>
+        <div id="loginPage" class="login-screen">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Voucher</h1>
+                    <p>Business Dashboard</p>
+                </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="text" id="email" value="test@test.de">
+                    <input type="text" id="email" value="test@test.de" placeholder="your@email.com">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="text" id="password" value="test">
+                    <input type="text" id="password" value="test" placeholder="••••••••">
                 </div>
-                <button onclick="login()">Login</button>
-                <p style="text-align: center; font-size: 12px; color: var(--color-text-secondary); margin-top: var(--space-lg);">Demo: any email/password works</p>
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <div class="login-footer">Demo: any email/password works</div>
             </div>
         </div>
 
         <!-- DASHBOARD -->
-        <div id="dashboard" style="display: flex; width: 100%; flex: 1;">
-            <!-- SIDEBAR -->
-            <aside class="sidebar show">
-                <div class="sidebar-logo">Voucher<span style="color: var(--color-primary);">.</span></div>
-                <nav class="nav-menu">
-                    <button class="nav-item active" onclick="goPage('dashboard')">📊 Dashboard</button>
-                    <button class="nav-item" onclick="goPage('vouchers')">🎟️ Vouchers</button>
-                    <button class="nav-item" onclick="goPage('analytics')">📈 Analytics</button>
-                    <button class="nav-item" onclick="goPage('settings')">⚙️ Settings</button>
-                </nav>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </aside>
+        <div id="dashboard" style="display: none; width: 100%; height: 100%; flex-direction: column;">
+            <div class="status-bar">
+                <span class="status-time" id="currentTime">9:41</span>
+                <span>iPhone</span>
+            </div>
 
-            <!-- MAIN CONTENT -->
-            <div class="main-content show">
-                <header class="header">
-                    <h1 id="pageTitle">Dashboard</h1>
-                </header>
-                <div class="content">
-                    <!-- DASHBOARD PAGE -->
-                    <div id="dashboardPage" class="page active">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-label">Total Vouchers</div>
-                                <div class="stat-value" id="totalVouchers">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Redeemed</div>
-                                <div class="stat-value" id="totalRedeemed">0</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Active</div>
-                                <div class="stat-value" id="activeVouchers">0</div>
-                            </div>
+            <div class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <p id="pageSubtitle">Welcome back</p>
+            </div>
+
+            <div class="content">
+                <!-- DASHBOARD PAGE -->
+                <div id="dashboardPage" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Vouchers</div>
+                            <div class="stat-value" id="totalVouchers">0</div>
                         </div>
-
-                        <div class="section">
-                            <h2>Recent Vouchers <button class="btn-primary" onclick="openCreateModal()">+ New</button></h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Offer</th>
-                                        <th>Redeemed</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recentTable">
-                                    <tr><td colspan="4" class="empty">No vouchers yet</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="stat-card">
+                            <div class="stat-label">Redeemed</div>
+                            <div class="stat-value" id="totalRedeemed">0</div>
                         </div>
                     </div>
 
-                    <!-- VOUCHERS PAGE -->
-                    <div id="vouchersPage" class="page">
-                        <div class="section">
-                            <h2>All Vouchers <button class="btn-primary" onclick="openCreateModal()">+ New</button></h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Offer</th>
-                                        <th>Redeemed</th>
-                                        <th>Max</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="allTable">
-                                    <tr><td colspan="5" class="empty">No vouchers yet</td></tr>
-                                </tbody>
-                            </table>
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">Recent</div>
+                            <button class="btn-secondary" onclick="openCreateModal()">+</button>
                         </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Offer</th>
+                                    <th style="text-align: right;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTable">
+                                <tr><td colspan="3" class="empty">No vouchers yet</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <!-- ANALYTICS PAGE -->
-                    <div id="analyticsPage" class="page">
-                        <div class="section">
-                            <h2>Analytics</h2>
-                            <p id="analyticsContent" class="empty">Create vouchers to see analytics</p>
+                <!-- VOUCHERS PAGE -->
+                <div id="vouchersPage" class="page">
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">All Vouchers</div>
+                            <button class="btn-secondary" onclick="openCreateModal()">+</button>
                         </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Offer</th>
+                                    <th style="text-align: right;">Used</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allTable">
+                                <tr><td colspan="3" class="empty">No vouchers yet</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <!-- SETTINGS PAGE -->
-                    <div id="settingsPage" class="page">
-                        <div class="section" style="max-width: 400px;">
-                            <h2 style="flex-direction: column; align-items: flex-start;">Business Settings</h2>
-                            <div class="form-group">
-                                <label>Business Name</label>
-                                <input type="text" id="businessName">
-                            </div>
-                            <button onclick="saveSettings()">Save</button>
+                <!-- ANALYTICS PAGE -->
+                <div id="analyticsPage" class="page">
+                    <div class="section">
+                        <div class="section-title" style="margin-bottom: 20px;">Analytics</div>
+                        <div id="analyticsContent" class="empty">Create vouchers to see data</div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS PAGE -->
+                <div id="settingsPage" class="page">
+                    <div class="section">
+                        <div class="section-title" style="margin-bottom: 24px;">Settings</div>
+                        <div class="form-group">
+                            <label>Business Name</label>
+                            <input type="text" id="businessName">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+                        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                            <button class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--error);" onclick="logout()">Logout</button>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- BOTTOM NAVIGATION -->
+            <div class="bottom-nav">
+                <button class="nav-btn active" onclick="switchPage('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span>Home</span>
+                </button>
+                <button class="nav-btn" onclick="switchPage('vouchers')">
+                    <span class="nav-icon">🎟️</span>
+                    <span>Vouchers</span>
+                </button>
+                <button class="nav-btn" onclick="switchPage('analytics')">
+                    <span class="nav-icon">📈</span>
+                    <span>Stats</span>
+                </button>
+                <button class="nav-btn" onclick="switchPage('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </button>
             </div>
         </div>
     </div>
@@ -492,7 +633,10 @@
     <!-- CREATE VOUCHER MODAL -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <h2>Create Voucher <button class="close-btn" onclick="closeModal()">✕</button></h2>
+            <div class="modal-header">
+                <div class="modal-title">New Voucher</div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
             <div class="form-group">
                 <label>Code</label>
                 <input type="text" id="voucherCode" placeholder="e.g., SUMMER20">
@@ -507,9 +651,12 @@
             </div>
             <div class="form-group">
                 <label>Max Uses (0 = unlimited)</label>
-                <input type="number" id="voucherMax" value="0">
+                <input type="number" id="voucherMax" value="0" min="0">
             </div>
-            <button onclick="saveVoucher()">Save Voucher</button>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--bg-hover);" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveVoucher()">Create</button>
+            </div>
         </div>
     </div>
 
@@ -520,41 +667,34 @@
 
         function login() {
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            if (!email) { alert('Enter email'); return; }
 
-            if (!email || !password) {
-                alert('Enter email and password');
-                return;
-            }
-
-            user = { email, name: 'Demo Business' };
-            localStorage.setItem('app_user', JSON.stringify(user));
-            localStorage.setItem('app_vouchers', JSON.stringify(vouchers));
+            user = { name: 'Demo Business', email };
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('vouchers', JSON.stringify(vouchers));
 
             document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('businessName').value = user.name;
-
             render();
         }
 
         function logout() {
             user = null;
             localStorage.clear();
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
+            location.reload();
         }
 
-        function goPage(page) {
+        function switchPage(page) {
             currentPage = page;
-            const titles = { dashboard: 'Dashboard', vouchers: 'Vouchers', analytics: 'Analytics', settings: 'Settings' };
-            document.getElementById('pageTitle').textContent = titles[page];
-
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page + 'Page').classList.add('active');
 
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.classList.add('active');
+            const titles = { dashboard: 'Dashboard', vouchers: 'Vouchers', analytics: 'Analytics', settings: 'Settings' };
+            document.getElementById('pageTitle').textContent = titles[page];
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.closest('.nav-btn').classList.add('active');
 
             render();
         }
@@ -575,73 +715,78 @@
             const code = document.getElementById('voucherCode').value;
             const offer = document.getElementById('voucherOffer').value;
             const until = document.getElementById('voucherUntil').value;
-            const max = parseInt(document.getElementById('voucherMax').value) || 0;
 
-            if (!code || !offer || !until) {
-                alert('Fill all fields');
-                return;
-            }
+            if (!code || !offer || !until) { alert('Fill all fields'); return; }
 
-            vouchers.push({ id: Date.now(), code, offer, until, max, redeemed: 0 });
-            localStorage.setItem('app_vouchers', JSON.stringify(vouchers));
+            vouchers.push({ id: Date.now(), code, offer, until, max: parseInt(document.getElementById('voucherMax').value) || 0, redeemed: 0 });
+            localStorage.setItem('vouchers', JSON.stringify(vouchers));
             closeModal();
             render();
         }
 
         function deleteVoucher(id) {
-            vouchers = vouchers.filter(v => v.id !== id);
-            localStorage.setItem('app_vouchers', JSON.stringify(vouchers));
-            render();
+            if (confirm('Delete?')) {
+                vouchers = vouchers.filter(v => v.id !== id);
+                localStorage.setItem('vouchers', JSON.stringify(vouchers));
+                render();
+            }
         }
 
         function render() {
-            // Stats
             document.getElementById('totalVouchers').textContent = vouchers.length;
             document.getElementById('totalRedeemed').textContent = vouchers.reduce((s, v) => s + v.redeemed, 0);
-            document.getElementById('activeVouchers').textContent = vouchers.length;
 
-            // Recent
-            const recentHTML = vouchers.slice(-5).reverse().map(v => `
+            const recentHTML = vouchers.slice(-3).reverse().map(v => `
                 <tr>
                     <td><span class="voucher-code">${v.code}</span></td>
-                    <td>${v.offer}</td>
-                    <td>${v.redeemed}/${v.max || '∞'}</td>
-                    <td><button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="deleteVoucher(${v.id})">Delete</button></td>
+                    <td style="font-size: 13px;">${v.offer}</td>
+                    <td style="text-align: right;">
+                        <button style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 16px;" onclick="deleteVoucher(${v.id})">×</button>
+                    </td>
                 </tr>
             `).join('');
-            document.getElementById('recentTable').innerHTML = recentHTML || '<tr><td colspan="4" class="empty">No vouchers yet</td></tr>';
+            document.getElementById('recentTable').innerHTML = recentHTML || '<tr><td colspan="3" class="empty">No vouchers</td></tr>';
 
-            // All
             const allHTML = vouchers.map(v => `
                 <tr>
                     <td><span class="voucher-code">${v.code}</span></td>
-                    <td>${v.offer}</td>
-                    <td>${v.redeemed}</td>
-                    <td>${v.max || '∞'}</td>
-                    <td><button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="deleteVoucher(${v.id})">Delete</button></td>
+                    <td style="font-size: 13px;">${v.offer}</td>
+                    <td style="text-align: right;">${v.redeemed}/${v.max || '∞'}</td>
                 </tr>
             `).join('');
-            document.getElementById('allTable').innerHTML = allHTML || '<tr><td colspan="5" class="empty">No vouchers yet</td></tr>';
+            document.getElementById('allTable').innerHTML = allHTML || '<tr><td colspan="3" class="empty">No vouchers</td></tr>';
+
+            if (vouchers.length > 0) {
+                const total = vouchers.reduce((s, v) => s + v.redeemed, 0);
+                document.getElementById('analyticsContent').innerHTML = `<div style="text-align: left;">Total Redeemed: <strong>${total}</strong></div>`;
+            }
         }
 
         function saveSettings() {
             user.name = document.getElementById('businessName').value;
-            localStorage.setItem('app_user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user));
             alert('Saved!');
         }
 
-        // Load on startup
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('app_user');
-            const saved_vouchers = localStorage.getItem('app_vouchers');
+            const saved = localStorage.getItem('user');
+            const saved_vouchers = localStorage.getItem('vouchers');
 
             if (saved) {
                 user = JSON.parse(saved);
                 vouchers = saved_vouchers ? JSON.parse(saved_vouchers) : [];
                 document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
                 document.getElementById('businessName').value = user.name;
                 render();
             }
+
+            setInterval(() => {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const mins = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('currentTime').textContent = hours + ':' + mins;
+            }, 60000);
         });
     </script>
 </body>
