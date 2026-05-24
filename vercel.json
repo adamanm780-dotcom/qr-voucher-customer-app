@@ -1,25 +1,11 @@
 {
-  "buildCommand": "echo 'Static site - no build needed'",
+  "buildCommand": "echo 'Static files only'",
   "outputDirectory": "public",
+  "cleanUrls": false,
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
       "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
-        }
-      ]
+      "destination": "https://api.example.com/api/$1"
     }
   ]
 }
