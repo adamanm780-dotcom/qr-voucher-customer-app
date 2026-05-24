@@ -1,11 +1,8 @@
 {
-  "buildCommand": "echo 'Static files only'",
-  "outputDirectory": "public",
-  "cleanUrls": false,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://api.example.com/api/$1"
+  "functions": {
+    "index.js": {
+      "memory": 128,
+      "maxDuration": 10
     }
-  ]
+  }
 }
