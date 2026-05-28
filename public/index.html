@@ -2,1379 +2,308 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Voucher Pro — Premium Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lila Wiesbaden - Gutschein Demo</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        :root {
-            --bg: #ffffff;
-            --bg-secondary: #fafbfc;
-            --bg-tertiary: #f3f4f6;
-            --text-primary: #0a0a0a;
-            --text-secondary: #65676b;
-            --text-tertiary: #8a8d91;
-            --primary: #2563eb;
-            --accent: #1e40af;
-            --border: #e5e7eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --info: #0ea5e9;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        [data-theme="dark"] {
-            --bg: #0f1117;
-            --bg-secondary: #1a1f2e;
-            --bg-tertiary: #252d3d;
-            --text-primary: #ffffff;
-            --text-secondary: #a0aec0;
-            --text-tertiary: #718096;
-            --border: #2d3544;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Sora', sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
-            transition: background 200ms ease, color 200ms ease;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
             width: 100%;
-            max-width: 390px;
-            height: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-            position: relative;
+            padding: 40px;
         }
 
-        .bg-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 300px;
-            background: linear-gradient(135deg, #f0f4ff 0%, #fff5f0 50%, #f0fff4 100%);
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 0;
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
 
-        [data-theme="dark"] .bg-pattern {
-            background: linear-gradient(135deg, #1a3a5c 0%, #3d1f2c 50%, #1a3d2a 100%);
-            opacity: 0.15;
-        }
-
-        @keyframes slideInFromBottom { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideOutToBottom { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
-        @keyframes fadeInDelayed { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        @keyframes slideInToast { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* TOAST NOTIFICATIONS */
-        .toast-container {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-width: 340px;
-            pointer-events: none;
-        }
-
-        .toast {
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            animation: slideInToast 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            pointer-events: all;
-        }
-
-        .toast.success { background: var(--success); color: white; }
-        .toast.error { background: var(--error); color: white; }
-        .toast.info { background: var(--info); color: white; }
-
-        /* LOGIN */
-        .login-screen {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            justify-content: space-between;
-            padding: 48px 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-screen.hidden { display: none; }
-
-        .login-header { animation: fadeInDelayed 0.6s ease; }
-        .login-header h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .login-header p { font-size: 14px; color: var(--text-tertiary); font-weight: 500; }
-
-        .login-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            animation: slideInFromBottom 0.8s ease;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; }
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 15px;
-            font-family: 'Sora', sans-serif;
-            color: var(--text-primary);
-            transition: all 200ms ease;
-        }
-        .form-group input:focus { outline: none; background: var(--bg); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08); }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 200ms ease;
-            font-family: 'Sora', sans-serif;
-        }
-        .login-btn:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-
-        /* APP */
-        .app-screen { display: none; flex-direction: column; width: 100%; height: 100%; position: relative; z-index: 1; }
-        .app-screen.active { display: flex; }
-
-        .app-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-secondary);
-        }
-
-        .app-header-left h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
-        .app-header-left p { font-size: 11px; color: var(--text-tertiary); }
-
-        .app-header-right { display: flex; gap: 8px; }
-        .theme-toggle, .logout-btn { padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'Sora', sans-serif; transition: all 150ms ease; }
-        .theme-toggle:hover, .logout-btn:hover { background: var(--bg); border-color: var(--primary); }
-
-        .search-bar { padding: 0 20px; margin: 12px 0; }
-        .search-input {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
             font-size: 14px;
-            font-family: 'Sora', sans-serif;
-            color: var(--text-primary);
-            transition: all 200ms ease;
         }
-        .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08); }
 
-        .content {
+        .voucher-list {
+            margin-bottom: 30px;
+        }
+
+        .voucher-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .voucher-item:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .voucher-item.active {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .voucher-code {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .voucher-offer {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 8px 0 4px;
+        }
+
+        .voucher-business {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
             flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 90px;
-        }
-
-        .page { display: none; animation: fadeInDelayed 0.3s ease; }
-        .page.active { display: block; }
-
-        .page-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.3px; }
-
-        /* DASHBOARD */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .dashboard-card {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(16, 185, 129, 0.03) 100%);
-            border: 1px solid rgba(37, 99, 235, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 200ms ease;
-        }
-
-        .dashboard-card:hover { transform: translateY(-2px); border-color: var(--primary); }
-        .dashboard-card-title { font-size: 11px; color: var(--text-tertiary); font-weight: 600; margin-bottom: 6px; }
-        .dashboard-card-value { font-size: 24px; font-weight: 800; color: var(--primary); }
-        .dashboard-card-trend { font-size: 10px; color: var(--success); margin-top: 4px; }
-
-        .chart-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            height: 200px;
-            position: relative;
-        }
-
-        .insights-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .insight-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
+            padding: 14px 20px;
+            border: none;
             border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .insight-value { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
-        .insight-label { font-size: 11px; color: var(--text-tertiary); }
-
-        .top-vouchers { margin-bottom: 20px; }
-        .top-vouchers-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-
-        .top-voucher-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .top-voucher-info { flex: 1; }
-        .top-voucher-code { font-size: 13px; font-weight: 700; }
-        .top-voucher-meta { font-size: 11px; color: var(--text-tertiary); }
-        .top-voucher-badge { background: var(--success); color: white; font-size: 10px; padding: 4px 8px; border-radius: 4px; font-weight: 700; }
-
-        /* VOUCHER CARDS */
-        .voucher-grid { display: flex; flex-direction: column; gap: 12px; }
-
-        .voucher-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 200ms ease;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
         }
 
-        .voucher-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--primary);
-            opacity: 0;
-            transition: opacity 200ms ease;
+        .btn-primary {
+            background: #667eea;
+            color: white;
         }
 
-        .voucher-card:hover {
-            border-color: var(--primary);
-            background: var(--bg);
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .voucher-card:hover::before { opacity: 1; }
-
-        .voucher-info { flex: 1; }
-        .voucher-code { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
-        .voucher-meta { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
-        .voucher-status { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: var(--success); color: white; }
-
-        .voucher-badge { font-size: 18px; margin-left: 8px; }
-        .voucher-star { font-size: 18px; cursor: pointer; margin-right: 8px; }
-
-        .voucher-actions { display: flex; gap: 6px; }
-
-        .action-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 150ms ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .action-btn:hover { background: var(--primary); color: white; }
-
-        /* BUTTONS */
-        .btn {
-            padding: 14px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 200ms ease;
-            font-family: 'Sora', sans-serif;
+        .btn-secondary {
+            background: #e9ecef;
+            color: #1a1a1a;
         }
 
-        .btn:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        .btn-full { width: 100%; margin-bottom: 16px; }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
-        .btn-small { padding: 8px 12px; font-size: 12px; }
-
-        /* MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(2px);
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 1000;
+        .btn-secondary:hover:not(:disabled) {
+            background: #dee2e6;
         }
 
-        .modal.active { display: flex; animation: slideInFromBottom 0.3s ease; }
-
-        .modal-content {
-            background: var(--bg);
-            border-radius: 20px 20px 0 0;
-            padding: 24px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-bottom: none;
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
-        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
-        .modal-buttons .btn { flex: 1; padding: 12px; }
-
-        .qr-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+        .qr-display {
             text-align: center;
-            margin: 16px 0;
+            margin-bottom: 20px;
+            display: none;
         }
 
-        .share-link-input {
-            width: 100%;
-            padding: 10px 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 12px;
-            font-family: monospace;
-            color: var(--text-primary);
-            margin: 8px 0;
+        .qr-display.show {
+            display: block;
+            animation: fadeIn 0.3s;
         }
 
-        /* ACTIVITY TIMELINE */
-        .activity-timeline {
-            margin-top: 12px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        .activity-item {
-            display: flex;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-        }
-
-        .activity-item:last-child { border-bottom: none; }
-        .activity-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-        .activity-text { color: var(--text-secondary); }
-        .activity-time { color: var(--text-tertiary); font-size: 11px; }
-
-        /* TABS */
-        .tab-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tab-btn {
-            padding: 12px 16px;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 200ms ease;
-            font-size: 13px;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        /* NAVIGATION */
-        .nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            display: flex;
-            gap: 0;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-        }
-
-        .nav-btn {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: transparent;
-            border: none;
-            color: var(--text-tertiary);
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 600;
-            transition: all 200ms ease;
-            font-family: 'Sora', sans-serif;
-        }
-
-        .nav-btn-icon { font-size: 24px; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn:hover { color: var(--text-primary); }
-
-        /* EMPTY STATE */
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-tertiary); }
-        .empty-icon { font-size: 48px; margin-bottom: 12px; display: block; }
-        .empty-text { font-size: 14px; line-height: 1.5; }
-
-        .badge-icon { font-size: 20px; margin-right: 4px; }
-
-        /* PERFORMANCE BADGES */
-        .badge-hot { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
-        .badge-trending { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
-        .badge-cold { background: #e5e7eb; color: #65676b; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; }
-
-        .trend-indicator { display: inline-block; margin-left: 4px; }
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--error); }
-
-        .metric-mini {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .quick-action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .quick-action-btn {
-            padding: 10px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 150ms ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .quick-action-btn:hover {
-            background: var(--bg);
-            border-color: var(--primary);
-        }
-
-        .quick-action-icon { font-size: 16px; }
-
-        .summary-bar {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
-            border: 1px solid rgba(37, 99, 235, 0.1);
+        .qr-display img {
+            max-width: 100%;
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            font-size: 12px;
+            border: 3px solid #667eea;
         }
 
-        .summary-bar-label { color: var(--text-tertiary); font-weight: 600; margin-bottom: 4px; }
-        .summary-bar-value { font-size: 20px; font-weight: 800; color: var(--primary); }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
+        .qr-label {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
         }
 
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-secondary); }
-        .stat-value { font-weight: 700; }
+        .pass-url {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 11px;
+            color: #667eea;
+            word-break: break-all;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+        }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="bg-pattern"></div>
+        <h1>🎟️ Gutschein Demo</h1>
+        <p class="subtitle">Lila Wiesbaden</p>
 
-        <!-- LOGIN -->
-        <div class="login-screen" id="loginScreen">
-            <div class="login-header">
-                <h1>Voucher Pro</h1>
-                <p>Premium Enterprise Voucher Management</p>
+        <div class="instructions">
+            <strong>Anleitung:</strong> Wähle einen Gutschein, generiere den QR-Code und scanne ihn mit deinem iPhone um den Gutschein in deine Wallet zu importieren.
+        </div>
+
+        <div class="voucher-list">
+            <h3 style="margin-bottom: 12px; color: #1a1a1a; font-size: 14px; font-weight: 600;">Verfügbare Gutscheine:</h3>
+            <div class="voucher-item" data-code="ABC123">
+                <div class="voucher-code">ABC123</div>
+                <div class="voucher-offer">20% Rabatt auf alle Getränke</div>
+                <div class="voucher-business">Lila Wiesbaden</div>
             </div>
-
-            <div class="login-content">
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="email" value="test@test.de" placeholder="you@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" value="test" placeholder="••••••••">
-                </div>
-                <button class="login-btn" onclick="handleLogin()">Sign In</button>
-            </div>
-
-            <div style="text-align: center; font-size: 12px; color: var(--text-tertiary);">
-                © 2024 Voucher Pro — Premium Platform
+            <div class="voucher-item" data-code="XYZ789">
+                <div class="voucher-code">XYZ789</div>
+                <div class="voucher-offer">Kostenloser Matcha Latte</div>
+                <div class="voucher-business">Matcha Café</div>
             </div>
         </div>
 
-        <!-- APP -->
-        <div class="app-screen" id="appScreen">
-            <div class="app-header">
-                <div class="app-header-left">
-                    <h1>Dashboard</h1>
-                    <p id="userEmail">test@test.de</p>
-                </div>
-                <div class="app-header-right">
-                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-                    <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
-                </div>
+        <div class="button-group">
+            <button class="btn-primary" id="generateBtn" disabled>QR-Code Generieren</button>
+            <button class="btn-secondary" id="downloadBtn" disabled>Pass Downloaden</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>QR-Code wird generiert...</p>
+        </div>
+
+        <div class="qr-display" id="qrDisplay">
+            <img id="qrImage" src="" alt="QR Code">
+            <div class="qr-label">
+                Scanne diesen QR-Code mit deinem iPhone Wallet Scanner
             </div>
-
-            <div class="search-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search vouchers..." onkeyup="searchVouchers()">
-            </div>
-
-            <div class="content">
-                <!-- DASHBOARD PAGE -->
-                <div class="page active" id="dashboardPage">
-                    <div class="page-title">Overview</div>
-
-                    <div class="quick-action-grid">
-                        <button class="quick-action-btn" onclick="openCreateModal()" title="Create new voucher">
-                            <span class="quick-action-icon">✨</span>
-                            <span>New</span>
-                        </button>
-                        <button class="quick-action-btn" onclick="switchPage('analytics')" title="View detailed analytics">
-                            <span class="quick-action-icon">📈</span>
-                            <span>Analytics</span>
-                        </button>
-                    </div>
-
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-title">Total Vouchers</div>
-                            <div class="dashboard-card-value" id="totalVouchers">0</div>
-                            <div class="dashboard-card-trend">Active campaigns</div>
-                        </div>
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-title">Total Redeemed</div>
-                            <div class="dashboard-card-value" id="totalRedeemed">0</div>
-                            <div class="dashboard-card-trend">Redemptions</div>
-                        </div>
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-title">Conversion</div>
-                            <div class="dashboard-card-value" id="redemptionRate">0%</div>
-                            <div class="dashboard-card-trend">Success rate</div>
-                        </div>
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-title">Live Today</div>
-                            <div class="dashboard-card-value" id="activeToday">0</div>
-                            <div class="dashboard-card-trend">Running now</div>
-                        </div>
-                    </div>
-
-                    <div class="insights-grid">
-                        <div class="insight-card">
-                            <div class="insight-value" id="avgRedemption">0%</div>
-                            <div class="insight-label">Avg Redemption</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-value" id="expiringCount">0</div>
-                            <div class="insight-label">Expiring Soon</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-value" id="topVoucherRate">0%</div>
-                            <div class="insight-label">Top Performance</div>
-                        </div>
-                        <div class="insight-card">
-                            <div class="insight-value" id="totalRevenueImpact">€0</div>
-                            <div class="insight-label">Est. Impact</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <canvas id="redemptionchart"></canvas>
-                    </div>
-
-                    <div class="top-vouchers">
-                        <div class="top-vouchers-title">🔥 Top Performing</div>
-                        <div id="topVouchers"></div>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">📋 Recent Vouchers</h3>
-                        <div class="voucher-grid" id="dashboardVouchers"></div>
-                    </div>
-                </div>
-
-                <!-- VOUCHERS PAGE -->
-                <div class="page" id="vouchersPage">
-                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                        <button class="btn btn-full" onclick="openCreateModal()" style="flex: 1; margin: 0;">✨ New Voucher</button>
-                        <button class="btn btn-secondary" onclick="exportToCSV()" style="flex: 0.4; margin: 0; padding: 14px 12px;">📥</button>
-                    </div>
-                    <div class="voucher-grid" id="vouchersList"></div>
-                </div>
-
-                <!-- ANALYTICS PAGE -->
-                <div class="page" id="analyticsPage">
-                    <div class="page-title">Analytics</div>
-
-                    <div class="summary-bar">
-                        <div class="summary-bar-label">Campaign Summary</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
-                            <div><span style="color: var(--text-tertiary); font-size: 11px;">Active</span><br><span style="font-size: 16px; font-weight: 700; color: var(--primary);" id="summaryActive">0</span></div>
-                            <div><span style="color: var(--text-tertiary); font-size: 11px;">Total Impact</span><br><span style="font-size: 16px; font-weight: 700; color: var(--success);" id="summaryImpact">€0</span></div>
-                        </div>
-                    </div>
-
-                    <div class="tab-selector">
-                        <button class="tab-btn active" onclick="switchTab('performance')">Performance</button>
-                        <button class="tab-btn" onclick="switchTab('activity')">Activity</button>
-                    </div>
-
-                    <div id="performanceTab">
-                        <div class="chart-container" style="height: 200px; margin-bottom: 20px;">
-                            <canvas id="performanceChart"></canvas>
-                        </div>
-                        <div class="voucher-grid" id="analyticsContent"></div>
-                    </div>
-
-                    <div id="activityTab" style="display: none;">
-                        <div id="activityLog"></div>
-                    </div>
-                </div>
-
-                <!-- SETTINGS PAGE -->
-                <div class="page" id="settingsPage">
-                    <div class="page-title">Settings</div>
-                    <div class="form-group">
-                        <label>Business Name</label>
-                        <input type="text" id="businessName" placeholder="Your business" style="width: 100%; padding: 12px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-family: Sora, sans-serif; color: var(--text-primary);">
-                    </div>
-                    <button class="btn btn-full" onclick="saveSettings()">Save Changes</button>
-
-                    <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
-
-                    <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Test Data</h3>
-                    <button class="btn btn-secondary btn-full" onclick="addTestRedemptions()">Add Test Redemptions</button>
-                    <button class="btn btn-secondary btn-full" onclick="clearAllData()" style="color: var(--error);">Clear All Data</button>
-                </div>
-            </div>
-
-            <!-- NAVIGATION -->
-            <div class="nav">
-                <button class="nav-btn active" onclick="switchPage('dashboard')">
-                    <span class="nav-btn-icon">🏠</span>
-                    <span>Home</span>
-                </button>
-                <button class="nav-btn" onclick="switchPage('vouchers')">
-                    <span class="nav-btn-icon">🎁</span>
-                    <span>Vouchers</span>
-                </button>
-                <button class="nav-btn" onclick="switchPage('analytics')">
-                    <span class="nav-btn-icon">📊</span>
-                    <span>Analytics</span>
-                </button>
-                <button class="nav-btn" onclick="switchPage('settings')">
-                    <span class="nav-btn-icon">⚙️</span>
-                    <span>Settings</span>
-                </button>
-            </div>
+            <div class="pass-url" id="passUrl"></div>
         </div>
     </div>
-
-    <!-- MODAL -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-title">✨ Create New Voucher</div>
-
-            <div class="form-group">
-                <label>Voucher Code</label>
-                <input type="text" id="voucherCode" placeholder="SUMMER2024" class="search-input">
-            </div>
-
-            <div class="form-group">
-                <label>Offer Description</label>
-                <input type="text" id="voucherOffer" placeholder="20% Off Everything" class="search-input">
-            </div>
-
-            <div class="form-group">
-                <label>Valid From</label>
-                <input type="date" id="voucherFrom" class="search-input">
-            </div>
-
-            <div class="form-group">
-                <label>Valid Until</label>
-                <input type="date" id="voucherUntil" class="search-input">
-            </div>
-
-            <div class="form-group">
-                <label>Max Uses (0 = unlimited)</label>
-                <input type="number" id="voucherMaxUses" placeholder="100" class="search-input">
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn" onclick="saveVoucher()">Create Voucher</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- QR MODAL -->
-    <div class="modal" id="qrModal">
-        <div class="modal-content">
-            <div class="modal-title" id="qrModalTitle">Voucher QR Code</div>
-            <div class="qr-container" id="qrContainer"></div>
-
-            <div class="form-group">
-                <label>Share Link</label>
-                <input type="text" class="share-link-input" id="shareLink" readonly>
-                <button class="btn btn-secondary" onclick="copyShareLink()" style="width: 100%; margin-top: 8px;">Copy Link</button>
-            </div>
-
-            <div class="form-group">
-                <label>Log Redemption</label>
-                <input type="number" id="redemptionCount" placeholder="1" class="search-input" min="1">
-                <button class="btn btn-secondary" onclick="logRedemption()" style="width: 100%; margin-top: 8px;">Add Redemptions</button>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeModal('qrModal')">Close</button>
-                <button class="btn" onclick="downloadQR()">Download QR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST CONTAINER -->
-    <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        const app = {
-            user: null,
-            vouchers: [],
-            favorites: [],
-            redemptionLog: [],
-            theme: localStorage.getItem('theme') || 'light',
-            currentVoucher: null,
-            currentTab: 'performance',
-            chart: null,
+        let selectedCode = null;
+        let currentPassUrl = null;
 
-            init() {
-                this.loadData();
-                document.documentElement.setAttribute('data-theme', this.theme);
+        // Voucher selection
+        document.querySelectorAll('.voucher-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.voucher-item').forEach(v => v.classList.remove('active'));
+                this.classList.add('active');
+                selectedCode = this.dataset.code;
+                document.getElementById('generateBtn').disabled = false;
+            });
+        });
 
-                if (this.user) {
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('appScreen').classList.add('active');
-                    this.renderDashboard();
-                    this.renderChart();
-                }
-            },
+        // Generate QR Code
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            if (!selectedCode) return;
 
-            loadData() {
-                const data = localStorage.getItem('app_data');
-                if (data) {
-                    const parsed = JSON.parse(data);
-                    this.user = parsed.user;
-                    this.vouchers = parsed.vouchers || [];
-                    this.favorites = parsed.favorites || [];
-                    this.redemptionLog = parsed.redemptionLog || [];
-                }
-            },
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('qrDisplay').classList.remove('show');
 
-            save() {
-                localStorage.setItem('app_data', JSON.stringify({
-                    user: this.user,
-                    vouchers: this.vouchers,
-                    favorites: this.favorites,
-                    redemptionLog: this.redemptionLog
-                }));
-            },
+            try {
+                const response = await fetch(`/api/qr?code=${encodeURIComponent(selectedCode)}`);
+                const data = await response.json();
 
-            showToast(message, type = 'success') {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
-            },
+                if (data.success) {
+                    document.getElementById('qrImage').src = data.qrUrl;
+                    document.getElementById('passUrl').textContent = data.passUrl;
+                    currentPassUrl = data.passUrl;
+                    document.getElementById('downloadBtn').disabled = false;
 
-            toggleFavorite(id) {
-                if (this.favorites.includes(id)) {
-                    this.favorites = this.favorites.filter(fav => fav !== id);
+                    setTimeout(() => {
+                        document.getElementById('loading').classList.remove('show');
+                        document.getElementById('qrDisplay').classList.add('show');
+                    }, 500);
                 } else {
-                    this.favorites.push(id);
+                    alert('Fehler: ' + data.error);
+                    document.getElementById('loading').classList.remove('show');
                 }
-                this.save();
-                this.render();
-            },
-
-            getPerformanceBadge(redemptionRate) {
-                if (redemptionRate >= 50) return '🔥 Hot';
-                if (redemptionRate >= 25) return '📈 Trending';
-                return '❄️ Cool';
-            },
-
-            renderDashboard() {
-                const total = this.vouchers.length;
-                const redeemed = this.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
-                const rate = total > 0 ? Math.round((redeemed / total) * 100) : 0;
-                const today = new Date().toISOString().split('T')[0];
-                const active = this.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
-                const expiring = this.vouchers.filter(v => {
-                    const days = Math.ceil((new Date(v.validUntil) - new Date()) / (1000 * 60 * 60 * 24));
-                    return days > 0 && days <= 7;
-                }).length;
-
-                const avgRedemption = total > 0 ? Math.round(redeemed / total * 100) : 0;
-
-                // Top voucher performance
-                const sortedVouchers = this.vouchers.slice().sort((a, b) => b.redeemedCount - a.redeemedCount);
-                const topPerf = sortedVouchers.length > 0 ? Math.round((sortedVouchers[0].redeemedCount / Math.max(sortedVouchers[0].maxUses || 100, 1)) * 100) : 0;
-
-                // Estimated revenue impact (assuming avg discount value of €10 per redemption)
-                const estimatedImpact = redeemed * 10;
-
-                document.getElementById('totalVouchers').textContent = total;
-                document.getElementById('totalRedeemed').textContent = redeemed;
-                document.getElementById('redemptionRate').textContent = rate + '%';
-                document.getElementById('activeToday').textContent = active;
-                document.getElementById('avgRedemption').textContent = avgRedemption + '%';
-                document.getElementById('expiringCount').textContent = expiring;
-                document.getElementById('topVoucherRate').textContent = topPerf + '%';
-                document.getElementById('totalRevenueImpact').textContent = '€' + estimatedImpact;
-                document.getElementById('userEmail').textContent = this.user.email;
-
-                const topVouchers = sortedVouchers.slice(0, 3);
-                const topHtml = topVouchers.map(v => `
-                    <div class="top-voucher-item">
-                        <div class="top-voucher-info">
-                            <div class="top-voucher-code">${v.code}</div>
-                            <div class="top-voucher-meta">${v.redeemedCount} redeemed</div>
-                        </div>
-                        <div class="top-voucher-badge">${((v.redeemedCount / Math.max(v.maxUses || 100, 1)) * 100).toFixed(0)}%</div>
-                    </div>
-                `).join('');
-                document.getElementById('topVouchers').innerHTML = topHtml || '<div style="font-size: 12px; color: var(--text-tertiary);">No data yet</div>';
-
-                const emojis = ['🎉', '🌟', '💝', '🎁', '✨', '🔥', '🚀', '💎'];
-                const html = this.vouchers.slice(-5).reverse().map((v, i) => {
-                    const perfRate = Math.round((v.redeemedCount / Math.max(v.maxUses || 100, 1)) * 100);
-                    const badge = perfRate >= 50 ? '🔥' : perfRate >= 25 ? '📈' : '❄️';
-                    return `
-                        <div class="voucher-card">
-                            <div class="voucher-star" onclick="app.toggleFavorite('${v.id}')">${this.favorites.includes(v.id) ? '⭐' : '☆'}</div>
-                            <div class="voucher-info">
-                                <div class="voucher-code">${v.code} ${badge}</div>
-                                <div class="voucher-meta">${v.offer} • ${v.redeemedCount} redeemed</div>
-                                <span class="voucher-status">Active</span>
-                            </div>
-                            <div class="voucher-badge">${emojis[i % emojis.length]}</div>
-                        </div>
-                    `;
-                }).join('');
-
-                document.getElementById('dashboardVouchers').innerHTML = html || '<div class="empty-state"><span class="empty-icon">📭</span><div class="empty-text">No vouchers yet</div></div>';
-            },
-
-            renderChart() {
-                const ctx = document.getElementById('redemptionchart');
-                if (!ctx) return;
-
-                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                const data = [12, 19, 8, 15, 22, 18, 10];
-
-                if (this.chart) this.chart.destroy();
-                this.chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: days,
-                        datasets: [{
-                            label: 'Redemptions',
-                            data: data,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#2563eb'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            },
-
-            renderPerformanceChart() {
-                const ctx = document.getElementById('performanceChart');
-                if (!ctx) return;
-
-                const today = new Date().toISOString().split('T')[0];
-                const active = this.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
-                const totalImpact = this.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0) * 10;
-
-                const codes = this.vouchers.map(v => v.code).slice(0, 5);
-                const redeemed = this.vouchers.map(v => v.redeemedCount).slice(0, 5);
-
-                document.getElementById('summaryActive').textContent = active;
-                document.getElementById('summaryImpact').textContent = '€' + totalImpact;
-
-                if (codes.length === 0) return;
-
-                if (this.chart) this.chart.destroy();
-                this.chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: codes,
-                        datasets: [{
-                            label: 'Redeemed',
-                            data: redeemed,
-                            backgroundColor: 'rgba(37, 99, 235, 0.7)',
-                            borderColor: '#2563eb',
-                            borderWidth: 1,
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { beginAtZero: true }
-                        }
-                    }
-                });
-            },
-
-            showQR(id) {
-                this.currentVoucher = this.vouchers.find(v => v.id === id);
-                if (!this.currentVoucher) return;
-
-                document.getElementById('qrModalTitle').textContent = `${this.currentVoucher.code} - QR Code`;
-                const container = document.getElementById('qrContainer');
-                container.innerHTML = '';
-                new QRCode(container, {
-                    text: this.currentVoucher.code,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#2563eb',
-                    colorLight: '#ffffff'
-                });
-
-                const shareUrl = `${window.location.origin}?voucher=${this.currentVoucher.code}`;
-                document.getElementById('shareLink').value = shareUrl;
-                document.getElementById('redemptionCount').value = '1';
-
-                document.getElementById('qrModal').classList.add('active');
-            },
-
-            editVoucher(id) {
-                const voucher = this.vouchers.find(v => v.id === id);
-                if (!voucher) return;
-                document.getElementById('voucherCode').value = voucher.code;
-                document.getElementById('voucherOffer').value = voucher.offer;
-                document.getElementById('voucherFrom').value = voucher.validFrom;
-                document.getElementById('voucherUntil').value = voucher.validUntil;
-                document.getElementById('voucherMaxUses').value = voucher.maxUses || 0;
-                document.getElementById('modal').classList.add('active');
-            },
-
-            deleteVoucher(id) {
-                if (confirm('Delete this voucher?')) {
-                    this.vouchers = this.vouchers.filter(v => v.id !== id);
-                    this.save();
-                    this.render();
-                    this.showToast('Voucher deleted', 'info');
-                }
-            },
-
-            duplicateVoucher(id) {
-                const voucher = this.vouchers.find(v => v.id === id);
-                if (!voucher) return;
-
-                const copy = {
-                    id: 'v_' + Date.now(),
-                    code: voucher.code + '_COPY',
-                    offer: voucher.offer,
-                    validFrom: voucher.validFrom,
-                    validUntil: voucher.validUntil,
-                    maxUses: voucher.maxUses,
-                    redeemedCount: 0
-                };
-                this.vouchers.push(copy);
-                this.save();
-                this.render();
-                this.showToast('Voucher duplicated', 'success');
-            },
-
-            render() {
-                this.renderDashboard();
-                const html = this.vouchers.map((v, i) => {
-                    const perfRate = Math.round((v.redeemedCount / Math.max(v.maxUses || 100, 1)) * 100);
-                    const badge = perfRate >= 50 ? '🔥' : perfRate >= 25 ? '📈' : '❄️';
-                    return `
-                        <div class="voucher-card">
-                            <div class="voucher-star" onclick="app.toggleFavorite('${v.id}')">${this.favorites.includes(v.id) ? '⭐' : '☆'}</div>
-                            <div class="voucher-info">
-                                <div class="voucher-code">${v.code} ${badge}</div>
-                                <div class="voucher-meta">${v.offer} • ${v.redeemedCount}/${v.maxUses || '∞'}</div>
-                                <span class="voucher-status">Active</span>
-                            </div>
-                            <div class="voucher-actions">
-                                <button class="action-btn" onclick="app.showQR('${v.id}')">📱</button>
-                                <button class="action-btn" onclick="app.editVoucher('${v.id}')">✏️</button>
-                                <button class="action-btn" onclick="app.duplicateVoucher('${v.id}')" title="Duplicate">📋</button>
-                                <button class="action-btn" onclick="app.deleteVoucher('${v.id}')">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('vouchersList').innerHTML = html || '<div class="empty-state"><span class="empty-icon">📭</span><div class="empty-text">No vouchers yet</div></div>';
-
-                const analyticsHtml = this.vouchers.map(v => {
-                    const perfRate = Math.round((v.redeemedCount / Math.max(v.maxUses || 100, 1)) * 100);
-                    const badge = perfRate >= 50 ? '🔥 Hot' : perfRate >= 25 ? '📈 Trending' : '❄️ Cool';
-                    const daysLeft = Math.ceil((new Date(v.validUntil) - new Date()) / (1000 * 60 * 60 * 24));
-                    const status = daysLeft < 0 ? '⏰ Expired' : daysLeft <= 7 ? '⚠️ Expiring' : '✅ Active';
-                    return `
-                        <div class="voucher-card">
-                            <div class="voucher-info">
-                                <div class="voucher-code">${v.code} <span style="font-size: 10px; opacity: 0.7;">${badge}</span></div>
-                                <div class="voucher-meta">${v.offer}</div>
-                                <div style="margin-top: 6px; font-size: 11px; color: var(--text-secondary);">
-                                    <div class="stat-row" style="padding: 3px 0; border: none;">
-                                        <span>Redeemed:</span>
-                                        <span style="font-weight: 700;">${v.redeemedCount}/${v.maxUses || '∞'}</span>
-                                    </div>
-                                    <div class="stat-row" style="padding: 3px 0; border: none;">
-                                        <span>Performance:</span>
-                                        <span style="font-weight: 700; color: var(--primary);">${perfRate}%</span>
-                                    </div>
-                                    <div class="stat-row" style="padding: 3px 0; border: none;">
-                                        <span>Status:</span>
-                                        <span style="font-weight: 700;">${status}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('analyticsContent').innerHTML = analyticsHtml || '<div class="empty-state"><span class="empty-icon">📊</span><div class="empty-text">No data yet</div></div>';
-
-                this.renderActivityLog();
-            },
-
-            renderActivityLog() {
-                const log = this.redemptionLog.slice().reverse().slice(0, 20);
-                const html = log.map(entry => `
-                    <div class="activity-item">
-                        <div class="activity-dot"></div>
-                        <div style="flex: 1;">
-                            <div class="activity-text">${entry.voucherCode} — <span style="color: var(--primary);">+${entry.count}</span> redeemed</div>
-                            <div class="activity-time">${new Date(entry.timestamp).toLocaleString('de-DE')}</div>
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('activityLog').innerHTML = html || '<div class="empty-state">No activity yet</div>';
-            },
-
-            addTestRedemptions() {
-                if (this.vouchers.length === 0) {
-                    this.showToast('Create vouchers first', 'error');
-                    return;
-                }
-                const random = this.vouchers[Math.floor(Math.random() * this.vouchers.length)];
-                random.redeemedCount += Math.floor(Math.random() * 5) + 1;
-                this.redemptionLog.push({
-                    voucherCode: random.code,
-                    count: Math.floor(Math.random() * 5) + 1,
-                    timestamp: new Date().toISOString()
-                });
-                this.save();
-                this.render();
-                this.showToast('Test redemption added', 'success');
-            },
-
-            clearAllData() {
-                if (confirm('Clear all vouchers and data?')) {
-                    this.vouchers = [];
-                    this.favorites = [];
-                    this.redemptionLog = [];
-                    this.save();
-                    this.render();
-                    this.showToast('All data cleared', 'info');
-                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Fehler beim Generieren des QR-Codes: ' + error.message);
+                document.getElementById('loading').classList.remove('show');
             }
-        };
+        });
 
-        function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (email && password) {
-                app.user = { id: 'u_' + Date.now(), email };
-                app.save();
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('appScreen').classList.add('active');
-                app.renderDashboard();
-                app.renderChart();
+        // Download Pass
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (currentPassUrl) {
+                window.location.href = currentPassUrl;
             }
-        }
-
-        function handleLogout() {
-            app.user = null;
-            app.vouchers = [];
-            app.favorites = [];
-            app.redemptionLog = [];
-            app.save();
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appScreen').classList.remove('active');
-        }
-
-        function toggleTheme() {
-            app.theme = app.theme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', app.theme);
-            localStorage.setItem('theme', app.theme);
-        }
-
-        function switchPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page + 'Page').classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.closest('.nav-btn').classList.add('active');
-
-            if (page === 'analytics') {
-                app.renderPerformanceChart();
-            }
-        }
-
-        function switchTab(tab) {
-            app.currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-
-            document.getElementById('performanceTab').style.display = tab === 'performance' ? 'block' : 'none';
-            document.getElementById('activityTab').style.display = tab === 'activity' ? 'block' : 'none';
-
-            if (tab === 'performance') {
-                setTimeout(() => app.renderPerformanceChart(), 100);
-            }
-        }
-
-        function openCreateModal() {
-            document.getElementById('voucherCode').value = '';
-            document.getElementById('voucherOffer').value = '';
-            document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
-            document.getElementById('voucherUntil').value = '';
-            document.getElementById('voucherMaxUses').value = '';
-            document.getElementById('modal').classList.add('active');
-        }
-
-        function closeModal(id = 'modal') {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        function saveVoucher() {
-            const code = document.getElementById('voucherCode').value;
-            const offer = document.getElementById('voucherOffer').value;
-            const from = document.getElementById('voucherFrom').value;
-            const until = document.getElementById('voucherUntil').value;
-            const maxUses = parseInt(document.getElementById('voucherMaxUses').value) || 0;
-
-            if (code && offer && from && until) {
-                app.vouchers.push({
-                    id: 'v_' + Date.now(),
-                    code, offer,
-                    validFrom: from,
-                    validUntil: until,
-                    maxUses,
-                    redeemedCount: 0
-                });
-                app.save();
-                app.render();
-                closeModal();
-                app.showToast('Voucher created', 'success');
-            }
-        }
-
-        function logRedemption() {
-            if (!app.currentVoucher) return;
-            const count = parseInt(document.getElementById('redemptionCount').value) || 1;
-            app.currentVoucher.redeemedCount += count;
-            app.redemptionLog.push({
-                voucherCode: app.currentVoucher.code,
-                count: count,
-                timestamp: new Date().toISOString()
-            });
-            app.save();
-            app.render();
-            app.showToast(`${count} redemptions logged`, 'success');
-        }
-
-        function saveSettings() {
-            app.user.email = document.getElementById('businessName').value || app.user.email;
-            app.save();
-            app.showToast('Settings saved', 'success');
-        }
-
-        function searchVouchers() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = app.vouchers.filter(v => v.code.toLowerCase().includes(query) || v.offer.toLowerCase().includes(query));
-
-            const html = filtered.map(v => `
-                <div class="voucher-card">
-                    <div class="voucher-star" onclick="app.toggleFavorite('${v.id}')">${app.favorites.includes(v.id) ? '⭐' : '☆'}</div>
-                    <div class="voucher-info">
-                        <div class="voucher-code">${v.code}</div>
-                        <div class="voucher-meta">${v.offer}</div>
-                        <span class="voucher-status">Active</span>
-                    </div>
-                    <div class="voucher-actions">
-                        <button class="action-btn" onclick="app.showQR('${v.id}')">📱</button>
-                        <button class="action-btn" onclick="app.editVoucher('${v.id}')">✏️</button>
-                        <button class="action-btn" onclick="app.duplicateVoucher('${v.id}')" title="Duplicate">📋</button>
-                        <button class="action-btn" onclick="app.deleteVoucher('${v.id}')">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('vouchersList').innerHTML = html || '<div class="empty-state">No results found</div>';
-        }
-
-        function downloadQR() {
-            const canvas = document.querySelector('#qrContainer canvas');
-            if (canvas) {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL();
-                link.download = app.currentVoucher.code + '.png';
-                link.click();
-                app.showToast('QR code downloaded', 'success');
-            }
-        }
-
-        function copyShareLink() {
-            const link = document.getElementById('shareLink').value;
-            navigator.clipboard.writeText(link);
-            app.showToast('Link copied to clipboard', 'success');
-        }
-
-        function exportToCSV() {
-            let csv = 'Code,Offer,Valid From,Valid Until,Max Uses,Redeemed,Redemption Rate (%),Created\n';
-            app.vouchers.forEach(v => {
-                const rate = ((v.redeemedCount / Math.max(v.maxUses || 100, 1)) * 100).toFixed(1);
-                csv += `"${v.code}","${v.offer}","${v.validFrom}","${v.validUntil}","${v.maxUses || '∞'}","${v.redeemedCount}","${rate}","${new Date(v.createdAt || v.id).toLocaleString('de-DE')}"\n`;
-            });
-
-            const link = document.createElement('a');
-            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-            link.download = `vouchers_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            app.showToast('CSV exported', 'success');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => app.init());
+        });
     </script>
 </body>
 </html>

@@ -2,10 +2,14 @@
   "name": "qr-voucher-customer-app",
   "version": "1.0.0",
   "description": "Premium QR Voucher Scanner App for Lila Wiesbaden",
-  "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.3",
+    "archiver": "^6.0.0",
+    "uuid": "^9.0.0"
   },
   "keywords": [
     "qr-code",

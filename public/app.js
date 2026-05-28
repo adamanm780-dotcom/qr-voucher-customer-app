@@ -1,418 +1,519 @@
-// Simple Business Dashboard App
-console.log('App.js loaded');
-
-// Global login handlers
-function handleLoginClick() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    console.log('Login clicked:', email, password);
-    app.handleLogin(email, password);
-}
-
-function handleLoginSubmit(e) {
-    e.preventDefault();
-    handleLoginClick();
-}
+// VoucherFlow App - Complete State Management & Functionality
 
 const app = {
-    user: null,
+  state: {
+    loggedIn: false,
+    user: {
+      email: '',
+      name: '',
+      company: ''
+    },
     vouchers: [],
-    currentPage: 'dashboard',
-    currentVoucher: null,
-
-    init() {
-        console.log('Initializing app');
-        this.loadFromStorage();
-        this.attachEventListeners();
-
-        if (this.user) {
-            this.showDashboard();
-        } else {
-            this.showLogin();
-        }
-    },
-
-    loadFromStorage() {
-        const data = localStorage.getItem('app_data');
-        if (data) {
-            const parsed = JSON.parse(data);
-            this.user = parsed.user;
-            this.vouchers = parsed.vouchers || [];
-        }
-    },
-
-    save() {
-        localStorage.setItem('app_data', JSON.stringify({
-            user: this.user,
-            vouchers: this.vouchers
-        }));
-    },
-
-    attachEventListeners() {
-        // Login
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                this.handleLogin(email, password);
-            });
-        }
-
-        // Nav
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.dataset.page;
-                this.goToPage(page);
-            });
-        });
-
-        // Logout
-        document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
-
-        // Voucher buttons
-        document.getElementById('createVoucherBtn')?.addEventListener('click', () => this.openCreateModal());
-        document.getElementById('createVoucherBtn2')?.addEventListener('click', () => this.openCreateModal());
-        document.getElementById('modalCloseBtn')?.addEventListener('click', () => this.closeModal('voucherModal'));
-        document.getElementById('modalCancelBtn')?.addEventListener('click', () => this.closeModal('voucherModal'));
-        document.getElementById('qrModalCloseBtn')?.addEventListener('click', () => this.closeModal('qrModal'));
-
-        // Save voucher
-        document.getElementById('modalSaveBtn')?.addEventListener('click', () => this.saveVoucher());
-
-        // QR actions
-        document.getElementById('downloadQrBtn')?.addEventListener('click', () => this.downloadQR());
-        document.getElementById('printQrBtn')?.addEventListener('click', () => this.printQR());
-
-        // Settings
-        document.getElementById('saveSettingsBtn')?.addEventListener('click', () => this.saveSettings());
-    },
-
-    handleLogin(email, password) {
-        console.log('Login:', email, password);
-
-        if (!email || !password) {
-            document.getElementById('loginError').textContent = 'Email and password required';
-            return;
-        }
-
-        this.user = {
-            id: 'user_' + Date.now(),
-            name: 'Demo Business',
-            email: email
-        };
-
-        this.save();
-        console.log('User logged in:', this.user);
-
-        // Hide login, show app
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('appPage').style.display = 'flex';
-
-        this.showDashboard();
-    },
-
-    logout() {
-        this.user = null;
-        this.vouchers = [];
-        this.save();
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('appPage').style.display = 'none';
-        document.getElementById('loginForm').reset();
-    },
-
-    showLogin() {
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('appPage').style.display = 'none';
-    },
-
-    showDashboard() {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('appPage').style.display = 'flex';
-        this.updateUserInfo();
-        this.goToPage('dashboard');
-    },
-
-    updateUserInfo() {
-        if (this.user) {
-            document.getElementById('userName').textContent = this.user.name;
-            document.getElementById('userEmail').textContent = this.user.email;
-        }
-    },
-
-    goToPage(page) {
-        console.log('Going to:', page);
-        this.currentPage = page;
-
-        // Hide all content pages
-        document.querySelectorAll('.content > .page').forEach(p => {
-            p.style.display = 'none';
-        });
-
-        // Show selected page
-        const pageEl = document.getElementById(page + 'Page');
-        if (pageEl) {
-            pageEl.style.display = 'block';
-        }
-
-        // Update nav
-        document.querySelectorAll('.nav-item').forEach(item => {
-            if (item.dataset.page === page) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-
-        // Update title
-        const titles = {
-            dashboard: 'Dashboard',
-            vouchers: 'All Vouchers',
-            analytics: 'Analytics',
-            settings: 'Settings'
-        };
-        document.getElementById('pageTitle').textContent = titles[page] || page;
-
-        // Render content
-        if (page === 'dashboard') {
-            this.renderDashboard();
-        } else if (page === 'vouchers') {
-            this.renderVouchers();
-        } else if (page === 'analytics') {
-            this.renderAnalytics();
-        } else if (page === 'settings') {
-            this.renderSettings();
-        }
-    },
-
-    renderDashboard() {
-        const today = new Date().toISOString().split('T')[0];
-        const active = this.vouchers.filter(v => v.validFrom <= today && v.validUntil >= today).length;
-        const redeemed = this.vouchers.reduce((sum, v) => sum + v.redeemedCount, 0);
-
-        document.getElementById('totalVouchers').textContent = this.vouchers.length;
-        document.getElementById('activeToday').textContent = active;
-        document.getElementById('totalRedeemed').textContent = redeemed;
-        document.getElementById('conversionRate').textContent = this.vouchers.length > 0 ? Math.round(redeemed / this.vouchers.length * 100) + '%' : '0%';
-
-        this.renderRecentVouchers();
-    },
-
-    renderRecentVouchers() {
-        const tbody = document.getElementById('recentVouchersTable');
-        const recent = this.vouchers.slice(-5).reverse();
-
-        if (recent.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No vouchers yet</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = recent.map(v => `
-            <tr>
-                <td><span class="voucher-code">${v.code}</span></td>
-                <td>${v.offer}</td>
-                <td><span class="voucher-status status-${this.getStatus(v)}">${this.getStatus(v)}</span></td>
-                <td>${v.redeemedCount}/${v.maxUses || '∞'}</td>
-                <td>${new Date(v.validUntil).toLocaleDateString('de-DE')}</td>
-                <td><button onclick="app.showQR('${v.id}')" class="btn-icon btn-sm">📱</button></td>
-            </tr>
-        `).join('');
-    },
-
-    renderVouchers() {
-        const tbody = document.getElementById('allVouchersTable');
-
-        if (this.vouchers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vouchers yet</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = this.vouchers.map(v => `
-            <tr>
-                <td><span class="voucher-code">${v.code}</span></td>
-                <td>${v.offer}</td>
-                <td><span class="voucher-status status-${this.getStatus(v)}">${this.getStatus(v)}</span></td>
-                <td>${v.redeemedCount}</td>
-                <td>${v.maxUses || '∞'}</td>
-                <td>${new Date(v.validUntil).toLocaleDateString('de-DE')}</td>
-                <td>
-                    <button onclick="app.showQR('${v.id}')" class="btn-icon btn-sm">📱</button>
-                    <button onclick="app.editVoucher('${v.id}')" class="btn-icon btn-sm">✏️</button>
-                    <button onclick="app.deleteVoucher('${v.id}')" class="btn-icon btn-sm">🗑️</button>
-                </td>
-            </tr>
-        `).join('');
-    },
-
-    renderAnalytics() {
-        if (this.vouchers.length === 0) {
-            document.getElementById('topVouchersAnalytics').innerHTML = '<div class="empty-state">No data yet</div>';
-            return;
-        }
-
-        const top = this.vouchers.sort((a, b) => b.redeemedCount - a.redeemedCount).slice(0, 5);
-        const total = this.vouchers.reduce((s, v) => s + v.redeemedCount, 0);
-
-        document.getElementById('topVouchersAnalytics').innerHTML = top.map(v => `
-            <div style="padding: var(--space-md); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between;">
-                <span>${v.code}</span>
-                <span style="color: var(--color-primary);">${v.redeemedCount}</span>
-            </div>
-        `).join('');
-
-        document.getElementById('performanceMetrics').innerHTML = `
-            <div style="padding: var(--space-md);">
-                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
-                    <span>Total Redeemed</span>
-                    <span style="color: var(--color-success); font-weight: 600;">${total}</span>
-                </div>
-            </div>
-        `;
-    },
-
-    renderSettings() {
-        document.getElementById('businessName').value = this.user.name;
-        document.getElementById('businessEmail').value = this.user.email;
-    },
-
-    getStatus(v) {
-        const today = new Date().toISOString().split('T')[0];
-        if (v.validUntil < today) return 'expired';
-        if (v.validFrom > today) return 'inactive';
-        return 'active';
-    },
-
-    openCreateModal() {
-        this.currentVoucher = null;
-        document.getElementById('modalTitle').textContent = 'Create Voucher';
-        document.getElementById('voucherCode').value = '';
-        document.getElementById('voucherOffer').value = '';
-        document.getElementById('voucherFrom').value = new Date().toISOString().split('T')[0];
-        document.getElementById('voucherUntil').value = '';
-        document.getElementById('voucherMaxUses').value = '0';
-        this.openModal('voucherModal');
-    },
-
-    editVoucher(id) {
-        this.currentVoucher = this.vouchers.find(v => v.id === id);
-        if (!this.currentVoucher) return;
-
-        document.getElementById('modalTitle').textContent = 'Edit Voucher';
-        document.getElementById('voucherCode').value = this.currentVoucher.code;
-        document.getElementById('voucherOffer').value = this.currentVoucher.offer;
-        document.getElementById('voucherFrom').value = this.currentVoucher.validFrom;
-        document.getElementById('voucherUntil').value = this.currentVoucher.validUntil;
-        document.getElementById('voucherMaxUses').value = this.currentVoucher.maxUses;
-        this.openModal('voucherModal');
-    },
-
-    deleteVoucher(id) {
-        if (!confirm('Delete this voucher?')) return;
-        this.vouchers = this.vouchers.filter(v => v.id !== id);
-        this.save();
-        this.goToPage(this.currentPage);
-    },
-
-    saveVoucher() {
-        const code = document.getElementById('voucherCode').value;
-        const offer = document.getElementById('voucherOffer').value;
-        const from = document.getElementById('voucherFrom').value;
-        const until = document.getElementById('voucherUntil').value;
-        const max = parseInt(document.getElementById('voucherMaxUses').value) || 0;
-
-        if (!code || !offer || !from || !until) {
-            alert('Fill all fields');
-            return;
-        }
-
-        if (this.currentVoucher) {
-            this.currentVoucher.code = code;
-            this.currentVoucher.offer = offer;
-            this.currentVoucher.validFrom = from;
-            this.currentVoucher.validUntil = until;
-            this.currentVoucher.maxUses = max;
-        } else {
-            this.vouchers.push({
-                id: 'v_' + Date.now(),
-                code, offer, validFrom: from, validUntil: until,
-                maxUses: max,
-                redeemedCount: 0,
-                createdAt: new Date().toISOString()
-            });
-        }
-
-        this.save();
-        this.closeModal('voucherModal');
-        this.goToPage(this.currentPage);
-    },
-
-    showQR(id) {
-        this.currentVoucher = this.vouchers.find(v => v.id === id);
-        if (!this.currentVoucher) return;
-
-        const qrValue = this.currentVoucher.code;
-        document.getElementById('qrCodeValue').textContent = qrValue;
-
-        const container = document.getElementById('qrCodePlaceholder');
-        container.innerHTML = '';
-
-        try {
-            new QRCode(container, {
-                text: qrValue,
-                width: 250,
-                height: 250,
-                colorDark: '#fff',
-                colorLight: '#000'
-            });
-        } catch (e) {
-            container.textContent = 'QR: ' + qrValue;
-        }
-
-        this.openModal('qrModal');
-    },
-
-    downloadQR() {
-        const canvas = document.querySelector('#qrCodePlaceholder canvas');
-        if (canvas) {
-            const a = document.createElement('a');
-            a.href = canvas.toDataURL();
-            a.download = this.currentVoucher.code + '.png';
-            a.click();
-        }
-    },
-
-    printQR() {
-        const w = window.open();
-        w.document.write(`<h1>${this.currentVoucher.code}</h1><p>${this.currentVoucher.offer}</p>`);
-        const canvas = document.querySelector('#qrCodePlaceholder canvas');
-        if (canvas) {
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL();
-            img.style.width = '300px';
-            w.document.body.appendChild(img);
-        }
-        w.print();
-    },
-
-    saveSettings() {
-        this.user.name = document.getElementById('businessName').value;
-        this.user.email = document.getElementById('businessEmail').value;
-        this.save();
-        alert('Saved!');
-    },
-
-    openModal(id) {
-        document.getElementById(id).classList.add('active');
-    },
-
-    closeModal(id) {
-        document.getElementById(id).classList.remove('active');
+    currentVoucherId: null,
+    settings: {
+      companyName: 'Café Mocha',
+      email: 'contact@cafemocha.de',
+      phone: '+49 30 12345678'
     }
+  },
+
+  init() {
+    this.loadFromStorage();
+
+    // Hide loading screen after 3 seconds
+    setTimeout(() => {
+      const loadingScreen = document.getElementById('loading');
+      if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+      }
+    }, 3000);
+
+    // Show login if not logged in
+    if (!this.state.loggedIn) {
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('app').style.display = 'none';
+    } else {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      this.renderDashboard();
+    }
+  },
+
+  saveToStorage() {
+    localStorage.setItem('vf', JSON.stringify(this.state));
+  },
+
+  loadFromStorage() {
+    const stored = localStorage.getItem('vf');
+    if (stored) {
+      this.state = JSON.parse(stored);
+    }
+  },
+
+  showLoginPage() {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  },
+
+  showAppPages() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.querySelectorAll('.page').forEach(el => {
+      el.style.display = 'none';
+    });
+    document.getElementById('dashboardPage').style.display = 'block';
+  },
+
+  handleLogin(event) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    const email = document.getElementById('email')?.value;
+    const password = document.getElementById('password')?.value;
+
+    if (!email || !password) {
+      alert('Bitte alle Felder ausfüllen');
+      return;
+    }
+
+    this.state.loggedIn = true;
+    this.state.user = {
+      email: email,
+      name: email.split('@')[0],
+      company: 'Café Mocha'
+    };
+
+    this.saveToStorage();
+    this.showAppPages();
+    this.renderDashboard();
+  },
+
+  handleLogout() {
+    this.state.loggedIn = false;
+    this.saveToStorage();
+    this.showLoginPage();
+
+    // Clear form
+    document.querySelector('input[type="email"]').value = '';
+    document.querySelector('input[type="password"]').value = '';
+  },
+
+  switchPage(pageId, event) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    // Update nav buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    if (event && event.target) {
+      event.target.classList.add('active');
+    }
+
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+      page.style.display = 'none';
+    });
+
+    // Show selected page
+    const page = document.getElementById(pageId);
+    if (page) {
+      page.style.display = 'block';
+    }
+
+    // Render page content
+    if (pageId === 'dashboardPage') {
+      this.renderDashboard();
+    } else if (pageId === 'vouchersPage') {
+      this.renderVouchers();
+    } else if (pageId === 'analyticsPage') {
+      this.renderAnalytics();
+    } else if (pageId === 'settingsPage') {
+      this.renderSettings();
+    }
+  },
+
+  renderDashboard() {
+    const statsContainer = document.querySelector('.stats-grid');
+    if (!statsContainer) return;
+
+    const totalVouchers = this.state.vouchers.length;
+    const redeemed = this.state.vouchers.filter(v => v.redeemed).length;
+    const pending = totalVouchers - redeemed;
+    const redemptionRate = totalVouchers > 0 ? ((redeemed / totalVouchers) * 100).toFixed(1) : 0;
+
+    statsContainer.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Total Vouchers</div>
+        <div class="stat-value">${totalVouchers}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Redeemed</div>
+        <div class="stat-value">${redeemed}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value">${pending}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Redemption Rate</div>
+        <div class="stat-value">${redemptionRate}%</div>
+      </div>
+    `;
+
+    // Render recent vouchers
+    this.renderRecentVouchers();
+  },
+
+  renderRecentVouchers() {
+    const container = document.querySelector('.recent-vouchers-list');
+    if (!container) return;
+
+    const recent = this.state.vouchers.slice(-3).reverse();
+
+    if (recent.length === 0) {
+      container.innerHTML = '<p style="color: #a8a8b8; text-align: center; padding: 20px;">No vouchers yet. Create one!</p>';
+      return;
+    }
+
+    container.innerHTML = recent.map((v, idx) => `
+      <div class="voucher-card" style="animation-delay: ${idx * 0.1}s">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <div style="font-weight: 700; margin-bottom: 4px;">${v.title}</div>
+            <div style="font-size: 14px; color: #a8a8b8;">${v.description}</div>
+            <div style="font-size: 12px; color: #e91e8c; margin-top: 8px; font-weight: 700;">${v.value}</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-icon" onclick="app.showQR('${v.id}')">QR</button>
+            <button class="btn-icon" onclick="app.editVoucher('${v.id}')">Edit</button>
+            <button class="btn-icon" onclick="app.deleteVoucher('${v.id}')">Del</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderVouchers() {
+    const container = document.querySelector('.vouchers-list');
+    if (!container) return;
+
+    if (this.state.vouchers.length === 0) {
+      container.innerHTML = '<p style="color: #a8a8b8; text-align: center; padding: 40px;">No vouchers yet. Create your first one!</p>';
+      return;
+    }
+
+    container.innerHTML = this.state.vouchers.map((v, idx) => `
+      <div class="voucher-card" style="animation-delay: ${idx * 0.1}s">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <div style="font-weight: 700; margin-bottom: 4px;">${v.title}</div>
+            <div style="font-size: 13px; color: #a8a8b8; margin-bottom: 8px;">${v.description}</div>
+            <div style="display: flex; gap: 12px; font-size: 12px;">
+              <span style="color: #e91e8c;">${v.value}</span>
+              <span style="color: #a8a8b8;">${new Date(v.created).toLocaleDateString('de-DE')}</span>
+              ${v.redeemed ? '<span style="color: #4caf50;">✓ Redeemed</span>' : '<span style="color: #ff9800;">Pending</span>'}
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+            <button class="btn-icon" onclick="app.showQR('${v.id}')">QR</button>
+            <button class="btn-icon" onclick="app.editVoucher('${v.id}')">Edit</button>
+            <button class="btn-icon" onclick="app.toggleRedeem('${v.id}')">${v.redeemed ? 'Undo' : 'Mark Redeemed'}</button>
+            <button class="btn-icon" onclick="app.deleteVoucher('${v.id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderAnalytics() {
+    const container = document.querySelector('.analytics-content');
+    if (!container) return;
+
+    const totalVouchers = this.state.vouchers.length;
+    const redeemed = this.state.vouchers.filter(v => v.redeemed).length;
+    const pending = totalVouchers - redeemed;
+    const redemptionRate = totalVouchers > 0 ? ((redeemed / totalVouchers) * 100).toFixed(1) : 0;
+
+    // Group by date
+    const byDate = {};
+    this.state.vouchers.forEach(v => {
+      const date = new Date(v.created).toLocaleDateString('de-DE');
+      if (!byDate[date]) byDate[date] = { total: 0, redeemed: 0 };
+      byDate[date].total++;
+      if (v.redeemed) byDate[date].redeemed++;
+    });
+
+    const dateChart = Object.entries(byDate)
+      .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+      .map(([date, data]) => `
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+            <span>${date}</span>
+            <span>${data.redeemed}/${data.total} redeemed</span>
+          </div>
+          <div style="background: rgba(168, 168, 184, 0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, #e91e8c, #ff4ca6); height: 100%; width: ${data.total > 0 ? (data.redeemed / data.total) * 100 : 0}%;"></div>
+          </div>
+        </div>
+      `).join('');
+
+    container.innerHTML = `
+      <div style="padding: 20px; background: rgba(233, 30, 140, 0.1); border-radius: 12px; margin-bottom: 28px;">
+        <div style="font-weight: 700; margin-bottom: 12px;">Overall Statistics</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; font-size: 13px;">
+          <div>
+            <div style="color: #a8a8b8; margin-bottom: 4px;">Total</div>
+            <div style="font-size: 20px; font-weight: 700; color: #e91e8c;">${totalVouchers}</div>
+          </div>
+          <div>
+            <div style="color: #a8a8b8; margin-bottom: 4px;">Redeemed</div>
+            <div style="font-size: 20px; font-weight: 700; color: #4caf50;">${redeemed}</div>
+          </div>
+          <div>
+            <div style="color: #a8a8b8; margin-bottom: 4px;">Pending</div>
+            <div style="font-size: 20px; font-weight: 700; color: #ff9800;">${pending}</div>
+          </div>
+          <div>
+            <div style="color: #a8a8b8; margin-bottom: 4px;">Rate</div>
+            <div style="font-size: 20px; font-weight: 700; color: #2196f3;">${redemptionRate}%</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding: 20px; background: rgba(168, 168, 184, 0.05); border-radius: 12px; border: 1px solid rgba(168, 168, 184, 0.1);">
+        <div style="font-weight: 700; margin-bottom: 20px;">Redemption Timeline</div>
+        ${dateChart}
+      </div>
+    `;
+  },
+
+  renderSettings() {
+    const nameInput = document.querySelector('input[name="companyName"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const phoneInput = document.querySelector('input[name="phone"]');
+
+    if (nameInput) nameInput.value = this.state.settings.companyName;
+    if (emailInput) emailInput.value = this.state.settings.email;
+    if (phoneInput) phoneInput.value = this.state.settings.phone;
+  },
+
+  openCreateModal() {
+    const modal = document.getElementById('voucherModal');
+    if (modal) {
+      modal.style.display = 'block';
+      this.currentVoucherId = null;
+      document.querySelector('input[name="voucherTitle"]').value = '';
+      document.querySelector('input[name="voucherValue"]').value = '';
+      document.querySelector('textarea[name="voucherDescription"]').value = '';
+    }
+  },
+
+  closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  },
+
+  saveVoucher() {
+    const title = document.querySelector('input[name="voucherTitle"]').value;
+    const value = document.querySelector('input[name="voucherValue"]').value;
+    const description = document.querySelector('textarea[name="voucherDescription"]').value;
+
+    if (!title || !value) {
+      alert('Bitte alle erforderlichen Felder ausfüllen');
+      return;
+    }
+
+    if (this.currentVoucherId) {
+      // Edit existing
+      const voucher = this.state.vouchers.find(v => v.id === this.currentVoucherId);
+      if (voucher) {
+        voucher.title = title;
+        voucher.value = value;
+        voucher.description = description;
+        voucher.updated = new Date().toISOString();
+      }
+    } else {
+      // Create new
+      this.state.vouchers.push({
+        id: 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        title,
+        value,
+        description,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        redeemed: false,
+        qrData: null
+      });
+    }
+
+    this.saveToStorage();
+    this.closeModal('voucherModal');
+    this.renderDashboard();
+    this.renderVouchers();
+  },
+
+  editVoucher(id) {
+    const voucher = this.state.vouchers.find(v => v.id === id);
+    if (voucher) {
+      this.currentVoucherId = id;
+      document.querySelector('input[name="voucherTitle"]').value = voucher.title;
+      document.querySelector('input[name="voucherValue"]').value = voucher.value;
+      document.querySelector('textarea[name="voucherDescription"]').value = voucher.description;
+      this.openCreateModal();
+    }
+  },
+
+  deleteVoucher(id) {
+    if (confirm('Voucher wirklich löschen?')) {
+      this.state.vouchers = this.state.vouchers.filter(v => v.id !== id);
+      this.saveToStorage();
+      this.renderDashboard();
+      this.renderVouchers();
+    }
+  },
+
+  toggleRedeem(id) {
+    const voucher = this.state.vouchers.find(v => v.id === id);
+    if (voucher) {
+      voucher.redeemed = !voucher.redeemed;
+      this.saveToStorage();
+      this.renderDashboard();
+      this.renderVouchers();
+      this.renderAnalytics();
+    }
+  },
+
+  showQR(id) {
+    const voucher = this.state.vouchers.find(v => v.id === id);
+    if (!voucher) return;
+
+    this.currentVoucherId = id;
+    const qrContainer = document.getElementById('qrCodeContainer');
+    if (qrContainer) {
+      qrContainer.innerHTML = '';
+
+      const qrData = JSON.stringify({
+        id: voucher.id,
+        title: voucher.title,
+        value: voucher.value,
+        timestamp: new Date().toISOString()
+      });
+
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 200,
+        height: 200,
+        colorDark: '#e91e8c',
+        colorLight: '#0a0a12',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // Store for download
+      voucher.qrData = qrData;
+      this.saveToStorage();
+    }
+
+    const modal = document.getElementById('qrModal');
+    if (modal) {
+      modal.style.display = 'block';
+    }
+  },
+
+  downloadQR() {
+    const canvas = document.querySelector('#qrCodeContainer canvas');
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `voucher_${this.currentVoucherId}.png`;
+    link.click();
+  },
+
+  saveSettings() {
+    this.state.settings.companyName = document.querySelector('input[name="companyName"]').value || 'Café Mocha';
+    this.state.settings.email = document.querySelector('input[name="email"]').value || 'contact@example.de';
+    this.state.settings.phone = document.querySelector('input[name="phone"]').value || '+49 30 12345678';
+
+    this.saveToStorage();
+    alert('Einstellungen gespeichert!');
+  },
+
+  addTestData() {
+    const testVouchers = [
+      { title: 'Free Coffee', value: 'Free', description: 'Gratis Kaffee für dich' },
+      { title: '20% Off', value: '20%', description: 'Rabatt auf die gesamte Bestellung' },
+      { title: 'Free Cake Slice', value: 'Free', description: 'Ein Stück Kuchen kostenlos' },
+      { title: '€5 Off', value: '€5', description: 'Rabatt von 5 Euro' },
+      { title: 'Buy 1 Get 1', value: 'B1G1', description: 'Kaufe eins, bekomme eins kostenlos' }
+    ];
+
+    testVouchers.forEach(test => {
+      this.state.vouchers.push({
+        id: 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        title: test.title,
+        value: test.value,
+        description: test.description,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        redeemed: Math.random() > 0.5,
+        qrData: null
+      });
+    });
+
+    this.saveToStorage();
+    this.renderDashboard();
+    this.renderVouchers();
+    this.renderAnalytics();
+    alert('Sample vouchers added!');
+  }
 };
 
-// Start app
+// Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded');
-    app.init();
+  app.init();
 });
+
+// Make handlers globally available
+function handleLogin(event) {
+  app.handleLogin(event);
+}
+
+function handleLogout() {
+  app.handleLogout();
+}
+
+function switchPage(pageId, event) {
+  app.switchPage(pageId, event);
+}
+
+function openCreateModal() {
+  app.openCreateModal();
+}
+
+function closeModal(modalId) {
+  app.closeModal(modalId);
+}
+
+function saveVoucher() {
+  app.saveVoucher();
+}
+
+function showQR(id) {
+  app.showQR(id);
+}
+
+function downloadQR() {
+  app.downloadQR();
+}
+
+function saveSettings() {
+  app.saveSettings();
+}
+
+function addTestData() {
+  app.addTestData();
+}
