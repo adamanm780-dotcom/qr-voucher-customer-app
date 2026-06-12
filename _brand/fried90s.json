@@ -1,0 +1,5 @@
+{ "slug":"fried-90s", "name":"Fried 90's", "goal":5,
+  "colorBg":"#1c130f", "colorText":"#ffffff", "accent":"#f83808",
+  "fillColor":"#f83808", "reward":"Gratis Chicken",
+  "vibe":"bold retro 90s Nashville hot chicken street food",
+  "logoPath":"_brand/logo-orig.png" }

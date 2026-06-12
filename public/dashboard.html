@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Dashboard · FlowState Wallet</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#05070d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FlowState">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070d; --bg2:#080b13; --panel:#0b0f18; --panel-2:#0d121c;
+    --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.11);
+    --text:#eaf2ff; --muted:#6b7691; --muted-2:#48526b;
+    --accent:#22e9ff; --accent-ink:#04222a;
+    --grad:linear-gradient(120deg, #22e9ff 0%, #7a6bff 55%, #c062ff 100%);
+    --brand:#7a4fb5; --ok:#3ddc7f; --r:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',-apple-system,sans-serif;font-size:13.5px;color:var(--text);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(120% 70% at 88% -8%, rgba(122,107,255,.08), transparent 58%),
+      radial-gradient(90% 55% at 0% 0%, rgba(34,233,255,.05), transparent 52%),
+      var(--bg);
+    background-attachment:fixed}
+  h1,h2,h3{font-family:'Space Grotesk'}
+  ::selection{background:rgba(34,233,255,.25)}
+
+  #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:50;color:var(--muted);font-size:13px;gap:11px}
+  .spin{width:22px;height:22px;border:3px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  /* ===== WILLKOMMEN ===== */
+  #welcome{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;overflow:hidden;
+    background:radial-gradient(110% 80% at 50% -5%, rgba(34,233,255,.14) 0%, var(--bg) 58%)}
+  #welcome .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;pointer-events:none}
+  #welcome .orb.a{width:480px;height:480px;background:rgba(34,233,255,.25);top:-160px;left:50%;transform:translateX(-50%);animation:wob 12s ease-in-out infinite}
+  @keyframes wob{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.12)}}
+  #welcome .grid{position:absolute;inset:0;opacity:.4;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 80%)}
+  #welcome>*{position:relative;z-index:1}
+  #welcome.exit{opacity:0;transform:scale(1.05);pointer-events:none;transition:opacity .85s ease,transform .85s ease}
+  .w-logo{font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:38px;opacity:.95;display:flex;align-items:center;gap:10px}
+  .w-logo img{height:30px;width:auto;filter:drop-shadow(0 2px 12px rgba(34,233,255,.4))}
+  .w-logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .w-hello{font-family:'Space Grotesk';font-weight:600;font-size:clamp(28px,4.6vw,52px);line-height:1.06;letter-spacing:-.03em;max-width:20ch;margin-bottom:14px;opacity:0;transform:translateY(20px);animation:rise .85s .15s forwards cubic-bezier(.2,.7,.2,1)}
+  .w-hello em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .w-sub{color:var(--muted);font-size:clamp(14px,1.6vw,16px);max-width:38ch;line-height:1.6;margin-bottom:40px;opacity:0;transform:translateY(20px);animation:rise .85s .32s forwards cubic-bezier(.2,.7,.2,1)}
+  .go{position:relative;width:96px;height:96px;border-radius:50%;border:none;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Space Grotesk';font-size:21px;font-weight:700;opacity:0;transform:translateY(20px) scale(.9);animation:rise .85s .5s forwards cubic-bezier(.2,.7,.2,1);box-shadow:0 16px 46px rgba(122,107,255,.5);transition:transform .18s,box-shadow .2s}
+  .go:hover{transform:translateY(0) scale(1.06)!important;box-shadow:0 22px 64px rgba(192,98,255,.65)}
+  .go:active{transform:scale(.94)!important}
+  .go::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(34,233,255,.5);animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+  @keyframes rise{to{opacity:1;transform:translateY(0) scale(1)}}
+  #wave{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;transform:scale(.2);background:radial-gradient(circle at 50% 58%, var(--accent) 0%, rgba(34,233,255,.45) 36%, transparent 72%)}
+  #wave.flood{animation:flood 1.05s cubic-bezier(.4,0,.2,1) forwards}
+  @keyframes flood{0%{opacity:0;transform:scale(.2)}35%{opacity:.8}100%{opacity:0;transform:scale(2.4)}}
+
+  /* ===== APP ===== */
+  #app{display:none;grid-template-columns:212px 1fr;min-height:100dvh;opacity:0;transition:opacity .55s ease}
+  #app.show{opacity:1}
+  .side{border-right:1px solid var(--line);padding:22px 13px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100dvh;
+    background:linear-gradient(180deg,#0a0e17 0%, #070a11 100%)}
+  .fslogo{display:flex;align-items:center;gap:8px;padding:0 8px 14px;font-family:'Space Grotesk';font-weight:700;font-size:13px;letter-spacing:.01em}
+  .fslogo img{height:22px;width:auto;filter:drop-shadow(0 1px 6px rgba(34,233,255,.35))}
+  .fslogo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brandrow{display:flex;align-items:center;gap:11px;padding:14px 8px 18px;border-top:1px solid var(--line)}
+  .avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;overflow:hidden;background:var(--brand);color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:16px;flex-shrink:0}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .bn{font-family:'Space Grotesk';font-weight:600;font-size:14px;line-height:1.2}
+  .br{font-size:10.5px;color:var(--muted-2);letter-spacing:.02em}
+  .nav{background:none;border:none;text-align:left;display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:9px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;width:100%;position:relative;transition:background .14s,color .14s,transform .08s}
+  .nav svg{width:17px;height:17px;flex-shrink:0;transition:stroke .14s}
+  .nav:hover{background:rgba(255,255,255,.04);color:var(--text)}
+  .nav:active{transform:scale(.97)}
+  .nav.active{background:rgba(34,233,255,.10);color:var(--accent)}
+  .nav.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;border-radius:2px;background:var(--grad)}
+  .nav.active svg{stroke:var(--accent)}
+  .spacer{flex:1}
+  .logout{color:var(--muted-2)} .logout:hover{color:#ff6b6b;background:rgba(255,107,107,.06)}
+  /* Watermark */
+  .wm{margin-top:14px;padding:10px 11px;font-size:10.5px;color:var(--muted-2);display:flex;align-items:center;gap:7px;border-top:1px solid var(--line);letter-spacing:.02em}
+  .wm .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex-shrink:0}
+  .wm b{color:var(--muted);font-weight:600}
+
+  .main{padding:36px 40px 90px;max-width:900px}
+  .gk{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:9px;font-weight:600}
+  .gk::before{content:"";width:18px;height:1px;background:var(--grad)}
+  .ph1{font-size:clamp(24px,2.8vw,33px);font-weight:700;letter-spacing:-.03em;margin-bottom:7px}
+  .lead{color:var(--muted);margin-bottom:30px;font-size:14px;line-height:1.55;max-width:54ch}
+  .page{display:none}
+  .page.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:32px}
+  .stat{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px 18px 17px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .28s}
+  .stat:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.5)}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
+  .stat::after{content:"";position:absolute;top:-42%;right:-28%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(34,233,255,.12),transparent 68%);pointer-events:none}
+  .stat .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(34,233,255,.10);border:1px solid rgba(34,233,255,.16);margin-bottom:15px}
+  .stat .ico svg{width:18px;height:18px;stroke:var(--accent);fill:none}
+  .stat .l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .stat .n{font-family:'Space Grotesk';font-size:33px;font-weight:700;line-height:1;letter-spacing:-.02em}
+
+  /* Erstellen — Typ-Toggle inline + Formular sofort sichtbar */
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px;gap:4px;margin-bottom:18px}
+  .seg button{background:none;border:none;color:var(--muted);font-family:'Space Grotesk';font-weight:600;font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,transform .08s}
+  .seg button svg{width:16px;height:16px}
+  .seg button:active{transform:scale(.96)}
+  .seg button.on{background:rgba(34,233,255,.12);color:var(--accent)}
+  .seg button.on svg{stroke:var(--accent)}
+  .typehint{color:var(--muted);font-size:12.5px;margin-bottom:18px;line-height:1.5}
+
+  .form{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .field{margin-bottom:14px}
+  label{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+  input,textarea{width:100%;padding:11px 12px;border-radius:9px;font-size:16px;font-family:inherit;background:#070b13;border:1px solid var(--line);color:var(--text);transition:border-color .16s,box-shadow .16s}
+  input::placeholder,textarea::placeholder{color:#3a4258}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,233,255,.14)}
+  textarea{resize:vertical;min-height:58px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border:none;border-radius:10px;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Space Grotesk';font-size:13.5px;font-weight:700;transition:transform .1s,box-shadow .18s,filter .15s}
+  .btn:hover:not(:disabled){box-shadow:0 8px 24px rgba(122,107,255,.38);filter:brightness(1.08)}
+  .btn:active:not(:disabled){transform:scale(.97)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line-2);color:var(--text)}
+  .btn.ghost:hover{background:rgba(255,255,255,.05);box-shadow:none}
+  .formMsg{font-size:13px;margin-top:12px;min-height:16px}
+  .formMsg.ok{color:var(--accent)} .formMsg.err{color:#ff6b6b}
+  /* Gutschein-Vorlagen */
+  .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .tpl{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;cursor:pointer;text-align:left;position:relative;overflow:hidden;transition:border-color .15s,transform .1s,box-shadow .2s;color:var(--text);font-family:inherit}
+  .tpl:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 28px rgba(34,233,255,.12)}
+  .tpl:active{transform:translateY(0) scale(.98)}
+  .tpl .big{font-family:'Space Grotesk';font-weight:700;font-size:24px;line-height:1;margin-bottom:8px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .tpl .lbl{font-size:13px;color:var(--text);font-weight:500;margin-bottom:3px}
+  .tpl .sub{font-size:11.5px;color:var(--muted)}
+  .tpl.custom{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-style:dashed;color:var(--muted)}
+  .tpl.custom svg{width:22px;height:22px;stroke:var(--accent);margin-bottom:8px}
+  .tpl.custom .lbl{color:var(--text)}
+  /* Custom Modal */
+  .cm-overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,4,8,.82);backdrop-filter:blur(5px);padding:24px}
+  .cm-overlay.show{display:flex;animation:fade .25s ease}
+  .cm-card{background:var(--bg2);border:1px solid var(--line-2);border-radius:18px;padding:26px;max-width:380px;width:100%}
+  .cm-card h3{font-size:18px;margin-bottom:18px}
+
+  .empty{border:1px dashed var(--line-2);border-radius:14px;padding:36px 24px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6}
+  .list{display:flex;flex-direction:column;gap:9px}
+  .item{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:13px;padding:15px 16px;display:flex;align-items:center;gap:13px;transition:border-color .16s,transform .14s,box-shadow .2s}
+  .item:hover{border-color:var(--line-2);transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.36)}
+  .item .grow{flex:1;min-width:0}
+  .item .t{font-weight:600;font-size:14px;margin-bottom:2px}
+  .item .m{font-size:12px;color:var(--muted)}
+  .pill{font-size:10.5px;padding:4px 10px;border-radius:999px;background:rgba(34,233,255,.12);color:var(--accent);font-weight:600;white-space:nowrap}
+  .pill.stamp{background:rgba(122,79,181,.2);color:#c9b6ec}
+
+  .scanwrap{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:24px;text-align:center;max-width:440px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  #video{width:100%;max-width:340px;border-radius:12px;background:#000;aspect-ratio:1;object-fit:cover;margin:0 auto;display:block}
+  .scanhint{color:var(--muted);font-size:12.5px;margin-top:13px;line-height:1.5}
+  .scanresult{margin-top:16px;font-size:16px;line-height:1.45;min-height:18px;font-weight:600}
+  .scanresult.ok{color:var(--accent)} .scanresult.err{color:#ff6b6b}
+  .rewardCard{margin-top:18px;padding:24px 18px;border-radius:18px;background:rgba(34,233,255,.10);border:1px solid rgba(34,233,255,.38);text-align:center;animation:rzoom .4s cubic-bezier(.2,.8,.2,1)}
+  @keyframes rzoom{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  .rewardCard .rwIcon{font-size:42px;line-height:1}
+  .rewardCard .rwLbl{margin-top:8px;font-family:'Space Grotesk';font-weight:700;letter-spacing:1.8px;text-transform:uppercase;font-size:12.5px;color:var(--accent)}
+  .rewardCard .rwName{margin-top:7px;font-size:23px;font-weight:800;color:var(--text);line-height:1.25}
+  .rewardCard .rwBtns{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .rewardCard .rwBtns .btn{flex:1;min-width:150px}
+
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--grad);color:var(--accent-ink);padding:13px 20px;border-radius:11px;font-weight:700;font-family:'Space Grotesk';font-size:13.5px;box-shadow:0 12px 40px rgba(122,107,255,.4);opacity:0;transition:all .3s;z-index:60;pointer-events:none}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,4,8,.82);backdrop-filter:blur(5px);padding:24px}
+  #modal.show{display:flex;animation:fade .25s ease}
+  .modalcard{background:var(--bg2);border:1px solid var(--line-2);border-radius:18px;padding:28px;max-width:360px;width:100%;text-align:center}
+  .modalcard h3{font-size:18px;margin-bottom:5px}
+  .modalcard p{color:var(--muted);font-size:12.5px;margin-bottom:18px;line-height:1.5}
+  .qrbox{background:#fff;border-radius:13px;padding:14px;display:inline-block;margin-bottom:18px}
+  .qrbox img{display:block;width:210px;height:210px}
+  @media (max-width:760px){
+    #app{grid-template-columns:1fr}
+    /* Top-Bar am Handy: Safe-Area beachten, damit Logo/Name nicht unter der Statusleiste verschwinden */
+    .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;
+      border-right:none;border-bottom:1px solid var(--line);
+      padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 12px;
+      background:linear-gradient(180deg,#0a0e17,#070a11)}
+    .fslogo{padding-bottom:0;flex:1}
+    #logoutBtn{order:1;width:auto;padding:8px 10px;margin-left:auto;font-size:0}  /* oben rechts, nur Icon */
+    #logoutBtn svg{width:19px;height:19px}
+    .brandrow{order:5;width:100%;padding:12px 4px 4px;margin-top:6px;border-top:1px solid var(--line)}
+    .spacer,.wm{display:none}
+    .nav{order:9;width:auto;flex:0 0 auto;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.04);font-size:13px}
+    .nav.active{background:rgba(34,233,255,.12)}
+    .nav.active::before{display:none}
+    .main{padding:22px 16px calc(60px + env(safe-area-inset-bottom, 0px));max-width:100%}
+    .row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+  <div id="loading"><span class="spin"></span> Lädt …</div>
+
+  <section id="welcome">
+    <span class="orb a"></span><span class="grid"></span>
+    <div class="w-logo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b> Wallet</div>
+    <h1 class="w-hello">Herzlich willkommen, <em id="wName">—</em></h1>
+    <p class="w-sub">Schön, dass du da bist. Viel Spaß mit deinem persönlichen Dashboard.</p>
+    <button class="go" id="goBtn">GO</button>
+  </section>
+  <div id="wave"></div>
+
+  <div id="app">
+    <aside class="side">
+      <div class="fslogo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
+      <div class="brandrow">
+        <div class="avatar" id="avatar">L</div>
+        <div><div class="bn" id="bizName">—</div><div class="br">Betriebs-Dashboard</div></div>
+      </div>
+      <button class="nav active" data-page="overview"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Übersicht</button>
+      <button class="nav" data-page="create"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Erstellen</button>
+      <button class="nav" data-page="manage"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Meine Aktionen</button>
+      <button class="nav" data-page="scan"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7V5a1 1 0 011-1h2M17 4h2a1 1 0 011 1v2M20 17v2a1 1 0 01-1 1h-2M7 20H5a1 1 0 01-1-1v-2"/><path d="M4 12h16"/></svg>Scanner</button>
+      <div class="spacer"></div>
+      <button class="nav logout" id="logoutBtn"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Abmelden</button>
+      <div class="wm"><span class="dot"></span><span>powered by <b>FlowState</b></span></div>
+    </aside>
+
+    <div class="main">
+      <section class="page active" id="page-overview">
+        <div class="gk">Dashboard</div>
+        <div class="ph1">Übersicht</div>
+        <p class="lead">Deine Gutscheine und Stempelkarten auf einen Blick.</p>
+        <div class="grid3">
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 11h18"/></svg></div>
+            <div class="l">Im Umlauf</div><div class="n" id="statActive">0</div>
+          </div>
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7S11 3 8.5 3 5.5 5 6 7m6 0s1-4 3.5-4S18 5 17.5 7"/></svg></div>
+            <div class="l">Eingelöst gesamt</div><div class="n" id="statRedeemed">0</div>
+          </div>
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l2.2 5.5L20 10l-5.8 1.5L12 17l-2.2-5.5L4 10l5.8-1.5z"/></svg></div>
+            <div class="l">Aktive Aktionen</div><div class="n" id="statCampaigns">0</div>
+          </div>
+        </div>
+        <div class="gk">Letzte Aktivität</div>
+        <div id="activityList" class="list"><div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div></div>
+      </section>
+
+      <section class="page" id="page-create">
+        <div class="gk">Neu</div>
+        <div class="ph1">Aktion erstellen</div>
+        <p class="lead">Typ wählen — der Rest geht in Sekunden.</p>
+        <div class="seg">
+          <button type="button" class="on" id="seg-coupon"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4z"/></svg>Gutschein</button>
+          <button type="button" id="seg-stamp"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="7" cy="8" r="2.2"/><circle cx="14" cy="8" r="2.2"/><circle cx="7" cy="15" r="2.2"/><circle cx="14" cy="15" r="2.2"/></svg>Stempelkarte</button>
+        </div>
+
+        <!-- GUTSCHEIN: Vorlagen-Kacheln -->
+        <div id="couponMode">
+          <p class="typehint">Wähle eine Vorlage — fertig. Oder erstelle einen eigenen.</p>
+          <div class="tpl-grid" id="couponTpls"></div>
+        </div>
+
+        <!-- STEMPELKARTE: Minimal -->
+        <div id="stampMode" style="display:none">
+          <p class="typehint">Stempelzahl wählen und Belohnung eintragen — fertig.</p>
+          <form class="form" id="stampForm">
+            <div class="field">
+              <label>Wie viele Stempel bis zur Belohnung?</label>
+              <div class="seg" id="goalSeg" style="margin-bottom:0">
+                <button type="button" data-goal="5">5 Stempel</button>
+                <button type="button" class="on" data-goal="10">10 Stempel</button>
+              </div>
+            </div>
+            <div class="field"><label for="sReward">Belohnung</label><input id="sReward" required placeholder="z. B. 1 Kaffee gratis"></div>
+            <button class="btn" type="submit" id="stampBtn">Stempelkarte erstellen</button>
+            <div class="formMsg" id="stampMsg"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Modal: eigener Gutschein -->
+      <div id="customModal" class="cm-overlay">
+        <div class="cm-card">
+          <h3>Eigener Gutschein</h3>
+          <form id="customForm">
+            <div class="field"><label for="cTitle">Titel</label><input id="cTitle" required placeholder="z. B. 25% auf Cocktails"></div>
+            <div class="field"><label for="cValue">Wert / Vorteil</label><input id="cValue" placeholder="z. B. 25%"></div>
+            <div style="display:flex;gap:10px;margin-top:6px">
+              <button class="btn" type="submit">Erstellen</button>
+              <button class="btn ghost" type="button" id="customCancel">Abbrechen</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section class="page" id="page-manage">
+        <div class="gk">Verwaltung</div>
+        <div class="ph1">Meine Aktionen</div>
+        <p class="lead">QR-Code zum Ausgeben anzeigen.</p>
+        <div id="campaignList" class="list"><div class="empty">Lade …</div></div>
+      </section>
+
+      <section class="page" id="page-scan">
+        <div class="gk">Einlösen</div>
+        <div class="ph1">Scanner</div>
+        <p class="lead">Scanne die Gäste-Karte, um zu entwerten oder einen Stempel zu geben.</p>
+        <div class="scanwrap">
+          <video id="video" playsinline muted></video>
+          <div class="scanhint" id="scanHint">Tippe „Scanner starten", um die Kamera zu aktivieren.</div>
+          <div style="margin-top:14px;display:flex;gap:10px;justify-content:center">
+            <button class="btn" id="scanStart">Scanner starten</button>
+            <button class="btn ghost" id="scanStop" style="display:none">Stoppen</button>
+          </div>
+          <div class="scanresult" id="scanResult"></div>
+          <div class="rewardCard" id="rewardCard" style="display:none">
+            <div class="rwIcon">🎉</div>
+            <div class="rwLbl">Belohnung freigeschaltet</div>
+            <div class="rwName" id="rewardName"></div>
+            <div class="rwBtns">
+              <button class="btn" id="rewardRedeem">Belohnung einlösen</button>
+              <button class="btn ghost" id="rewardKeep">Belohnung behalten</button>
+            </div>
+          </div>
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line)">
+            <label for="manualCode" style="margin-bottom:8px">Oder Code manuell eingeben</label>
+            <div style="display:flex;gap:8px">
+              <input id="manualCode" placeholder="z. B. NINI-AB12CD" style="text-transform:uppercase">
+              <button class="btn" id="manualBtn" style="white-space:nowrap">Einlösen</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="modal"><div class="modalcard">
+    <h3 id="qrTitle">QR-Code</h3>
+    <p id="qrSub">Gäste scannen diesen Code, um die Karte in ihre Wallet zu laden.</p>
+    <div class="qrbox" id="qrBox"></div>
+    <div style="display:flex;gap:10px;justify-content:center"><button class="btn ghost" id="qrClose">Schließen</button></div>
+  </div></div>
+  <div id="toast"></div>
+
+  <!-- QR-Decoder (funktioniert auch auf iPhone/Safari, wo BarcodeDetector fehlt) -->
+  <script src="./js/jsQR.js"></script>
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!session) location.replace('./index.html');
+
+    const { data:bizRows, error } = await supabase.from('businesses').select('id, name, slug, logo_url, color_bg, color_text');
+    if (error || !bizRows || !bizRows.length){
+      // Admin-Login ohne eigenen Betrieb -> ins Cockpit umleiten.
+      const r = await fetch('/api/admin/businesses', { headers:{ 'Authorization':'Bearer '+session.access_token } }).catch(()=>null);
+      if (r && r.status===200){ location.replace('./cockpit.html'); throw new Error('redirect to cockpit'); }
+      document.getElementById('loading').textContent='Kein Betrieb mit diesem Login verknüpft.'; throw new Error('no business');
+    }
+    const biz = bizRows[0];
+    document.documentElement.style.setProperty('--brand', biz.color_bg || '#7a4fb5');
+    document.getElementById('wName').textContent = biz.name;
+    document.getElementById('bizName').textContent = biz.name;
+
+    // Admin-Ansicht: schwebender "Zurück zum Cockpit"-Knopf — NUR wenn du als Admin hierher gewechselt bist.
+    const adminRaw = localStorage.getItem('fs_admin_session');
+    if (adminRaw){
+      const b = document.createElement('button');
+      b.textContent = '← Zurück zum Cockpit';
+      Object.assign(b.style,{position:'fixed',left:'14px',bottom:'calc(14px + env(safe-area-inset-bottom))',zIndex:'99999',
+        background:'linear-gradient(135deg,#19e3c2,#5b8cff)',color:'#04130d',border:'none',borderRadius:'999px',
+        padding:'13px 20px',font:'800 14px/1 -apple-system,sans-serif',boxShadow:'0 10px 28px rgba(0,0,0,.4)',cursor:'pointer'});
+      b.addEventListener('click', async ()=>{
+        b.textContent='Wechsle …';
+        try{ const a=JSON.parse(adminRaw); await supabase.auth.setSession({ access_token:a.access_token, refresh_token:a.refresh_token }); }catch{}
+        localStorage.removeItem('fs_admin_session');
+        location.replace('./cockpit.html');
+      });
+      document.body.appendChild(b);
+    }
+    const av=document.getElementById('avatar');
+    // Sicher: Bild per DOM setzen (kein innerHTML -> keine HTML/Script-Injektion über logo_url),
+    // und nur http(s)-URLs zulassen. Sonst Initiale anzeigen.
+    const logoOk = biz.logo_url && /^https?:\/\//i.test(String(biz.logo_url).trim());
+    if (logoOk) { const im=document.createElement('img'); im.src=String(biz.logo_url).trim(); im.alt=''; av.replaceChildren(im); }
+    else av.textContent=(biz.name||'?').trim().charAt(0).toUpperCase();
+
+    const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);};
+    const esc=s=>(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+    async function loadStats(){
+      const [{count:a},{count:r},{count:c}]=await Promise.all([
+        supabase.from('passes').select('*',{count:'exact',head:true}).eq('status','active'),
+        // "Eingelöst" = nur eingelöste Belohnungen voller Stempelkarten (Notiz "Belohnung: …")
+        supabase.from('redemptions').select('*',{count:'exact',head:true}).eq('action','redeem').ilike('note','Belohnung:%'),
+        supabase.from('campaigns').select('*',{count:'exact',head:true}).eq('active',true),
+      ]);
+      document.getElementById('statActive').textContent=a??0;
+      document.getElementById('statRedeemed').textContent=r??0;
+      document.getElementById('statCampaigns').textContent=c??0;
+    }
+    async function loadCampaigns(){
+      const { data:camps }=await supabase.from('campaigns').select('id,type,title,value,stamp_goal,reward,enroll_token,created_at').order('created_at',{ascending:false});
+      const list=document.getElementById('campaignList');
+      if(!camps||!camps.length){ list.innerHTML='<div class="empty">Noch keine Aktionen. Erstelle deine erste unter „Erstellen".</div>'; return; }
+      list.innerHTML=camps.map(c=>`<div class="item"><div class="grow"><div class="t">${esc(c.title)}</div><div class="m">${c.type==='stampcard'?`Stempelkarte · Ziel ${c.stamp_goal} · Belohnung: ${esc(c.reward||'—')}`:`Gutschein · ${esc(c.value||'—')}`}</div></div><span class="pill ${c.type==='stampcard'?'stamp':''}">${c.type==='stampcard'?'Stempelkarte':'Gutschein'}</span><button class="btn ghost" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}">QR</button></div>`).join('');
+    }
+    await loadStats(); await loadCampaigns();
+
+    document.getElementById('loading').style.display='none';
+    document.getElementById('welcome').style.display='flex';
+    document.getElementById('goBtn').addEventListener('click',()=>{
+      document.getElementById('wave').classList.add('flood');
+      document.getElementById('welcome').classList.add('exit');
+      setTimeout(()=>{document.getElementById('welcome').style.display='none';const app=document.getElementById('app');app.style.display='grid';requestAnimationFrame(()=>app.classList.add('show'));},700);
+    });
+
+    document.querySelectorAll('.nav[data-page]').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.nav[data-page]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const p=btn.dataset.page;
+      document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+      document.getElementById('page-'+p).classList.add('active');
+    }));
+
+    // --- Typ-Umschalter Gutschein / Stempelkarte ---
+    document.getElementById('seg-coupon').addEventListener('click',()=>{
+      document.getElementById('seg-coupon').classList.add('on');
+      document.getElementById('seg-stamp').classList.remove('on');
+      document.getElementById('couponMode').style.display='block';
+      document.getElementById('stampMode').style.display='none';
+    });
+    document.getElementById('seg-stamp').addEventListener('click',()=>{
+      document.getElementById('seg-stamp').classList.add('on');
+      document.getElementById('seg-coupon').classList.remove('on');
+      document.getElementById('stampMode').style.display='block';
+      document.getElementById('couponMode').style.display='none';
+    });
+    // 5/10-Stempel-Umschalter
+    document.querySelectorAll('#goalSeg button').forEach(b=>b.addEventListener('click',()=>{
+      document.querySelectorAll('#goalSeg button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+    }));
+
+    // --- Gemeinsame Speicher-Funktion ---
+    async function createCampaign(payload){
+      payload.business_id=biz.id; payload.active=true;
+      const { error:insErr }=await supabase.from('campaigns').insert(payload);
+      if(insErr){ toast('Fehler: '+insErr.message); return false; }
+      toast('Aktion erstellt ✓');
+      await loadStats(); await loadCampaigns();
+      document.querySelector('.nav[data-page="manage"]').click();
+      return true;
+    }
+
+    // --- Gutschein-Vorlagen ---
+    const COUPON_TEMPLATES=[
+      { big:'10%', lbl:'10% Rabatt', sub:'auf den Einkauf', value:'10%' },
+      { big:'20%', lbl:'20% Rabatt', sub:'auf alles', value:'20%' },
+      { big:'☕', lbl:'Gratis Kaffee', sub:'1 Heißgetränk', value:'Gratis Kaffee' },
+      { big:'🥤', lbl:'1 Getränk gratis', sub:'aufs Haus', value:'1 Getränk gratis' },
+      { big:'5€', lbl:'5€ Gutschein', sub:'Wertgutschein', value:'5€' },
+      { big:'2für1', lbl:'2 für 1', sub:'Buy one get one', value:'2 für 1' },
+    ];
+    const grid=document.getElementById('couponTpls');
+    grid.innerHTML = COUPON_TEMPLATES.map((t,i)=>`
+      <button class="tpl" data-i="${i}">
+        <span class="big">${t.big}</span>
+        <div class="lbl">${t.lbl}</div>
+        <div class="sub">${t.sub}</div>
+      </button>`).join('') + `
+      <button class="tpl custom" id="tplCustom">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <div class="lbl">Eigener Gutschein</div>
+        <div class="sub">frei eingeben</div>
+      </button>`;
+    grid.addEventListener('click',async(e)=>{
+      const card=e.target.closest('.tpl'); if(!card) return;
+      if(card.id==='tplCustom'){ document.getElementById('customModal').classList.add('show'); return; }
+      const t=COUPON_TEMPLATES[+card.dataset.i];
+      card.style.opacity='.5';
+      await createCampaign({ type:'coupon', title:t.lbl, value:t.value });
+      card.style.opacity='1';
+    });
+
+    // --- Eigener Gutschein (Modal) ---
+    const cm=document.getElementById('customModal');
+    document.getElementById('customCancel').addEventListener('click',()=>cm.classList.remove('show'));
+    cm.addEventListener('click',e=>{ if(e.target===cm) cm.classList.remove('show'); });
+    document.getElementById('customForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const ok=await createCampaign({ type:'coupon', title:document.getElementById('cTitle').value.trim(), value:document.getElementById('cValue').value.trim()||null });
+      if(ok){ cm.classList.remove('show'); e.target.reset(); }
+    });
+
+    // --- Stempelkarte (minimal) ---
+    document.getElementById('stampForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const btn=document.getElementById('stampBtn'),msg=document.getElementById('stampMsg');
+      btn.disabled=true;btn.textContent='Speichern …';msg.className='formMsg';msg.textContent='';
+      const goal=parseInt(document.querySelector('#goalSeg button.on')?.dataset.goal)||10; // 5 oder 10
+      const reward=document.getElementById('sReward').value.trim();
+      const ok=await createCampaign({
+        type:'stampcard',
+        title:`Stempelkarte · ${reward}`,
+        stamp_goal:goal, reward,
+        enroll_token:crypto.randomUUID().replace(/-/g,'').slice(0,16),
+      });
+      btn.disabled=false;btn.textContent='Stempelkarte erstellen';
+      if(ok) e.target.reset();
+    });
+
+    const modal=document.getElementById('modal');
+    document.getElementById('campaignList').addEventListener('click',(e)=>{
+      const b=e.target.closest('[data-qr]');if(!b)return;
+      document.getElementById('qrTitle').textContent=b.dataset.title;
+      const token=b.dataset.token;
+      const campId=b.dataset.qr;
+      // Echter Pass-Link: Stempelkarte = Dauer-QR (enroll-Token), Gutschein = campaign-ID.
+      // Gast scannt -> /api/pass erzeugt signierten .pkpass -> landet in Wallet.
+      const url = token
+        ? `${location.origin}/api/pass?enroll=${token}`
+        : `${location.origin}/api/pass?campaign=${campId}`;
+      document.getElementById('qrBox').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}" alt="QR">`;
+      document.getElementById('qrSub').textContent = token
+        ? 'Dauer-QR: Gäste scannen → Stempelkarte landet in der Wallet. (Druck ihn aus für den Tresen!)'
+        : 'Gäste scannen → Gutschein landet in der Wallet.';
+      // direkter Test-Link drunter (auf iPhone in Safari oeffnen)
+      let tl=document.getElementById('qrTestLink');
+      if(!tl){ tl=document.createElement('a'); tl.id='qrTestLink'; tl.target='_blank';
+        tl.style.cssText='display:block;margin-top:14px;font-size:12px;color:var(--accent);word-break:break-all';
+        document.getElementById('qrSub').after(tl); }
+      tl.href=url; tl.textContent='Direkt testen: '+url;
+      modal.classList.add('show');
+    });
+    document.getElementById('qrClose').addEventListener('click',()=>modal.classList.remove('show'));
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show');});
+
+    let stream=null,scanning=false,detector=null,processing=false;
+    const video=document.getElementById('video'),scanResult=document.getElementById('scanResult');
+    // Schneller Weg auf Android/Chrome. Auf iPhone/Safari fehlt BarcodeDetector -> wir nutzen jsQR.
+    if('BarcodeDetector' in window){try{detector=new BarcodeDetector({formats:['qr_code']});}catch{}}
+    // Offscreen-Canvas für jsQR (liest die Kamera-Frames pixelweise).
+    const scanCanvas=document.createElement('canvas');
+    const scanCtx=scanCanvas.getContext('2d',{willReadFrequently:true});
+
+    document.getElementById('scanStart').addEventListener('click',async()=>{
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        video.srcObject=stream;await video.play();
+        document.getElementById('scanStart').style.display='none';document.getElementById('scanStop').style.display='inline-flex';
+        document.getElementById('scanHint').textContent='Kamera aktiv — QR der Gäste-Karte ins Bild halten.';
+        scanResult.className='scanresult'; scanResult.textContent='';
+        scanning=true;processing=false;tick();
+      }catch(err){scanResult.className='scanresult err';scanResult.textContent='Kamera nicht verfügbar: '+err.message;}
+    });
+    document.getElementById('scanStop').addEventListener('click',stopScan);
+    function stopScan(){scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}document.getElementById('scanStart').style.display='inline-flex';document.getElementById('scanStop').style.display='none';document.getElementById('scanHint').textContent='Scanner gestoppt.';}
+
+    // Treffer: Serial aus dem QR ziehen (direkt "LILA-XXXX" oder aus einer URL) und einlösen.
+    async function onHit(raw){
+      processing=true;
+      try{ if(navigator.vibrate) navigator.vibrate(60); }catch{}
+      let serial=(raw||'').trim();
+      // beliebiges Karten-Präfix (NINI-, TRAU-, LILA-, FS-, …) aus dem Scan ziehen
+      const m=serial.match(/[A-Z]{2,8}-[A-Z0-9]{4,}/i);
+      if(m) serial=m[0].toUpperCase();
+      stopScan();                 // Einzel-Scan: nach einem Treffer Kamera stoppen
+      await redeem(serial);       // Ergebnis bleibt sichtbar, „Scanner starten" für den nächsten Gast
+    }
+
+    async function tick(){
+      if(!scanning||processing)return;
+      try{
+        if(detector){
+          if(video.readyState===4){
+            const codes=await detector.detect(video);
+            if(codes.length&&codes[0].rawValue){ await onHit(codes[0].rawValue); return; }
+          }
+        } else if(video.readyState===video.HAVE_ENOUGH_DATA&&video.videoWidth){
+          scanCanvas.width=video.videoWidth; scanCanvas.height=video.videoHeight;
+          scanCtx.drawImage(video,0,0,scanCanvas.width,scanCanvas.height);
+          const img=scanCtx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
+          const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+          if(code&&code.data){ await onHit(code.data); return; }
+        }
+      }catch{}
+      requestAnimationFrame(tick);
+    }
+
+    let rewardSerial=null;
+    const rewardCard=document.getElementById('rewardCard');
+    function hideReward(){ rewardCard.style.display='none'; rewardSerial=null; }
+
+    async function redeem(serial, redeemReward=false){
+      hideReward();
+      scanResult.className='scanresult'; scanResult.textContent='Prüfe '+serial+' …';
+      try{
+        const { data:{ session:s } } = await supabase.auth.getSession();
+        const r=await fetch('/api/redeem',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(s?.access_token||'')},body:JSON.stringify({serial,redeemReward})});
+        const j=await r.json();
+        if(j.ok){
+          if(j.action==='reward_ready'){
+            // Karte voll -> Belohnung anbieten (einlösen oder behalten)
+            scanResult.className='scanresult'; scanResult.textContent='';
+            document.getElementById('rewardName').textContent=j.reward||j.title||'Belohnung';
+            rewardSerial=serial; rewardCard.style.display='block';
+            toast('🎉 Karte voll!');
+          } else {
+            scanResult.className='scanresult ok';
+            scanResult.textContent='✓ '+j.message;
+            toast(j.action==='reward_redeemed'?'Belohnung eingelöst ✓':(j.action==='redeemed'?'Eingelöst ✓':'Stempel +1 ✓'));
+          }
+          await loadStats(); await loadCampaigns();
+        } else {
+          scanResult.className='scanresult err';
+          scanResult.textContent='✗ '+(j.message||'Fehler');
+          toast(j.action==='already'?'Schon eingelöst':'Fehler');
+        }
+      }catch(e){
+        scanResult.className='scanresult err';
+        scanResult.textContent='✗ Netzwerkfehler: '+e.message;
+      }
+    }
+    // Belohnungs-Buttons
+    document.getElementById('rewardRedeem').addEventListener('click',()=>{ if(rewardSerial) redeem(rewardSerial,true); });
+    document.getElementById('rewardKeep').addEventListener('click',()=>{
+      hideReward();
+      scanResult.className='scanresult ok'; scanResult.textContent='✓ Belohnung gespeichert — die Karte bleibt voll.';
+      toast('Belohnung behalten');
+    });
+
+    // Manuelle Eingabe als Fallback (falls Kamera nicht geht)
+    document.getElementById('manualBtn').addEventListener('click',()=>{
+      const code=document.getElementById('manualCode').value.trim().toUpperCase();
+      if(code) redeem(code);
+    });
+    document.getElementById('manualCode').addEventListener('keydown',(e)=>{
+      if(e.key==='Enter'){ const code=e.target.value.trim().toUpperCase(); if(code) redeem(code); }
+    });
+    document.getElementById('logoutBtn').addEventListener('click',async()=>{stopScan();localStorage.removeItem('fs_admin_session');await supabase.auth.signOut();location.replace('./index.html');});
+  </script>
+</body>
+</html>

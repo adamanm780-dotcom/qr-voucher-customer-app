@@ -1,309 +1,171 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lila Wiesbaden - Gutschein Demo</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FlowState Wallet · Login</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#05070d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FlowState">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070d; --bg2:#080b13; --text:#eaf2ff; --muted:#6b7691; --muted-2:#48526b;
+    --accent:#22e9ff; --accent-ink:#04222a; --line:rgba(255,255,255,.07);
+    --grad:linear-gradient(120deg, #22e9ff 0%, #7a6bff 55%, #c062ff 100%);
+    --err:#ff6b6b; --r:13px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',-apple-system,sans-serif;font-size:14px;
+    background:var(--bg);color:var(--text);
+    display:grid;grid-template-columns:1.1fr .9fr;min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- BRAND PANEL ---------- */
+  .brand{
+    position:relative;overflow:hidden;padding:44px 52px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:var(--bg);border-right:1px solid var(--line);
+  }
+  /* animierter Glow */
+  .brand .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;pointer-events:none}
+  .brand .orb.a{width:420px;height:420px;background:rgba(34,233,255,.22);top:-120px;left:-100px;animation:float1 14s ease-in-out infinite}
+  .brand .orb.b{width:320px;height:320px;background:rgba(80,120,255,.16);bottom:-90px;right:-60px;animation:float2 18s ease-in-out infinite}
+  @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px)}}
+  @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-40px)}}
+  .brand .grid{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:44px 44px;mask-image:radial-gradient(75% 75% at 28% 22%,#000,transparent 78%)}
+  .brand>*{position:relative;z-index:1}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+  .logo{font-family:'Space Grotesk';font-weight:700;font-size:18px;letter-spacing:-.01em;display:flex;align-items:center;gap:11px}
+  .logo img{height:30px;width:auto;filter:drop-shadow(0 2px 10px rgba(34,233,255,.35))}
+  .logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
-            padding: 40px;
-        }
+  .pitch{max-width:18ch}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;font-weight:500}
+  .kicker::before{content:"";width:24px;height:1px;background:var(--grad)}
+  .pitch h1{font-family:'Space Grotesk';font-weight:600;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spacing:-.03em}
+  .pitch h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pitch p{color:var(--muted);font-size:14.5px;line-height:1.65;max-width:42ch;margin-top:18px}
 
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
+  .meta{display:flex;align-items:center;gap:20px}
+  .claim{font-family:'Space Grotesk';font-size:13px;color:var(--muted);letter-spacing:.01em}
+  .claim b{color:var(--text);font-weight:600}
+  .badge{font-size:11px;color:var(--muted-2);display:flex;align-items:center;gap:7px}
+  .badge .lk{width:5px;height:5px;border-radius:50%;background:#3ddc7f;box-shadow:0 0 8px #3ddc7f}
 
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .voucher-list {
-            margin-bottom: 30px;
-        }
-
-        .voucher-item {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .voucher-item:hover {
-            border-color: #667eea;
-            background: #f0f3ff;
-        }
-
-        .voucher-item.active {
-            border-color: #667eea;
-            background: #f0f3ff;
-        }
-
-        .voucher-code {
-            font-weight: 700;
-            color: #667eea;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-
-        .voucher-offer {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin: 8px 0 4px;
-        }
-
-        .voucher-business {
-            font-size: 13px;
-            color: #999;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            flex: 1;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: #e9ecef;
-            color: #1a1a1a;
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: #dee2e6;
-        }
-
-        .btn-secondary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .qr-display {
-            text-align: center;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .qr-display.show {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .qr-display img {
-            max-width: 100%;
-            border-radius: 10px;
-            border: 3px solid #667eea;
-        }
-
-        .qr-label {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .pass-url {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 11px;
-            color: #667eea;
-            word-break: break-all;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .instructions {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #856404;
-            line-height: 1.5;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  /* ---------- AUTH PANEL ---------- */
+  .auth{display:flex;align-items:center;justify-content:center;padding:40px;
+    background:radial-gradient(100% 55% at 50% -8%, rgba(34,233,255,.07), transparent 55%), var(--bg2)}
+  .card{width:100%;max-width:340px;opacity:0;transform:translateY(14px);animation:in .7s .1s forwards cubic-bezier(.2,.7,.2,1)}
+  @keyframes in{to{opacity:1;transform:translateY(0)}}
+  .card h2{font-family:'Space Grotesk';font-weight:600;font-size:25px;letter-spacing:-.015em;margin-bottom:5px}
+  .card .sub{color:var(--muted);font-size:13.5px;margin-bottom:28px}
+  label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 7px;font-weight:500}
+  .field{margin-bottom:15px}
+  input{
+    width:100%;padding:12px 13px;border-radius:10px;font-size:16px;font-family:inherit;
+    background:#0b0f18;border:1px solid var(--line);color:var(--text);
+    transition:border-color .18s,box-shadow .18s,background .18s;
+  }
+  input::placeholder{color:#3a4258}
+  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,233,255,.15);background:#0d121c}
+  button{
+    width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;
+    background:var(--grad);color:var(--accent-ink);font-size:14.5px;font-weight:700;
+    font-family:'Space Grotesk';letter-spacing:.01em;margin-top:8px;
+    transition:transform .1s ease,box-shadow .2s ease,filter .15s;
+  }
+  button:hover:not(:disabled){box-shadow:0 8px 26px rgba(122,107,255,.4);filter:brightness(1.08)}
+  button:active:not(:disabled){transform:scale(.975)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .msg{margin-top:14px;font-size:13px;min-height:17px;line-height:1.4}
+  .msg.error{color:var(--err)}
+  .msg.ok{color:var(--accent)}
+  .foot{margin-top:26px;font-size:11.5px;color:var(--muted-2);line-height:1.55}
+  @media (max-width:860px){
+    body{grid-template-columns:1fr}
+    .brand{display:none}
+    .auth{min-height:100dvh}
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎟️ Gutschein Demo</h1>
-        <p class="subtitle">Lila Wiesbaden</p>
-
-        <div class="instructions">
-            <strong>Anleitung:</strong> Wähle einen Gutschein, generiere den QR-Code und scanne ihn mit deinem iPhone um den Gutschein in deine Wallet zu importieren.
-        </div>
-
-        <div class="voucher-list">
-            <h3 style="margin-bottom: 12px; color: #1a1a1a; font-size: 14px; font-weight: 600;">Verfügbare Gutscheine:</h3>
-            <div class="voucher-item" data-code="ABC123">
-                <div class="voucher-code">ABC123</div>
-                <div class="voucher-offer">20% Rabatt auf alle Getränke</div>
-                <div class="voucher-business">Lila Wiesbaden</div>
-            </div>
-            <div class="voucher-item" data-code="XYZ789">
-                <div class="voucher-code">XYZ789</div>
-                <div class="voucher-offer">Kostenloser Matcha Latte</div>
-                <div class="voucher-business">Matcha Café</div>
-            </div>
-        </div>
-
-        <div class="button-group">
-            <button class="btn-primary" id="generateBtn" disabled>QR-Code Generieren</button>
-            <button class="btn-secondary" id="downloadBtn" disabled>Pass Downloaden</button>
-        </div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>QR-Code wird generiert...</p>
-        </div>
-
-        <div class="qr-display" id="qrDisplay">
-            <img id="qrImage" src="" alt="QR Code">
-            <div class="qr-label">
-                Scanne diesen QR-Code mit deinem iPhone Wallet Scanner
-            </div>
-            <div class="pass-url" id="passUrl"></div>
-        </div>
+  <aside class="brand">
+    <span class="orb a"></span><span class="orb b"></span><span class="grid"></span>
+    <div class="logo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
+    <div class="pitch">
+      <div class="kicker">Wallet-Plattform</div>
+      <h1>Gutscheine, die <span>direkt</span> in der Wallet landen.</h1>
+      <p>Erstelle Gutscheine und Stempelkarten, gib sie per Scan an deine Gäste — und löse sie im Laden ein. Alles an einem Ort.</p>
     </div>
+    <div class="meta">
+      <div class="claim"><b>Schnell.</b> Schön. Einfach.</div>
+      <div class="badge"><span class="lk"></span>Apple&nbsp;&amp;&nbsp;Google Wallet</div>
+    </div>
+  </aside>
 
-    <script>
-        let selectedCode = null;
-        let currentPassUrl = null;
+  <main class="auth">
+    <form class="card" id="loginForm" autocomplete="on">
+      <h2>Anmelden</h2>
+      <p class="sub">Zugang zu deinem Betriebs-Dashboard.</p>
+      <div class="field">
+        <label for="email">E-Mail</label>
+        <input type="email" id="email" name="email" required autocomplete="username" placeholder="name@betrieb.de">
+      </div>
+      <div class="field">
+        <label for="password">Passwort</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button type="submit" id="submitBtn">Einloggen</button>
+      <div class="msg" id="msg"></div>
+      <p class="foot">Noch kein Zugang? Dein FlowState-Account wird für dich eingerichtet — melde dich bei deinem Ansprechpartner.</p>
+    </form>
+  </main>
 
-        // Voucher selection
-        document.querySelectorAll('.voucher-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.voucher-item').forEach(v => v.classList.remove('active'));
-                this.classList.add('active');
-                selectedCode = this.dataset.code;
-                document.getElementById('generateBtn').disabled = false;
-            });
-        });
+  <script type="module">
+    import { supabase } from './js/supabase-client.js';
 
-        // Generate QR Code
-        document.getElementById('generateBtn').addEventListener('click', async () => {
-            if (!selectedCode) return;
+    // Admins -> Cockpit, Betriebe -> ihr Dashboard.
+    async function routeAfterLogin(){
+      const { data:{ session } } = await supabase.auth.getSession();
+      if(!session) return;
+      try{
+        const r = await fetch('/api/admin/businesses', { headers:{ 'Authorization':'Bearer '+session.access_token }});
+        if(r.status===200){ location.replace('./cockpit.html'); return; }
+      }catch{}
+      location.replace('./dashboard.html');
+    }
 
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('qrDisplay').classList.remove('show');
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (session) routeAfterLogin();
 
-            try {
-                const response = await fetch(`/api/qr?code=${encodeURIComponent(selectedCode)}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('qrImage').src = data.qrUrl;
-                    document.getElementById('passUrl').textContent = data.passUrl;
-                    currentPassUrl = data.passUrl;
-                    document.getElementById('downloadBtn').disabled = false;
-
-                    setTimeout(() => {
-                        document.getElementById('loading').classList.remove('show');
-                        document.getElementById('qrDisplay').classList.add('show');
-                    }, 500);
-                } else {
-                    alert('Fehler: ' + data.error);
-                    document.getElementById('loading').classList.remove('show');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Fehler beim Generieren des QR-Codes: ' + error.message);
-                document.getElementById('loading').classList.remove('show');
-            }
-        });
-
-        // Download Pass
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            if (currentPassUrl) {
-                window.location.href = currentPassUrl;
-            }
-        });
-    </script>
+    const form=document.getElementById('loginForm'), btn=document.getElementById('submitBtn'), msg=document.getElementById('msg');
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      msg.className='msg'; msg.textContent=''; btn.disabled=true; btn.textContent='Einloggen …';
+      const email=document.getElementById('email').value.trim();
+      const password=document.getElementById('password').value;
+      localStorage.removeItem('fs_admin_session'); // frischer Login -> evtl. alten Admin-Marker entfernen
+      const { error }=await supabase.auth.signInWithPassword({ email, password });
+      if (error){
+        msg.className='msg error';
+        msg.textContent='Anmeldung fehlgeschlagen: '+(error.message==='Invalid login credentials'?'E-Mail oder Passwort stimmt nicht.':error.message);
+        btn.disabled=false; btn.textContent='Einloggen'; return;
+      }
+      msg.className='msg ok'; msg.textContent='Erfolgreich — weiterleiten …';
+      routeAfterLogin();
+    });
+  </script>
 </body>
 </html>

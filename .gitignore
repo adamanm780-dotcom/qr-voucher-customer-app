@@ -5,4 +5,12 @@ node_modules/
 *.log
 .vercel
 
-.vercel
+# NIEMALS Zertifikate/Keys/Passes committen
+certs/
+build/
+*.p12
+*.pem
+*.key
+*.cer
+*.csr
+*.pkpass

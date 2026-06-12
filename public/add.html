@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Deine Karte 🎉</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:radial-gradient(1000px 600px at 50% -5%,#243049,#0b0e16 60%),#0b0e16;
+    color:#fff;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px 24px;overflow:hidden;position:relative;-webkit-font-smoothing:antialiased;
+  }
+  canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
+  .wrap{position:relative;z-index:2;max-width:420px;width:100%}
+  .emoji{font-size:68px;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+  h1{font-size:25px;font-weight:850;letter-spacing:-.4px;margin:16px 0 8px;animation:rise .5s .1s both}
+  p{color:#aab2c5;font-size:14.5px;margin-bottom:26px;animation:rise .5s .2s both}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    background:#fff;color:#000;font-weight:800;font-size:16px;border:none;border-radius:14px;
+    padding:15px 26px;text-decoration:none;animation:rise .5s .3s both}
+  @keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<canvas id="cf"></canvas>
+<div class="wrap">
+  <div class="emoji">🎉</div>
+  <h1>Deine Stempelkarte!</h1>
+  <p>Wird zur Apple Wallet hinzugefügt …</p>
+  <a class="btn" id="add" href="#"><span></span> Zur Wallet hinzufügen</a>
+</div>
+<script>
+  // Echter Pass-Link (alte Methode = direktes natives Apple-Fenster)
+  const pass = '/api/pass' + location.search;
+  document.getElementById('add').href = pass;
+
+  // Nach kurzem Konfetti automatisch das native Apple-„Hinzufügen" öffnen (Top-Level-Navigation).
+  setTimeout(() => { window.location.href = pass; }, 1500);
+
+  // --- Konfetti von oben ---
+  const cv = document.getElementById('cf'), ctx = cv.getContext('2d');
+  let W, H; const resize = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+  resize(); addEventListener('resize', resize);
+  const colors = ['#ff5e5e','#ffd24c','#5bd16b','#5b8cff','#c66bff','#19e3c2','#ff9f43'];
+  const P = [];
+  // Regen von oben über die ganze Breite
+  function rain(n){ for(let i=0;i<n;i++) P.push({
+    x:Math.random()*W, y:-20-Math.random()*H*0.4, vx:(Math.random()-.5)*3, vy:3+Math.random()*5,
+    g:.06+Math.random()*.05, s:6+Math.random()*7, c:colors[(Math.random()*colors.length)|0],
+    r:Math.random()*6.28, vr:(Math.random()-.5)*.3 }); }
+  rain(160); setTimeout(()=>rain(120),250); setTimeout(()=>rain(100),550);
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=P.length-1;i>=0;i--){ const p=P[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); ctx.restore();
+      if(p.y>H+40) P.splice(i,1); }
+    if(P.length) requestAnimationFrame(loop);
+  })();
+</script>
+</body>
+</html>

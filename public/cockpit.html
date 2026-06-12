@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FlowState · Cockpit</title>
+<style>
+  :root{
+    --bg:#0a0b10; --surface:#141621; --surface2:#1b1e2b; --line:rgba(255,255,255,.08);
+    --txt:#f2f4f8; --muted:#8b91a4; --accent:#19e3c2; --accent2:#5b8cff;
+    --radius:18px; --s4:4px; --s8:8px; --s12:12px; --s16:16px; --s24:24px; --s32:32px; --s48:48px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DejaVu Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,rgba(91,140,255,.10),transparent 60%),
+               radial-gradient(900px 600px at -10% 110%,rgba(25,227,194,.08),transparent 55%),var(--bg);
+    color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;
+    padding:max(var(--s24),env(safe-area-inset-top)) var(--s16) var(--s48);
+  }
+  .wrap{max-width:1040px;margin:0 auto}
+  .brandbar{display:flex;align-items:center;gap:var(--s12);margin-bottom:var(--s32)}
+  .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+        display:grid;place-items:center;font-weight:800;color:#06210f;font-size:20px}
+  .brandbar b{font-size:18px;letter-spacing:.3px}
+  .brandbar .tag{margin-left:auto;font-size:12px;color:var(--muted);border:1px solid var(--line);
+        padding:6px 12px;border-radius:999px}
+
+  /* Login */
+  .card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--line);
+        border-radius:var(--radius);padding:var(--s32)}
+  .login{max-width:400px;margin:8vh auto 0}
+  .login h1{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-bottom:var(--s8)}
+  .login p{color:var(--muted);font-size:14px;margin-bottom:var(--s24)}
+  label{display:block;font-size:12px;color:var(--muted);margin:var(--s16) 0 var(--s8);letter-spacing:.4px;text-transform:uppercase}
+  input{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);
+        padding:14px 16px;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,227,194,.15)}
+  .btn{width:100%;margin-top:var(--s24);background:linear-gradient(135deg,var(--accent),var(--accent2));
+       color:#04130d;font-weight:800;font-size:15px;border:none;border-radius:12px;padding:15px;cursor:pointer;
+       letter-spacing:.3px;transition:transform .12s,filter .15s}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.06)} .btn:active{transform:translateY(0)}
+  .btn[disabled]{opacity:.55;cursor:default;transform:none}
+  .err{color:#ff8a8a;font-size:13px;margin-top:var(--s16);min-height:18px}
+
+  /* Cockpit */
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s16);margin-bottom:var(--s24);flex-wrap:wrap}
+  .head h1{font-size:24px;font-weight:800;letter-spacing:-.5px}
+  .head .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;
+         padding:9px 14px;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s}
+  .ghost:hover{color:var(--txt);border-color:rgba(255,255,255,.25)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s16)}
+  .shop{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--line);
+        border-radius:var(--radius);padding:var(--s24);cursor:pointer;position:relative;overflow:hidden;
+        transition:transform .15s,border-color .15s,box-shadow .2s;text-align:left}
+  .shop:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.22);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+  .shop .swatch{position:absolute;inset:0 auto 0 0;width:5px}
+  .shop .del{position:absolute;top:10px;right:12px;font-size:15px;opacity:.4;cursor:pointer;z-index:3;
+    width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s}
+  .shop .del:hover{opacity:1;background:rgba(255,90,90,.2)}
+  .shop .fb{position:absolute;top:10px;right:48px;font-size:15px;opacity:.4;cursor:pointer;z-index:3;
+    width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s}
+  .shop .fb:hover{opacity:1;background:rgba(25,227,194,.2)}
+  .shop .top{display:flex;align-items:center;gap:var(--s12);margin-bottom:var(--s16)}
+  .av{width:48px;height:48px;border-radius:13px;background:#0e1018;border:1px solid var(--line);
+      display:grid;place-items:center;overflow:hidden;flex:0 0 auto;font-weight:800;font-size:20px}
+  .av img{width:100%;height:100%;object-fit:contain}
+  .shop .name{font-size:17px;font-weight:700;line-height:1.2}
+  .shop .slug{font-size:12px;color:var(--muted);margin-top:2px}
+  .stats{display:flex;gap:var(--s24);margin-top:var(--s8)}
+  .stat .n{font-size:20px;font-weight:800} .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .enter{margin-top:var(--s16);display:flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:700}
+  .hidden{display:none}
+  .loading{color:var(--muted);text-align:center;padding:var(--s48)}
+
+  /* Upload-Modal */
+  .modal{position:fixed;inset:0;z-index:1000;background:rgba(4,5,10,.72);backdrop-filter:blur(6px);
+         display:flex;align-items:flex-start;justify-content:center;padding:6vh var(--s16) var(--s24);overflow:auto}
+  .modal.hidden{display:none}   /* muss .modat{display:flex} schlagen -> höhere Spezifität */
+  .sheet{width:100%;max-width:480px;background:linear-gradient(180deg,var(--surface),var(--surface2));
+         border:1px solid var(--line);border-radius:var(--radius);padding:var(--s32)}
+  .sheet h2{font-size:21px;font-weight:800;letter-spacing:-.4px}
+  .msub{color:var(--muted);font-size:13px;margin:6px 0 var(--s16);line-height:1.45}
+  .sheet .row{display:flex;gap:var(--s12)}
+  select{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:13px 14px;font-size:15px;outline:none}
+  input[type=file]{width:100%;background:#0e1018;border:1px dashed var(--line);border-radius:12px;color:var(--muted);padding:14px;font-size:13px}
+  textarea{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:12px 14px;font-size:15px;outline:none;resize:vertical;font-family:inherit}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,227,194,.15)}
+  input[type=color]{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+  #placeFull{position:fixed;inset:0;z-index:2000;background:#06080e;display:flex;flex-direction:column}
+  #placeFull.hidden{display:none}   /* ID schlägt .hidden -> hier explizit ausblenden */
+  .pfbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;
+    padding-top:calc(14px + env(safe-area-inset-top));background:#0e1018;border-bottom:1px solid var(--line)}
+  .pfhint{font-size:14px;color:var(--txt);font-weight:600;flex:1;min-width:170px}
+  .pfsize{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
+  .pfsize input[type=range]{width:150px}
+  .pfstage{flex:1;display:grid;place-items:center;padding:18px;overflow:auto}
+  #placeBox{position:relative;width:min(96vw,1300px);aspect-ratio:1125/432;border-radius:14px;overflow:hidden;
+    background:#0e1018 center/contain no-repeat;touch-action:none;user-select:none;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .pmark{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1;cursor:grab;touch-action:none}
+  .pmark svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55))}
+  .pmark::after{content:"";position:absolute;inset:-18%;border-radius:50%}
+  .pmark:active{cursor:grabbing}
+  .merr{color:#ff8a8a;font-size:13px;margin-top:var(--s12);min-height:16px}
+  .mrow{display:flex;justify-content:flex-end;gap:10px;margin-top:var(--s24)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <div class="logo">F</div><b>FlowState</b>
+    <span class="tag">Admin-Cockpit</span>
+  </div>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="login card hidden">
+    <h1>Cockpit-Login</h1>
+    <p>Nur für FlowState. Alle Kunden-Dashboards an einem Ort.</p>
+    <form id="loginForm">
+      <label for="email">E-Mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="pw">Passwort</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+      <button class="btn" id="loginBtn" type="submit">Anmelden</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+  </section>
+
+  <!-- COCKPIT -->
+  <section id="cockpitView" class="hidden">
+    <div class="head">
+      <div>
+        <h1>Alle Betriebe</h1>
+        <div class="sub" id="sub">Klick auf einen Betrieb, um in sein Dashboard zu wechseln.</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="uploadOpen" style="width:auto;margin:0;padding:11px 18px">＋ Design hochladen</button>
+        <button class="ghost" id="reloadBtn" title="Liste aktualisieren">↻ Aktualisieren</button>
+        <button class="ghost" id="logoutBtn">Abmelden</button>
+      </div>
+    </div>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <!-- UPLOAD-MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="sheet">
+      <h2>Neuer Betrieb aus Design</h2>
+      <p class="msub">Lade dein Karten-Design hoch (z. B. aus ChatGPT). Daraus baue ich eine funktionierende Stempelkarte + Dashboard.</p>
+      <label for="uName">Name des Betriebs</label>
+      <input id="uName" type="text" placeholder="z. B. Café Nero, Wiesbaden">
+      <div class="row">
+        <div style="flex:1">
+          <label for="uGoal">Stempel</label>
+          <select id="uGoal"><option value="5">5er-Karte</option><option value="10">10er-Karte</option></select>
+        </div>
+        <div style="flex:1">
+          <label for="uColor">Karten-Farbe <span style="text-transform:none;color:#6b7280">(auto, anpassbar)</span></label>
+          <input id="uColor" type="color" value="#1c130f" style="height:48px;padding:4px;width:100%">
+        </div>
+      </div>
+      <label for="uFile">Design-Streifen (PNG/JPG, quer)</label>
+      <input id="uFile" type="file" accept="image/*">
+      <div id="placeWrap" class="hidden">
+        <button type="button" id="openPlace" class="btn" style="width:100%;margin-top:14px">🔍 Design öffnen & Stempel setzen</button>
+        <div id="placeStatus" style="font-size:12.5px;color:#ff8a8a;margin-top:8px">Noch keine Stempel gesetzt — bitte erst setzen.</div>
+      </div>
+      <label for="uLogo" style="margin-top:18px">Logo <span style="text-transform:none;color:#6b7280">(optional – für ein perfektes Profilbild)</span></label>
+      <input id="uLogo" type="file" accept="image/*">
+      <label for="uNote" style="margin-top:18px">Hinweis an mich <span style="text-transform:none;color:#6b7280">(optional)</span></label>
+      <textarea id="uNote" rows="2" placeholder="z. B. „Stempel-Haken bei Kreis 3 saß zu hoch“ oder „Farbe dunkler“"></textarea>
+      <div class="merr" id="uErr"></div>
+      <div class="mrow">
+        <button class="ghost" id="uCancel">Abbrechen</button>
+        <button class="btn" id="uSubmit" style="width:auto;margin:0;padding:13px 22px">Hochladen &amp; bauen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLLBILD: Stempel platzieren -->
+  <div id="placeFull" class="hidden">
+    <div class="pfbar">
+      <div class="pfhint">Zieh jeden Haken genau auf seinen Kreis. Größe oben einstellen.</div>
+      <div class="pfsize">Haken-Größe <input type="range" id="uSize" min="35" max="140" value="80"></div>
+      <button type="button" id="placeReset" class="ghost" style="padding:9px 14px;font-size:13px">↺ Reset</button>
+      <button type="button" id="placeDone" class="btn" style="width:auto;margin:0;padding:11px 22px">✓ Fertig</button>
+    </div>
+    <div class="pfstage"><div id="placeBox"></div></div>
+  </div>
+
+  <div id="boot" class="loading">Lädt …</div>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase-client.js';
+
+const $ = id => document.getElementById(id);
+const show = (el) => el.classList.remove('hidden');
+const hide = (el) => el.classList.add('hidden');
+const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+async function token(){ const { data:{ session } } = await supabase.auth.getSession(); return session?.access_token || null; }
+async function api(path, opts={}){
+  const jwt = await token();
+  const r = await fetch('/api/admin'+path, { ...opts, headers:{ 'Authorization':'Bearer '+jwt, 'Content-Type':'application/json', ...(opts.headers||{}) }});
+  const j = await r.json().catch(()=>({}));
+  return { status:r.status, ...j };
+}
+
+function gotoLogin(msg){ hide($('boot')); hide($('cockpitView')); show($('loginView')); if(msg) $('loginErr').textContent=msg; }
+
+// Dauerhafte Admin-Sitzung: überlebt Impersonation (die die Haupt-Session überschreibt) UND App-Neustart.
+function saveAdminSession(s){ if(s&&s.access_token&&s.refresh_token) localStorage.setItem('fs_admin_persist', JSON.stringify({access_token:s.access_token, refresh_token:s.refresh_token})); }
+async function restoreAdminSession(){
+  const raw=localStorage.getItem('fs_admin_persist'); if(!raw) return false;
+  try{ const a=JSON.parse(raw); const { error }=await supabase.auth.setSession({access_token:a.access_token, refresh_token:a.refresh_token}); return !error; }catch{ return false; }
+}
+
+async function loadCockpit(triedRestore){
+  hide($('loginView')); show($('boot')); $('boot').textContent='Lädt Betriebe …';
+  const res = await api('/businesses');
+  if(res.status===401 || res.status===403){
+    // evtl. wurde die Session durch Impersonation überschrieben -> gespeicherte Admin-Session zurückholen
+    if(!triedRestore && await restoreAdminSession()){ return loadCockpit(true); }
+    if(res.status===403){ localStorage.removeItem('fs_admin_persist'); await supabase.auth.signOut(); return gotoLogin('Dieser Login hat keinen Admin-Zugriff.'); }
+    return gotoLogin();
+  }
+  if(!res.ok){ hide($('boot')); show($('cockpitView')); $('grid').innerHTML='<div class="loading">Fehler: '+esc(res.message||'')+'</div>'; return; }
+
+  // eingeloggt + Admin bestätigt -> Sitzung dauerhaft merken (bleibst eingeloggt)
+  try{ const { data:{ session:s } } = await supabase.auth.getSession(); saveAdminSession(s); }catch{}
+
+  const list = res.businesses||[];
+  $('sub').textContent = list.length+' Betrieb'+(list.length===1?'':'e')+' · Klick wechselt direkt ins Dashboard.';
+  $('grid').innerHTML = list.map(b=>{
+    const initial = (b.name||'?').trim().charAt(0).toUpperCase();
+    const av = b.logo_url ? `<img src="${esc(b.logo_url)}" alt="">` : esc(initial);
+    const del = b.slug==='lila-wiesbaden' ? '' : `<span class="del" title="Löschen" data-del="${b.id}" data-dname="${esc(b.name)}">🗑</span>`;
+    const fb = `<span class="fb" title="Verbesserung hinterlassen" data-fb="${b.id}" data-fname="${esc(b.name)}">💬</span>`;
+    return `<button class="shop" data-id="${b.id}" data-name="${esc(b.name)}">
+      <span class="swatch" style="background:${esc(b.color_bg||'#5b8cff')}"></span>
+      ${fb}${del}
+      <div class="top"><div class="av">${av}</div>
+        <div><div class="name">${esc(b.name)}</div><div class="slug">${esc(b.slug)}</div></div></div>
+      <div class="stats">
+        <div class="stat"><div class="n">${b.activePasses}</div><div class="l">Pässe aktiv</div></div>
+        <div class="stat"><div class="n">${b.activeCampaigns}</div><div class="l">Aktionen</div></div>
+      </div>
+      <div class="enter">Dashboard öffnen →</div>
+    </button>`;
+  }).join('') || '<div class="loading">Noch keine Betriebe.</div>';
+
+  $('grid').querySelectorAll('.fb').forEach(f=>{
+    f.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const note = prompt(`Verbesserung / Hinweis für „${f.dataset.fname}":`);
+      if(!note || !note.trim()) return;
+      const r = await api('/feedback', { method:'POST', body: JSON.stringify({ business_id: f.dataset.fb, business_name: f.dataset.fname, note: note.trim() })});
+      alert(r.ok ? '✓ Notiz gespeichert — wird bearbeitet.' : ('Fehler: '+(r.message||'')));
+    });
+  });
+  $('grid').querySelectorAll('.del').forEach(d=>{
+    d.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      if(!confirm(`„${d.dataset.dname}" wirklich löschen?\n(Betrieb, Login und alle Karten — unwiderruflich)`)) return;
+      d.textContent='…';
+      const r = await api('/delete-business', { method:'POST', body: JSON.stringify({ business_id: d.dataset.del })});
+      if(r.ok){ loadCockpit(); } else { alert('Fehler: '+(r.message||'unbekannt')); d.textContent='🗑'; }
+    });
+  });
+  $('grid').querySelectorAll('.shop').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      el.style.opacity=.5; el.querySelector('.enter').textContent='Öffne '+el.dataset.name+' …';
+      // Admin-Session sichern, damit das Dashboard einen "Zurück zum Cockpit"-Knopf zeigen kann (nur für dich).
+      const { data:{ session: adminSession } } = await supabase.auth.getSession();
+      const r = await api('/impersonate', { method:'POST', body: JSON.stringify({ business_id: el.dataset.id }) });
+      if(r.ok && r.access_token){
+        if(adminSession) localStorage.setItem('fs_admin_session', JSON.stringify({ access_token:adminSession.access_token, refresh_token:adminSession.refresh_token, name:el.dataset.name }));
+        await supabase.auth.setSession({ access_token:r.access_token, refresh_token:r.refresh_token });
+        location.href = '/dashboard';
+      } else { el.style.opacity=1; el.querySelector('.enter').textContent='Fehler: '+esc(r.message||'unbekannt'); }
+    });
+  });
+
+  hide($('boot')); show($('cockpitView'));
+}
+
+// Login
+$('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  $('loginErr').textContent=''; $('loginBtn').disabled=true; $('loginBtn').textContent='Anmelden …';
+  const { error } = await supabase.auth.signInWithPassword({ email:$('email').value.trim(), password:$('pw').value });
+  $('loginBtn').disabled=false; $('loginBtn').textContent='Anmelden';
+  if(error){ $('loginErr').textContent='Anmeldung fehlgeschlagen.'; return; }
+  loadCockpit();
+});
+$('logoutBtn').addEventListener('click', async ()=>{ localStorage.removeItem('fs_admin_persist'); await supabase.auth.signOut(); gotoLogin(); });
+$('reloadBtn').addEventListener('click', ()=>{ const b=$('reloadBtn'); b.textContent='↻ …'; loadCockpit().finally(()=>{ b.textContent='↻ Aktualisieren'; }); });
+
+// --- Upload-Modal ---
+let pickedFile = null, pickedLogo = null;
+const openModal = ()=>{ $('uErr').textContent=''; $('modal').classList.remove('hidden'); };
+const closeModal = ()=>{ $('modal').classList.add('hidden'); };
+$('uploadOpen').addEventListener('click', openModal);
+$('uCancel').addEventListener('click', closeModal);
+$('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+// Durchschnittsfarbe des Designs als Auto-Vorschlag (anpassbar)
+function avgColor(file){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{ const c=document.createElement('canvas'); c.width=c.height=1; const x=c.getContext('2d');
+      x.drawImage(img,0,0,1,1); const [r,g,b]=x.getImageData(0,0,1,1).data;
+      res('#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')); };
+    img.onerror=()=>res(null); img.src=URL.createObjectURL(file);
+  });
+}
+// --- Stempel platzieren (Vollbild, gemalte Haken, Größe einstellbar) ---
+const placeBox = $('placeBox');
+let markers = [], placedPositions = null, designURL = null;
+function currentRfr(){ return (parseInt($('uSize').value,10)||80) / 1000; }
+function checkSVG(){
+  const cx=50,cy=50,r=48,fill='#3aa84a',dark='#2c8038',k=r;
+  const p=`M ${cx-0.52*k} ${cy+0.02*k} C ${cx-0.34*k} ${cy+0.18*k}, ${cx-0.22*k} ${cy+0.32*k}, ${cx-0.05*k} ${cy+0.46*k} C ${cx+0.12*k} ${cy+0.18*k}, ${cx+0.36*k} ${cy-0.24*k}, ${cx+0.62*k} ${cy-0.54*k}`;
+  return `<svg viewBox="0 0 100 100"><path d="${p}" fill="none" stroke="${dark}" stroke-width="${r*0.5}" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="${p}" fill="none" stroke="${fill}" stroke-width="${r*0.33}" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function applyMarkerSize(){ const w=(currentRfr()*2*100)+'%'; markers.forEach(m=>{ m.style.width=w; }); }
+function initMarkers(keep){
+  const goal=parseInt($('uGoal').value,10)||5;
+  const old = (keep && markers.length===goal) ? markers.map(m=>({x:parseFloat(m.style.left)/100,y:parseFloat(m.style.top)/100})) : null;
+  placeBox.querySelectorAll('.pmark').forEach(e=>e.remove());
+  markers=[];
+  for(let i=0;i<goal;i++){
+    const m=document.createElement('div'); m.className='pmark'; m.innerHTML=checkSVG();
+    const fx = old? old[i].x : (i+0.5)/goal, fy = old? old[i].y : 0.62;
+    m.style.left=fx*100+'%'; m.style.top=fy*100+'%';
+    placeBox.appendChild(m); makeDraggable(m); markers.push(m);
+  }
+  applyMarkerSize();
+}
+function makeDraggable(m){
+  m.addEventListener('pointerdown', e=>{
+    e.preventDefault(); try{m.setPointerCapture(e.pointerId);}catch{}
+    const rect=placeBox.getBoundingClientRect();
+    const move=ev=>{
+      let x=(ev.clientX-rect.left)/rect.width, y=(ev.clientY-rect.top)/rect.height;
+      x=Math.max(0.02,Math.min(0.98,x)); y=Math.max(0.05,Math.min(0.95,y));
+      m.style.left=x*100+'%'; m.style.top=y*100+'%';
+    };
+    const up=()=>{ m.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); };
+    m.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
+  });
+}
+function getPositions(){ return markers.map(m=>({ x:+(parseFloat(m.style.left)/100).toFixed(4), y:+(parseFloat(m.style.top)/100).toFixed(4) })); }
+
+$('uSize').addEventListener('input', applyMarkerSize);
+$('placeReset').addEventListener('click', ()=>initMarkers(false));
+$('openPlace').addEventListener('click', ()=>{
+  if(designURL) placeBox.style.backgroundImage=`url(${designURL})`;
+  $('placeFull').classList.remove('hidden');
+  if(markers.length) initMarkers(true); else initMarkers(false);
+});
+$('placeDone').addEventListener('click', ()=>{
+  placedPositions = getPositions();
+  $('placeFull').classList.add('hidden');
+  $('placeStatus').style.color='#19e3c2';
+  $('placeStatus').textContent=`✓ ${placedPositions.length} Stempel gesetzt (Größe ${$('uSize').value}). Du kannst nochmal öffnen zum Anpassen.`;
+});
+$('uGoal').addEventListener('change', ()=>{ if(!$('placeFull').classList.contains('hidden')) initMarkers(false); });
+
+$('uFile').addEventListener('change', async e=>{
+  pickedFile = e.target.files[0] || null;
+  if(pickedFile){
+    designURL = URL.createObjectURL(pickedFile);
+    placeBox.style.backgroundImage=`url(${designURL})`;
+    $('placeWrap').classList.remove('hidden');
+    placedPositions=null; markers=[]; placeBox.querySelectorAll('.pmark').forEach(x=>x.remove());
+    $('placeStatus').style.color='#ff8a8a'; $('placeStatus').textContent='Noch keine Stempel gesetzt — bitte erst setzen.';
+    const col=await avgColor(pickedFile); if(col) $('uColor').value=col;   // Auto-Farbe vorschlagen
+    placeBox.style.backgroundColor=$('uColor').value;                       // Ränder in Designfarbe (contain)
+  }
+});
+$('uColor').addEventListener('input', ()=>{ placeBox.style.backgroundColor=$('uColor').value; });
+$('uLogo').addEventListener('change', e=>{ pickedLogo = e.target.files[0] || null; });
+// Bild im Browser auf max. 1600px Breite verkleinern -> data-URL (hält Upload klein)
+function resizeToDataURL(file, maxW=1600, mime='image/png', q=0.92){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1, maxW/img.width);
+      const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      const ctx=c.getContext('2d');
+      if(mime==='image/jpeg'){ ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h); } // JPEG kennt keine Transparenz
+      ctx.drawImage(img,0,0,w,h);
+      resolve(c.toDataURL(mime, q));
+    };
+    img.onerror=reject; img.src=URL.createObjectURL(file);
+  });
+}
+$('uSubmit').addEventListener('click', async ()=>{
+  const name=$('uName').value.trim();
+  if(!name){ $('uErr').textContent='Bitte einen Namen eingeben.'; return; }
+  if(!pickedFile){ $('uErr').textContent='Bitte ein Design-Bild wählen.'; return; }
+  if(!placedPositions || !placedPositions.length){ $('uErr').textContent='Bitte erst die Stempel setzen (🔍 Design öffnen & Stempel setzen).'; return; }
+  $('uErr').textContent=''; $('uSubmit').disabled=true; $('uSubmit').textContent='Lädt hoch …';
+  try{
+    const image_b64 = await resizeToDataURL(pickedFile, 1400, 'image/jpeg', 0.85); // kompakt -> geht zuverlässig durch
+    const logo_b64 = pickedLogo ? await resizeToDataURL(pickedLogo, 400) : null;
+    const r = await api('/upload-design', { method:'POST', body: JSON.stringify({
+      name, goal:$('uGoal').value, color_bg:$('uColor').value, image_b64, logo_b64, note:$('uNote').value.trim(),
+      positions: placedPositions, rfr: currentRfr()
+    })});
+    if(r.ok){
+      closeModal();
+      $('uName').value=''; $('uNote').value=''; pickedFile=null; pickedLogo=null; placedPositions=null; $('placeWrap').classList.add('hidden'); placeBox.style.backgroundImage=''; $('uFile').value=''; $('uLogo').value='';
+      $('sub').textContent = `✓ „${name}" hochgeladen — wird gebaut und erscheint gleich hier.`;
+    } else { $('uErr').textContent='Upload fehlgeschlagen ('+(r.status||'?')+'): '+esc(r.message||'Design evtl. zu groß — kleineres Bild versuchen.'); }
+  }catch(e){ $('uErr').textContent='Fehler beim Verarbeiten des Bildes.'; }
+  $('uSubmit').disabled=false; $('uSubmit').textContent='Hochladen & bauen';
+});
+
+// Boot: schon eingeloggt?
+(async ()=>{
+  const { data:{ session } } = await supabase.auth.getSession();
+  if(session){ loadCockpit(); return; }
+  // keine aktive Session -> gespeicherte Admin-Session wiederherstellen (dauerhaft eingeloggt)
+  if(await restoreAdminSession()){ loadCockpit(); return; }
+  gotoLogin();
+})();
+</script>
+</body>
+</html>

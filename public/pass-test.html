@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lila. · Wallet-Test</title>
+<style>
+  body{font-family:-apple-system,sans-serif;background:#0e0b14;color:#eaf2ff;margin:0;padding:44px 24px;text-align:center}
+  h1{font-size:21px;margin-bottom:8px}
+  p{color:#9a93a6;font-size:13.5px;margin-bottom:30px;line-height:1.5}
+  a{display:block;background:linear-gradient(120deg,#22e9ff,#7a6bff,#c062ff);color:#04222a;text-decoration:none;
+    padding:18px;border-radius:14px;font-size:16px;font-weight:700;margin:0 auto 13px;max-width:340px;
+    box-shadow:0 8px 28px rgba(122,107,255,.38)}
+  small{color:#6b7691;display:block;margin-top:24px;line-height:1.6}
+  .sec{color:#48526b;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:26px 0 12px}
+</style>
+</head>
+<body>
+  <h1>🟣 lila. Wallet-Pässe</h1>
+  <p>Auf dem iPhone in <b>Safari</b> öffnen. Jeder Klick lädt frisch.</p>
+
+  <div class="sec">Über den Pass-Server (dynamisch, signiert)</div>
+  <a id="d-coupon">🎟️ Gutschein 20% (Demo)</a>
+  <a id="d-s5">⭐ Stempelkarte 5 (Demo)</a>
+  <a id="d-s10">⭐ Stempelkarte 10 (Demo)</a>
+
+  <div class="sec">Statische Vorab-Pässe (Querformat-Design)</div>
+  <a id="s5">Stempelkarte 5 (Design)</a>
+  <a id="s10">Stempelkarte 10 (Design)</a>
+
+  <small>Die „Demo"-Pässe kommen vom Live-Server /api/pass (so wie beim QR-Scan im Dashboard). Querformat-Design scharf oben, Übergang in Lila, QR unten.</small>
+  <script>
+    const v = Date.now();
+    const base = location.origin;
+    document.getElementById('d-coupon').href = base + '/api/pass?demo=coupon&v=' + v;
+    document.getElementById('d-s5').href      = base + '/api/pass?demo=stamp5&v=' + v;
+    document.getElementById('d-s10').href     = base + '/api/pass?demo=stamp10&v=' + v;
+    document.getElementById('s5').href        = base + '/pass/lila-stamp5.pkpass?v=' + v;
+    document.getElementById('s10').href       = base + '/pass/lila-stamp10.pkpass?v=' + v;
+  </script>
+</body>
+</html>

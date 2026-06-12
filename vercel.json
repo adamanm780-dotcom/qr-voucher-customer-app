@@ -1,10 +1,37 @@
 {
-  "buildCommand": "echo 'Static site'",
-  "outputDirectory": "public",
-  "rewrites": [
+  "version": 2,
+  "builds": [
+    { "src": "api/pass.mjs", "use": "@vercel/node", "config": { "includeFiles": "api/_assets/**" } },
+    { "src": "api/redeem.mjs", "use": "@vercel/node" },
+    { "src": "api/v1.mjs", "use": "@vercel/node", "config": { "includeFiles": "api/_assets/**" } },
+    { "src": "api/provision.mjs", "use": "@vercel/node" },
+    { "src": "api/admin.mjs", "use": "@vercel/node" },
+    { "src": "api/card-image.mjs", "use": "@vercel/node", "config": { "includeFiles": "api/_assets/**" } },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/pass", "dest": "/api/pass.mjs" },
+    { "src": "/api/redeem", "dest": "/api/redeem.mjs" },
+    { "src": "/api/v1/(.*)", "dest": "/api/v1.mjs" },
+    { "src": "/api/v1", "dest": "/api/v1.mjs" },
+    { "src": "/api/provision", "dest": "/api/provision.mjs" },
+    { "src": "/api/admin/(.*)", "dest": "/api/admin.mjs" },
+    { "src": "/api/admin", "dest": "/api/admin.mjs" },
+    { "src": "/api/card-image", "dest": "/api/card-image.mjs" },
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/pass-test", "dest": "/public/pass-test.html" },
+    { "src": "/dashboard", "dest": "/public/dashboard.html" },
+    { "src": "/admin", "dest": "/public/admin.html" },
+    { "src": "/cockpit", "dest": "/public/cockpit.html" },
+    { "src": "/add", "dest": "/public/add.html" },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+      "src": "/pass/(.*\\.pkpass)",
+      "headers": {
+        "Content-Type": "application/vnd.apple.pkpass",
+        "Cache-Control": "no-store"
+      },
+      "dest": "/public/pass/$1"
+    },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
