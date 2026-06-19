@@ -90,13 +90,24 @@
   @keyframes cardIn{from{opacity:0;transform:translateY(12px)}}
   .grid.no-anim .shop{animation:none}
   .shop:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:0 18px 44px rgba(0,0,0,.45)}
-  .shop .del,.shop .fb,.shop .gear{position:absolute;top:10px;opacity:.45;cursor:pointer;z-index:3;color:var(--muted-2);
+  .shop .del,.shop .fb,.shop .gear,.shop .cred{position:absolute;top:10px;opacity:.45;cursor:pointer;z-index:3;color:var(--muted-2);
     width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s,color .15s}
-  .shop .del{right:12px} .shop .gear{right:48px} .shop .fb{right:84px}
-  .shop .del svg,.shop .fb svg,.shop .gear svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .shop .del{right:12px} .shop .gear{right:48px} .shop .fb{right:84px} .shop .cred{right:120px}
+  .shop .del svg,.shop .fb svg,.shop .gear svg,.shop .cred svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .shop .del:hover{opacity:1;color:#ff7e7e;background:rgba(255,126,126,.12)}
   .shop .fb:hover{opacity:1;color:var(--mint);background:rgba(60,232,196,.12)}
   .shop .gear:hover{opacity:1;color:var(--accent,#4f7dff);background:rgba(79,125,255,.14)}
+  .shop .cred:hover{opacity:1;color:#ffd166;background:rgba(255,209,102,.14)}
+  /* Zugangsdaten-Box */
+  #credModal .sheet{max-width:440px}
+  .cred-row{display:flex;align-items:center;gap:10px;background:var(--panel-2,#14161c);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+  .cred-row .cl{font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+  .cred-row .cv{font-family:'Sora',monospace;font-size:15px;font-weight:600;word-break:break-all}
+  .cred-row .grow{flex:1;min-width:0}
+  .cred-copy{flex:0 0 auto;border:1px solid var(--line-2,#2a2e38);background:transparent;color:var(--text,#fff);border-radius:9px;padding:8px 12px;font-size:13px;cursor:pointer;transition:background .15s}
+  .cred-copy:hover{background:rgba(255,255,255,.08)}
+  #credMsg{white-space:pre-wrap;font-size:13px;line-height:1.5;color:var(--muted,#cfd2da);background:var(--panel-2,#14161c);border:1px dashed var(--line-2,#2a2e38);border-radius:12px;padding:12px 14px;margin-top:6px}
+  .cred-warn{font-size:12px;color:#ffb27a;margin-top:10px;line-height:1.45}
   .shop .top{display:flex;align-items:center;gap:var(--s12);margin-bottom:var(--s16)}
   .av{width:46px;height:46px;border-radius:12px;background:#0b0f17;border:1px solid var(--line);
       display:grid;place-items:center;overflow:hidden;flex:0 0 auto;font-family:'Sora';font-weight:700;font-size:19px}
@@ -225,6 +236,30 @@
     <div id="niches" class="niches"></div>
     <div id="grid" class="grid"></div>
   </section>
+
+  <!-- ZUGANGSDATEN-MODAL -->
+  <div id="credModal" class="modal hidden">
+    <div class="sheet">
+      <h2>Zugangsdaten</h2>
+      <p class="msub" id="credSub">Login für den Betrieb — zum Weitergeben an den Kunden.</p>
+      <div id="credBody" style="display:none">
+        <div class="cred-row">
+          <div class="grow"><div class="cl">Login-Adresse (E-Mail)</div><div class="cv" id="credEmail"></div></div>
+          <button type="button" class="cred-copy" data-copy="credEmail">Kopieren</button>
+        </div>
+        <div class="cred-row">
+          <div class="grow"><div class="cl">Passwort (neu gesetzt)</div><div class="cv" id="credPass"></div></div>
+          <button type="button" class="cred-copy" data-copy="credPass">Kopieren</button>
+        </div>
+        <div class="cl" style="margin-top:14px">Fertige Nachricht zum Weitergeben</div>
+        <div id="credMsg"></div>
+        <button type="button" class="cred-copy" id="credCopyMsg" style="width:100%;margin-top:10px;padding:12px">📋 Ganze Nachricht kopieren</button>
+        <div class="cred-warn">⚠️ Das Passwort kann später nicht erneut angezeigt werden. Beim nächsten Öffnen wird ein <b>neues</b> gesetzt — gib dieses hier dem Kunden, bevor du das Fenster schließt.</div>
+      </div>
+      <div id="credLoad" style="padding:18px 2px;color:var(--muted-2)">Setze neues Passwort …</div>
+      <div class="row" style="margin-top:16px"><button type="button" class="ghost" id="credClose" style="width:100%">Schließen</button></div>
+    </div>
+  </div>
 
   <!-- UPLOAD-MODAL -->
   <div id="modal" class="modal hidden">
@@ -369,6 +404,7 @@ async function restoreAdminSession(){
 // ---- Betriebe rendern (aus Cache sofort, frisch vom Server danach) ----
 const ICON_FB  = '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.9A8 8 0 1 1 21 12z"/></svg>';
 const ICON_DEL = '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-1 13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 7"/></svg>';
+const ICON_KEY = '<svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15 19 4m-3 0 3 3m-5 2 2 2"/></svg>';
 const ICON_GEAR= '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 function renderBusinesses(list, fromCache){
   BIZ = list;
@@ -381,8 +417,9 @@ function renderBusinesses(list, fromCache){
     const del = b.slug==='lila-wiesbaden' ? '' : `<span class="del" title="Löschen" data-del="${b.id}" data-dname="${esc(b.name)}">${ICON_DEL}</span>`;
     const fb = `<span class="fb" title="Verbesserung hinterlassen" data-fb="${b.id}" data-fname="${esc(b.name)}">${ICON_FB}</span>`;
     const gear = b.slug==='lila-wiesbaden' ? '' : `<span class="gear" title="Karte bearbeiten" data-gear="${b.id}">${ICON_GEAR}</span>`;
+    const cred = `<span class="cred" title="Zugangsdaten anzeigen" data-cred="${b.id}" data-cname="${esc(b.name)}">${ICON_KEY}</span>`;
     return `<button class="shop" style="--i:${Math.min(i,14)}" data-id="${b.id}" data-name="${esc(b.name)}" data-ind="${esc(b.industry||'gastronomie')}" data-q="${esc((b.name+' '+b.slug).toLowerCase())}">
-      ${fb}${gear}${del}
+      ${cred}${fb}${gear}${del}
       <div class="top"><div class="av">${av}</div>
         <div><div class="name">${esc(b.name)}</div>
         <div class="slug"><span class="cdot" style="background:${esc(b.color_bg||'#4f7dff')}"></span>${esc(b.slug)}</div></div></div>
@@ -417,6 +454,9 @@ function renderBusinesses(list, fromCache){
   });
   $('grid').querySelectorAll('.gear').forEach(g=>{
     g.addEventListener('click', (e)=>{ e.stopPropagation(); openSettings(g.dataset.gear); });
+  });
+  $('grid').querySelectorAll('.cred').forEach(c=>{
+    c.addEventListener('click', (e)=>{ e.stopPropagation(); openCredentials(c.dataset.cred, c.dataset.cname); });
   });
   $('grid').querySelectorAll('.shop').forEach(el=>{
     el.addEventListener('click', async ()=>{
@@ -514,6 +554,40 @@ const closeModal = ()=>{ $('modal').classList.add('hidden'); };
 $('uploadOpen').addEventListener('click', openModal);
 $('uCancel').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+
+// ---- Zugangsdaten: Passwort serverseitig NEU setzen + anzeigen (kann nicht zurückgelesen werden) ----
+const LOGIN_URL='https://qr-voucher-customer-app.vercel.app';
+async function copyText(text, btn){
+  try{ await navigator.clipboard.writeText(text); }
+  catch{ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch{} t.remove(); }
+  if(btn){ const o=btn.textContent; btn.textContent='✓ Kopiert'; setTimeout(()=>btn.textContent=o,1400); }
+}
+async function openCredentials(id, name){
+  $('credSub').textContent = `Login für „${name}" — zum Weitergeben an den Kunden.`;
+  $('credBody').style.display='none';
+  $('credLoad').style.display=''; $('credLoad').textContent='Setze neues Passwort …';
+  $('credModal').classList.remove('hidden');
+  const r = await api('/credentials', { method:'POST', body: JSON.stringify({ business_id:id }) });
+  if(!r.ok){ $('credLoad').textContent='Fehler: '+(r.message||'unbekannt'); return; }
+  $('credEmail').textContent = r.email;
+  $('credPass').textContent = r.password;
+  $('credMsg').textContent =
+`Hallo! Hier sind deine Zugangsdaten für dein FlowState-Dashboard:
+
+🔗 Login: ${LOGIN_URL}
+📧 E-Mail: ${r.email}
+🔑 Passwort: ${r.password}
+
+Einfach einloggen — du landest direkt in deinem persönlichen Dashboard.`;
+  $('credLoad').style.display='none';
+  $('credBody').style.display='';
+}
+$('credClose').addEventListener('click', ()=>$('credModal').classList.add('hidden'));
+$('credModal').addEventListener('click', e=>{ if(e.target.id==='credModal') $('credModal').classList.add('hidden'); });
+$('credModal').querySelectorAll('.cred-copy[data-copy]').forEach(btn=>{
+  btn.addEventListener('click', ()=>copyText($(btn.dataset.copy).textContent, btn));
+});
+$('credCopyMsg').addEventListener('click', ()=>copyText($('credMsg').textContent, $('credCopyMsg')));
 
 // ---- Einstellungen-Panel: Karte wie in Wallet + Kartenkörper-Farbe live ändern ----
 let setBizId = null;

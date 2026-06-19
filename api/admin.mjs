@@ -7,8 +7,18 @@
 //   - Dessen E-Mail muss in ENV ADMIN_EMAILS (kommagetrennt) stehen. Sonst 403.
 //   - Service-Key (umgeht RLS) wird erst NACH bestandener Admin-Prüfung benutzt.
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 const APP = 'https://qr-voucher-customer-app.vercel.app';
+
+// Lesbares Passwort, leicht an einer Marke erkennbar: z.B. "Cinnamood" -> "Cinna-7K4P".
+function genPassword(name) {
+  const base = (name || '').replace(/[^a-zA-Z]/g, '');
+  const pre = base ? (base[0].toUpperCase() + base.slice(1, 5).toLowerCase()) : 'FS';
+  const set = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const rnd = Array.from({ length: 4 }, () => set[crypto.randomInt(set.length)]).join('');
+  return `${pre}-${rnd}`;
+}
 const svc = () => createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 
 // Branchen/Nischen (Phase 1) — kanonische IDs. Neue Nischen hier + im Cockpit ergänzen.
@@ -99,6 +109,22 @@ export default async function handler(req, res) {
       const access_token = p.get('access_token'), refresh_token = p.get('refresh_token');
       if (!access_token || !refresh_token) return res.status(500).json({ ok: false, message: 'Session konnte nicht erzeugt werden' });
       return res.status(200).json({ ok: true, business: biz.name, access_token, refresh_token });
+    }
+
+    // --- Zugangsdaten: neues Passwort setzen + zurückgeben (nicht zurücklesbar -> reset & reveal) ---
+    if (req.method === 'POST' && path === 'credentials') {
+      const { business_id } = await readBody(req);
+      if (!business_id) return res.status(400).json({ ok: false, message: 'business_id fehlt' });
+      const { data: biz } = await db.from('businesses').select('id,name,owner_id').eq('id', business_id).maybeSingle();
+      if (!biz) return res.status(404).json({ ok: false, message: 'Betrieb nicht gefunden' });
+      if (!biz.owner_id) return res.status(404).json({ ok: false, message: 'Kein Login mit diesem Betrieb verknüpft.' });
+      const u = await db.auth.admin.getUserById(biz.owner_id);
+      const email = u?.data?.user?.email;
+      if (!email) return res.status(404).json({ ok: false, message: 'Login-Konto nicht gefunden.' });
+      const password = genPassword(biz.name);
+      const { error } = await db.auth.admin.updateUserById(biz.owner_id, { password });
+      if (error) { console.error('credentials set:', error.message); return res.status(500).json({ ok: false, message: 'Passwort konnte nicht gesetzt werden.' }); }
+      return res.status(200).json({ ok: true, business: biz.name, email, password });
     }
 
     // --- Design hochladen -> in Storage ablegen (Claude baut daraus den Betrieb) ---
