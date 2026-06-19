@@ -4,112 +4,190 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FlowState · Cockpit</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0d14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FlowState">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b10; --surface:#141621; --surface2:#1b1e2b; --line:rgba(255,255,255,.08);
-    --txt:#f2f4f8; --muted:#8b91a4; --accent:#19e3c2; --accent2:#5b8cff;
-    --radius:18px; --s4:4px; --s8:8px; --s12:12px; --s16:16px; --s24:24px; --s32:32px; --s48:48px;
+    --bg:#0a0d14; --panel:#10141d; --panel-2:#131826; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.13);
+    --txt:#f2f5fa; --muted:#8a93a8; --muted-2:#5a6377;
+    --mint:#3ce8c4; --blue:#4f7dff; --grad:linear-gradient(100deg,#3ce8c4,#4f7dff);
+    --ink:#04241c; --err:#ff7e7e;
+    --radius:16px; --s4:4px; --s8:8px; --s12:12px; --s16:16px; --s24:24px; --s32:32px; --s48:48px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    font-family:'DejaVu Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    background:radial-gradient(1200px 700px at 80% -10%,rgba(91,140,255,.10),transparent 60%),
-               radial-gradient(900px 600px at -10% 110%,rgba(25,227,194,.08),transparent 55%),var(--bg);
+    font-family:'Manrope',-apple-system,'Segoe UI',sans-serif;font-size:14px;
+    background:
+      radial-gradient(900px 520px at 85% -12%,rgba(79,125,255,.07),transparent 60%),
+      radial-gradient(700px 480px at -8% 108%,rgba(60,232,196,.05),transparent 55%),
+      var(--bg);
     color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;
     padding:max(var(--s24),env(safe-area-inset-top)) var(--s16) var(--s48);
   }
-  .wrap{max-width:1040px;margin:0 auto}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.02em}
+  ::selection{background:rgba(60,232,196,.25)}
+  .wrap{max-width:1060px;margin:0 auto}
+
   .brandbar{display:flex;align-items:center;gap:var(--s12);margin-bottom:var(--s32)}
-  .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-        display:grid;place-items:center;font-weight:800;color:#06210f;font-size:20px}
-  .brandbar b{font-size:18px;letter-spacing:.3px}
-  .brandbar .tag{margin-left:auto;font-size:12px;color:var(--muted);border:1px solid var(--line);
-        padding:6px 12px;border-radius:999px}
+  .brandbar img{height:30px;width:auto}
+  .brandbar b{font-family:'Sora';font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .brandbar .tag{margin-left:auto;font-size:11.5px;color:var(--muted);border:1px solid var(--line);
+        padding:6px 13px;border-radius:999px;letter-spacing:.04em}
 
   /* Login */
-  .card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--line);
-        border-radius:var(--radius);padding:var(--s32)}
-  .login{max-width:400px;margin:8vh auto 0}
-  .login h1{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-bottom:var(--s8)}
-  .login p{color:var(--muted);font-size:14px;margin-bottom:var(--s24)}
-  label{display:block;font-size:12px;color:var(--muted);margin:var(--s16) 0 var(--s8);letter-spacing:.4px;text-transform:uppercase}
-  input{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);
-        padding:14px 16px;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s}
-  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,227,194,.15)}
-  .btn{width:100%;margin-top:var(--s24);background:linear-gradient(135deg,var(--accent),var(--accent2));
-       color:#04130d;font-weight:800;font-size:15px;border:none;border-radius:12px;padding:15px;cursor:pointer;
-       letter-spacing:.3px;transition:transform .12s,filter .15s}
-  .btn:hover{transform:translateY(-1px);filter:brightness(1.06)} .btn:active{transform:translateY(0)}
-  .btn[disabled]{opacity:.55;cursor:default;transform:none}
-  .err{color:#ff8a8a;font-size:13px;margin-top:var(--s16);min-height:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:var(--s32)}
+  .login{max-width:380px;margin:9vh auto 0}
+  .login h1{font-size:23px;font-weight:600;margin-bottom:var(--s8)}
+  .login p{color:var(--muted);font-size:13.5px;margin-bottom:var(--s16);line-height:1.5}
+  label{display:block;font-size:11px;color:var(--muted);margin:var(--s16) 0 var(--s8);letter-spacing:.07em;text-transform:uppercase;font-weight:600}
+  input,select,textarea{width:100%;background:#0b0f17;border:1px solid var(--line);border-radius:11px;color:var(--txt);
+        padding:13px 15px;font-size:16px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--mint);box-shadow:0 0 0 3px rgba(60,232,196,.13)}
+  input::placeholder,textarea::placeholder{color:#414b61}
+  .btn{width:100%;margin-top:var(--s24);background:var(--grad);
+       color:var(--ink);font-weight:800;font-size:14.5px;border:none;border-radius:11px;padding:14px;cursor:pointer;
+       font-family:'Manrope';letter-spacing:.01em;transition:transform .12s,box-shadow .2s,filter .15s}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.07);box-shadow:0 10px 28px rgba(79,125,255,.32)}
+  .btn:active{transform:translateY(0) scale(.985)}
+  .btn[disabled]{opacity:.55;cursor:default;transform:none;box-shadow:none}
+  .err{color:var(--err);font-size:13px;margin-top:var(--s16);min-height:18px}
 
   /* Cockpit */
   .head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s16);margin-bottom:var(--s24);flex-wrap:wrap}
-  .head h1{font-size:24px;font-weight:800;letter-spacing:-.5px}
-  .head .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .head h1{font-size:24px;font-weight:600}
+  .head .sub{color:var(--muted);font-size:13px;margin-top:5px}
   .ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;
-         padding:9px 14px;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s}
-  .ghost:hover{color:var(--txt);border-color:rgba(255,255,255,.25)}
+         padding:10px 15px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+  .ghost:hover{color:var(--txt);border-color:var(--line-2);background:rgba(255,255,255,.03)}
+  .toolrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .search{position:relative}
+  .search input{width:210px;padding:10px 14px 10px 36px;font-size:13.5px;border-radius:10px;background:#0b0f17}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--muted-2);fill:none;pointer-events:none}
+
+  /* Nischen-Umschalter (nur Admin) */
+  .niches{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 var(--s24)}
+  .niche{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--line);
+    color:var(--muted);border-radius:999px;padding:8px 15px;font-family:inherit;font-size:13px;font-weight:600;
+    cursor:pointer;transition:color .15s,border-color .15s,background .15s,box-shadow .2s}
+  .niche:hover{color:var(--txt);border-color:var(--line-2)}
+  .niche.active{color:var(--ink);background:var(--grad);border-color:transparent;box-shadow:0 6px 18px rgba(79,125,255,.28)}
+  .niche .ct{font-size:11px;font-weight:800;opacity:.72;background:rgba(255,255,255,.10);border-radius:999px;padding:1px 7px}
+  .niche.active .ct{opacity:1;background:rgba(6,18,31,.18)}
+
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s16)}
-  .shop{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--line);
+  .shop{background:var(--panel);border:1px solid var(--line);
         border-radius:var(--radius);padding:var(--s24);cursor:pointer;position:relative;overflow:hidden;
-        transition:transform .15s,border-color .15s,box-shadow .2s;text-align:left}
-  .shop:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.22);box-shadow:0 18px 40px rgba(0,0,0,.4)}
-  .shop .swatch{position:absolute;inset:0 auto 0 0;width:5px}
-  .shop .del{position:absolute;top:10px;right:12px;font-size:15px;opacity:.4;cursor:pointer;z-index:3;
-    width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s}
-  .shop .del:hover{opacity:1;background:rgba(255,90,90,.2)}
-  .shop .fb{position:absolute;top:10px;right:48px;font-size:15px;opacity:.4;cursor:pointer;z-index:3;
-    width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s}
-  .shop .fb:hover{opacity:1;background:rgba(25,227,194,.2)}
+        transition:transform .16s,border-color .16s,box-shadow .22s;text-align:left;font-family:inherit;color:var(--txt);
+        animation:cardIn .5s backwards cubic-bezier(.2,.7,.2,1);animation-delay:calc(var(--i,0)*36ms)}
+  @keyframes cardIn{from{opacity:0;transform:translateY(12px)}}
+  .grid.no-anim .shop{animation:none}
+  .shop:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+  .shop .del,.shop .fb,.shop .gear{position:absolute;top:10px;opacity:.45;cursor:pointer;z-index:3;color:var(--muted-2);
+    width:30px;height:30px;display:grid;place-items:center;border-radius:8px;transition:opacity .15s,background .15s,color .15s}
+  .shop .del{right:12px} .shop .gear{right:48px} .shop .fb{right:84px}
+  .shop .del svg,.shop .fb svg,.shop .gear svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .shop .del:hover{opacity:1;color:#ff7e7e;background:rgba(255,126,126,.12)}
+  .shop .fb:hover{opacity:1;color:var(--mint);background:rgba(60,232,196,.12)}
+  .shop .gear:hover{opacity:1;color:var(--accent,#4f7dff);background:rgba(79,125,255,.14)}
   .shop .top{display:flex;align-items:center;gap:var(--s12);margin-bottom:var(--s16)}
-  .av{width:48px;height:48px;border-radius:13px;background:#0e1018;border:1px solid var(--line);
-      display:grid;place-items:center;overflow:hidden;flex:0 0 auto;font-weight:800;font-size:20px}
+  .av{width:46px;height:46px;border-radius:12px;background:#0b0f17;border:1px solid var(--line);
+      display:grid;place-items:center;overflow:hidden;flex:0 0 auto;font-family:'Sora';font-weight:700;font-size:19px}
   .av img{width:100%;height:100%;object-fit:contain}
-  .shop .name{font-size:17px;font-weight:700;line-height:1.2}
-  .shop .slug{font-size:12px;color:var(--muted);margin-top:2px}
+  .shop .name{font-family:'Sora';font-size:15.5px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+  .shop .slug{font-size:12px;color:var(--muted-2);margin-top:3px;display:flex;align-items:center;gap:6px}
+  .shop .slug .cdot{width:8px;height:8px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(255,255,255,.18)}
+  .shop .nbadge{display:inline-block;margin-top:9px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--muted);background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:6px;padding:3px 9px}
   .stats{display:flex;gap:var(--s24);margin-top:var(--s8)}
-  .stat .n{font-size:20px;font-weight:800} .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-  .enter{margin-top:var(--s16);display:flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:700}
+  .stat .n{font-family:'Sora';font-size:19px;font-weight:600}
+  .stat .l{font-size:10.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;font-weight:600}
+  .enter{margin-top:var(--s16);display:flex;align-items:center;gap:6px;color:var(--mint);font-size:13px;font-weight:700;opacity:.85}
+  .shop:hover .enter{opacity:1}
   .hidden{display:none}
   .loading{color:var(--muted);text-align:center;padding:var(--s48)}
 
   /* Upload-Modal */
-  .modal{position:fixed;inset:0;z-index:1000;background:rgba(4,5,10,.72);backdrop-filter:blur(6px);
-         display:flex;align-items:flex-start;justify-content:center;padding:6vh var(--s16) var(--s24);overflow:auto}
-  .modal.hidden{display:none}   /* muss .modat{display:flex} schlagen -> höhere Spezifität */
-  .sheet{width:100%;max-width:480px;background:linear-gradient(180deg,var(--surface),var(--surface2));
-         border:1px solid var(--line);border-radius:var(--radius);padding:var(--s32)}
-  .sheet h2{font-size:21px;font-weight:800;letter-spacing:-.4px}
-  .msub{color:var(--muted);font-size:13px;margin:6px 0 var(--s16);line-height:1.45}
+  .modal{position:fixed;inset:0;z-index:1000;background:rgba(5,7,12,.74);backdrop-filter:blur(7px);
+         display:flex;align-items:flex-start;justify-content:center;padding:5vh var(--s16) var(--s24);overflow:auto}
+  .modal.hidden{display:none}
+  .sheet{width:100%;max-width:490px;background:var(--panel-2);
+         border:1px solid var(--line-2);border-radius:var(--radius);padding:var(--s32)}
+  .sheet h2{font-size:19px;font-weight:600}
+  .msub{color:var(--muted);font-size:13px;margin:7px 0 var(--s8);line-height:1.5}
   .sheet .row{display:flex;gap:var(--s12)}
-  select{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:13px 14px;font-size:15px;outline:none}
-  input[type=file]{width:100%;background:#0e1018;border:1px dashed var(--line);border-radius:12px;color:var(--muted);padding:14px;font-size:13px}
-  textarea{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;color:var(--txt);padding:12px 14px;font-size:15px;outline:none;resize:vertical;font-family:inherit}
-  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,227,194,.15)}
-  input[type=color]{width:100%;background:#0e1018;border:1px solid var(--line);border-radius:12px;cursor:pointer}
-  #placeFull{position:fixed;inset:0;z-index:2000;background:#06080e;display:flex;flex-direction:column}
-  #placeFull.hidden{display:none}   /* ID schlägt .hidden -> hier explizit ausblenden */
+  input[type=file]{background:#0b0f17;border:1px dashed var(--line-2);color:var(--muted);padding:14px;font-size:13px}
+  input[type=color]{background:#0b0f17;cursor:pointer}
+  textarea{resize:vertical}
+  /* Design-Vorschau im Modal: zeigt sichtbar, dass der Streifen angehängt ist */
+  #uPreviewWrap{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0b0f17}
+  #uPreviewWrap img{display:block;width:100%;aspect-ratio:1125/432;object-fit:contain}
+  #uPrevMeta{font-size:12px;padding:8px 12px;border-top:1px solid var(--line);color:var(--mint);font-weight:700}
+  #placeFull{position:fixed;inset:0;z-index:2000;background:#070a10;display:flex;flex-direction:column}
+  #placeFull.hidden{display:none}
   .pfbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;
-    padding-top:calc(14px + env(safe-area-inset-top));background:#0e1018;border-bottom:1px solid var(--line)}
-  .pfhint{font-size:14px;color:var(--txt);font-weight:600;flex:1;min-width:170px}
-  .pfsize{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
-  .pfsize input[type=range]{width:150px}
+    padding-top:calc(14px + env(safe-area-inset-top));background:#0d1119;border-bottom:1px solid var(--line)}
+  .pfhint{font-size:13.5px;color:var(--txt);font-weight:700;flex:1;min-width:170px}
+  .pfhint small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
+  .pfsize{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:600}
+  .pfsize input[type=range]{width:150px;padding:0;accent-color:var(--mint)}
   .pfstage{flex:1;display:grid;place-items:center;padding:18px;overflow:auto}
   #placeBox{position:relative;width:min(96vw,1300px);aspect-ratio:1125/432;border-radius:14px;overflow:hidden;
-    background:#0e1018 center/contain no-repeat;touch-action:none;user-select:none;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+    background:#0b0f17 center/contain no-repeat;touch-action:none;user-select:none;box-shadow:0 20px 60px rgba(0,0,0,.55)}
   .pmark{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1;cursor:grab;touch-action:none}
   .pmark svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55))}
   .pmark::after{content:"";position:absolute;inset:-18%;border-radius:50%}
   .pmark:active{cursor:grabbing}
-  .merr{color:#ff8a8a;font-size:13px;margin-top:var(--s12);min-height:16px}
+  .merr{color:var(--err);font-size:13px;margin-top:var(--s12);min-height:16px}
   .mrow{display:flex;justify-content:flex-end;gap:10px;margin-top:var(--s24)}
+
+  /* Einstellungen-Panel: Stempelkarte wie in Apple Wallet (aufgeploppt) */
+  .wallet-stage{display:grid;place-items:center;padding:8px 0 4px}
+  .wcard{width:100%;max-width:340px;border-radius:18px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);
+    transition:background-color .18s ease}
+  .wcard .whead{display:flex;align-items:center;gap:9px;padding:13px 15px 12px}
+  .wcard .wlogo{width:26px;height:26px;border-radius:7px;object-fit:contain;background:rgba(255,255,255,.12);flex:0 0 auto}
+  .wcard .worg{font-family:'Sora';font-weight:600;font-size:13px;letter-spacing:.02em;
+    text-transform:uppercase;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wcard .wstrip{display:block;width:100%;aspect-ratio:1125/432;object-fit:cover;background:#0b0f17}
+  .wcard .wbody{padding:15px 16px 18px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+  .wcard .wfield .wlabel{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;opacity:.62;font-weight:700}
+  .wcard .wfield .wval{font-family:'Sora';font-weight:600;font-size:15px;margin-top:3px}
+  .wcaption{text-align:center;color:var(--muted);font-size:11.5px;margin-top:10px;line-height:1.45}
+  .colorrow{display:flex;align-items:center;gap:12px;margin-top:20px;
+    background:#0b0f17;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .colorrow input[type=color]{width:52px;height:42px;padding:3px;border-radius:9px;flex:0 0 auto}
+  .colorrow .clabel{font-size:13px;font-weight:600;color:var(--txt)}
+  .colorrow .chex{font-family:'Sora';font-size:13px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+  .colorrow .cspacer{flex:1}
+
+  /* Toast */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);z-index:3000;
+    background:#11151f;border:1px solid var(--line-2);color:var(--txt);font-size:13.5px;font-weight:600;
+    padding:12px 18px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;max-width:90vw}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (max-width:640px){
+    .head{flex-direction:column;align-items:stretch}
+    .toolrow{width:100%}
+    .search{flex:1 1 100%;min-width:0}
+    .search input{width:100%}
+    #uploadOpen{flex:1}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="brandbar">
-    <div class="logo">F</div><b>FlowState</b>
+    <img src="./assets/logo-mark.png" alt=""><b>FlowState</b>
     <span class="tag">Admin-Cockpit</span>
   </div>
 
@@ -134,12 +212,17 @@
         <h1>Alle Betriebe</h1>
         <div class="sub" id="sub">Klick auf einen Betrieb, um in sein Dashboard zu wechseln.</div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="toolrow">
+        <div class="search">
+          <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="filter" type="search" placeholder="Betrieb suchen …" autocomplete="off">
+        </div>
         <button class="btn" id="uploadOpen" style="width:auto;margin:0;padding:11px 18px">＋ Design hochladen</button>
-        <button class="ghost" id="reloadBtn" title="Liste aktualisieren">↻ Aktualisieren</button>
+        <button class="ghost" id="reloadBtn" title="Liste aktualisieren">↻</button>
         <button class="ghost" id="logoutBtn">Abmelden</button>
       </div>
     </div>
+    <div id="niches" class="niches"></div>
     <div id="grid" class="grid"></div>
   </section>
 
@@ -150,25 +233,31 @@
       <p class="msub">Lade dein Karten-Design hoch (z. B. aus ChatGPT). Daraus baue ich eine funktionierende Stempelkarte + Dashboard.</p>
       <label for="uName">Name des Betriebs</label>
       <input id="uName" type="text" placeholder="z. B. Café Nero, Wiesbaden">
+      <label for="uIndustry">Branche / Nische</label>
+      <select id="uIndustry"></select>
       <div class="row">
         <div style="flex:1">
           <label for="uGoal">Stempel</label>
           <select id="uGoal"><option value="5">5er-Karte</option><option value="10">10er-Karte</option></select>
         </div>
         <div style="flex:1">
-          <label for="uColor">Karten-Farbe <span style="text-transform:none;color:#6b7280">(auto, anpassbar)</span></label>
+          <label for="uColor">Karten-Farbe <span style="text-transform:none;color:#5a6377">(auto)</span></label>
           <input id="uColor" type="color" value="#1c130f" style="height:48px;padding:4px;width:100%">
         </div>
       </div>
       <label for="uFile">Design-Streifen (PNG/JPG, quer)</label>
       <input id="uFile" type="file" accept="image/*">
-      <div id="placeWrap" class="hidden">
-        <button type="button" id="openPlace" class="btn" style="width:100%;margin-top:14px">🔍 Design öffnen & Stempel setzen</button>
-        <div id="placeStatus" style="font-size:12.5px;color:#ff8a8a;margin-top:8px">Noch keine Stempel gesetzt — bitte erst setzen.</div>
+      <div id="uPreviewWrap" class="hidden">
+        <img id="uPreview" alt="Design-Vorschau">
+        <div id="uPrevMeta">…</div>
       </div>
-      <label for="uLogo" style="margin-top:18px">Logo <span style="text-transform:none;color:#6b7280">(optional – für ein perfektes Profilbild)</span></label>
+      <div id="placeWrap" class="hidden">
+        <button type="button" id="openPlace" class="btn" style="width:100%;margin-top:14px">🔍 Design öffnen &amp; Stempel setzen</button>
+        <div id="placeStatus" style="font-size:12.5px;color:var(--err);margin-top:8px">Noch keine Stempel gesetzt — bitte erst setzen.</div>
+      </div>
+      <label for="uLogo" style="margin-top:18px">Logo <span style="text-transform:none;color:#5a6377">(optional – für ein perfektes Profilbild)</span></label>
       <input id="uLogo" type="file" accept="image/*">
-      <label for="uNote" style="margin-top:18px">Hinweis an mich <span style="text-transform:none;color:#6b7280">(optional)</span></label>
+      <label for="uNote" style="margin-top:18px">Hinweis an mich <span style="text-transform:none;color:#5a6377">(optional)</span></label>
       <textarea id="uNote" rows="2" placeholder="z. B. „Stempel-Haken bei Kreis 3 saß zu hoch“ oder „Farbe dunkler“"></textarea>
       <div class="merr" id="uErr"></div>
       <div class="mrow">
@@ -181,7 +270,7 @@
   <!-- VOLLBILD: Stempel platzieren -->
   <div id="placeFull" class="hidden">
     <div class="pfbar">
-      <div class="pfhint">Zieh jeden Haken genau auf seinen Kreis. Größe oben einstellen.</div>
+      <div class="pfhint">Zieh jeden Haken genau auf seinen Kreis.<small>Höhe gilt automatisch für alle Haken — einmal ziehen reicht.</small></div>
       <div class="pfsize">Haken-Größe <input type="range" id="uSize" min="35" max="140" value="80"></div>
       <button type="button" id="placeReset" class="ghost" style="padding:9px 14px;font-size:13px">↺ Reset</button>
       <button type="button" id="placeDone" class="btn" style="width:auto;margin:0;padding:11px 22px">✓ Fertig</button>
@@ -189,16 +278,76 @@
     <div class="pfstage"><div id="placeBox"></div></div>
   </div>
 
+  <!-- EINSTELLUNGEN-MODAL: Karte wie in Wallet + Farbregler für den Kartenkörper -->
+  <div id="setModal" class="modal hidden">
+    <div class="sheet">
+      <h2>Karte bearbeiten</h2>
+      <p class="msub" id="setSub">So sieht die Stempelkarte aufgeploppt in Apple Wallet aus. Pass den Kartenkörper (alles unter dem Design) mit dem Farbwähler an.</p>
+
+      <div class="wallet-stage">
+        <div class="wcard" id="wCard">
+          <div class="whead">
+            <img class="wlogo" id="wLogo" alt="">
+            <div class="worg" id="wOrg">Betrieb</div>
+          </div>
+          <img class="wstrip" id="wStrip" alt="Karten-Design">
+          <div class="wbody">
+            <div class="wfield"><div class="wlabel" id="wL1">Stempel</div><div class="wval" id="wV1">0 / 5</div></div>
+            <div class="wfield" style="text-align:right"><div class="wlabel">Belohnung</div><div class="wval" id="wV2">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="wcaption">Nur der Kartenkörper ändert sich — das Design oben bleibt unberührt.</div>
+
+      <label for="setIndustry">Branche / Nische</label>
+      <select id="setIndustry"></select>
+
+      <div class="colorrow">
+        <input id="setColor" type="color" value="#1c130f">
+        <div>
+          <div class="clabel">Kartenkörper-Farbe</div>
+          <div class="chex" id="setHex">#1c130f</div>
+        </div>
+        <div class="cspacer"></div>
+      </div>
+
+      <div class="merr" id="setErr"></div>
+      <div class="mrow">
+        <button class="ghost" id="setCancel">Abbrechen</button>
+        <button class="btn" id="setSave" style="width:auto;margin:0;padding:13px 22px">Speichern</button>
+      </div>
+    </div>
+  </div>
+
   <div id="boot" class="loading">Lädt …</div>
 </div>
+<div id="toast"></div>
 
 <script type="module">
 import { supabase } from './js/supabase-client.js';
+import { bindLoginGuard, recordLoginFail, recordLoginSuccess } from './js/login-guard.js';
 
 const $ = id => document.getElementById(id);
 const show = (el) => el.classList.remove('hidden');
 const hide = (el) => el.classList.add('hidden');
 const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+let BIZ = [];   // aktuelle Betriebsliste (für Einstellungen-Panel)
+// Branchen/Nischen (Phase 1) — muss zu INDUSTRIES in api/admin.mjs passen.
+const INDUSTRIES = [
+  ['gastronomie','Gastronomie'],['cafe','Café / Quick-Service'],['arbeitgeber','Arbeitgeber / Benefits'],
+  ['kantine','Kantine'],['fitness','Fitnessstudio'],['beauty','Beauty / Friseur'],
+  ['waschanlage','Autowaschanlage'],['freizeit','Freizeit'],['event','Event / Messe'],
+  ['verein','Verein'],['bildung','Schule / Uni'],['sonstige','Sonstige'],
+];
+const INDUSTRY_LABEL = Object.fromEntries(INDUSTRIES);
+const indLabel = id => INDUSTRY_LABEL[id] || INDUSTRY_LABEL['gastronomie'];
+let activeNiche = 'all';   // aktiver Nischen-Tab
+// Branchen-Dropdowns (Upload + ⚙️-Panel) einmalig füllen
+const fillIndustrySelect = el => { if(el) el.innerHTML = INDUSTRIES.map(([id,label])=>`<option value="${id}">${esc(label)}</option>`).join(''); };
+fillIndustrySelect($('uIndustry')); fillIndustrySelect($('setIndustry'));
+const textOn = hex => { const n=parseInt((hex||'#000').slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255; return (0.299*r+0.587*g+0.114*b)/255>0.6?'#111111':'#ffffff'; };
+let toastT=null;
+const toast = (m)=>{ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2800); };
 
 async function token(){ const { data:{ session } } = await supabase.auth.getSession(); return session?.access_token || null; }
 async function api(path, opts={}){
@@ -217,39 +366,36 @@ async function restoreAdminSession(){
   try{ const a=JSON.parse(raw); const { error }=await supabase.auth.setSession({access_token:a.access_token, refresh_token:a.refresh_token}); return !error; }catch{ return false; }
 }
 
-async function loadCockpit(triedRestore){
-  hide($('loginView')); show($('boot')); $('boot').textContent='Lädt Betriebe …';
-  const res = await api('/businesses');
-  if(res.status===401 || res.status===403){
-    // evtl. wurde die Session durch Impersonation überschrieben -> gespeicherte Admin-Session zurückholen
-    if(!triedRestore && await restoreAdminSession()){ return loadCockpit(true); }
-    if(res.status===403){ localStorage.removeItem('fs_admin_persist'); await supabase.auth.signOut(); return gotoLogin('Dieser Login hat keinen Admin-Zugriff.'); }
-    return gotoLogin();
-  }
-  if(!res.ok){ hide($('boot')); show($('cockpitView')); $('grid').innerHTML='<div class="loading">Fehler: '+esc(res.message||'')+'</div>'; return; }
-
-  // eingeloggt + Admin bestätigt -> Sitzung dauerhaft merken (bleibst eingeloggt)
-  try{ const { data:{ session:s } } = await supabase.auth.getSession(); saveAdminSession(s); }catch{}
-
-  const list = res.businesses||[];
-  $('sub').textContent = list.length+' Betrieb'+(list.length===1?'':'e')+' · Klick wechselt direkt ins Dashboard.';
-  $('grid').innerHTML = list.map(b=>{
+// ---- Betriebe rendern (aus Cache sofort, frisch vom Server danach) ----
+const ICON_FB  = '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.9A8 8 0 1 1 21 12z"/></svg>';
+const ICON_DEL = '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-1 13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 7"/></svg>';
+const ICON_GEAR= '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+function renderBusinesses(list, fromCache){
+  BIZ = list;
+  $('sub').textContent = list.length+' Betrieb'+(list.length===1?'':'e')+(fromCache?' · aktualisiere …':' · Klick wechselt direkt ins Dashboard.');
+  // Stagger-Animation nur beim ersten Aufbau — nicht beim stillen Refresh nach Cache-Anzeige
+  $('grid').classList.toggle('no-anim', $('grid').children.length > 0);
+  $('grid').innerHTML = list.map((b,i)=>{
     const initial = (b.name||'?').trim().charAt(0).toUpperCase();
     const av = b.logo_url ? `<img src="${esc(b.logo_url)}" alt="">` : esc(initial);
-    const del = b.slug==='lila-wiesbaden' ? '' : `<span class="del" title="Löschen" data-del="${b.id}" data-dname="${esc(b.name)}">🗑</span>`;
-    const fb = `<span class="fb" title="Verbesserung hinterlassen" data-fb="${b.id}" data-fname="${esc(b.name)}">💬</span>`;
-    return `<button class="shop" data-id="${b.id}" data-name="${esc(b.name)}">
-      <span class="swatch" style="background:${esc(b.color_bg||'#5b8cff')}"></span>
-      ${fb}${del}
+    const del = b.slug==='lila-wiesbaden' ? '' : `<span class="del" title="Löschen" data-del="${b.id}" data-dname="${esc(b.name)}">${ICON_DEL}</span>`;
+    const fb = `<span class="fb" title="Verbesserung hinterlassen" data-fb="${b.id}" data-fname="${esc(b.name)}">${ICON_FB}</span>`;
+    const gear = b.slug==='lila-wiesbaden' ? '' : `<span class="gear" title="Karte bearbeiten" data-gear="${b.id}">${ICON_GEAR}</span>`;
+    return `<button class="shop" style="--i:${Math.min(i,14)}" data-id="${b.id}" data-name="${esc(b.name)}" data-ind="${esc(b.industry||'gastronomie')}" data-q="${esc((b.name+' '+b.slug).toLowerCase())}">
+      ${fb}${gear}${del}
       <div class="top"><div class="av">${av}</div>
-        <div><div class="name">${esc(b.name)}</div><div class="slug">${esc(b.slug)}</div></div></div>
+        <div><div class="name">${esc(b.name)}</div>
+        <div class="slug"><span class="cdot" style="background:${esc(b.color_bg||'#4f7dff')}"></span>${esc(b.slug)}</div></div></div>
+      <div class="nbadge">${esc(indLabel(b.industry))}</div>
       <div class="stats">
-        <div class="stat"><div class="n">${b.activePasses}</div><div class="l">Pässe aktiv</div></div>
-        <div class="stat"><div class="n">${b.activeCampaigns}</div><div class="l">Aktionen</div></div>
+        <div class="stat"><div class="n">${b.activePasses??'–'}</div><div class="l">Pässe aktiv</div></div>
+        <div class="stat"><div class="n">${b.activeCampaigns??'–'}</div><div class="l">Aktionen</div></div>
       </div>
       <div class="enter">Dashboard öffnen →</div>
     </button>`;
   }).join('') || '<div class="loading">Noch keine Betriebe.</div>';
+  renderNiches();
+  applyFilter();
 
   $('grid').querySelectorAll('.fb').forEach(f=>{
     f.addEventListener('click', async (e)=>{
@@ -266,8 +412,11 @@ async function loadCockpit(triedRestore){
       if(!confirm(`„${d.dataset.dname}" wirklich löschen?\n(Betrieb, Login und alle Karten — unwiderruflich)`)) return;
       d.textContent='…';
       const r = await api('/delete-business', { method:'POST', body: JSON.stringify({ business_id: d.dataset.del })});
-      if(r.ok){ loadCockpit(); } else { alert('Fehler: '+(r.message||'unbekannt')); d.textContent='🗑'; }
+      if(r.ok){ loadCockpit(); } else { alert('Fehler: '+(r.message||'unbekannt')); d.innerHTML=ICON_DEL; }
     });
+  });
+  $('grid').querySelectorAll('.gear').forEach(g=>{
+    g.addEventListener('click', (e)=>{ e.stopPropagation(); openSettings(g.dataset.gear); });
   });
   $('grid').querySelectorAll('.shop').forEach(el=>{
     el.addEventListener('click', async ()=>{
@@ -282,29 +431,155 @@ async function loadCockpit(triedRestore){
       } else { el.style.opacity=1; el.querySelector('.enter').textContent='Fehler: '+esc(r.message||'unbekannt'); }
     });
   });
+}
 
+// Nischen-Umschalter (nur Admin): 'Alle' + jede belegte Nische mit Zähler.
+function renderNiches(){
+  const counts = {};
+  for(const b of BIZ){ const k=b.industry||'gastronomie'; counts[k]=(counts[k]||0)+1; }
+  if(activeNiche!=='all' && !counts[activeNiche]) activeNiche='all';   // leer gewordener Tab -> Alle
+  const tabs = [['all','Alle',BIZ.length], ...INDUSTRIES.filter(([id])=>counts[id]).map(([id,label])=>[id,label,counts[id]])];
+  $('niches').innerHTML = tabs.map(([id,label,ct])=>
+    `<button class="niche ${id===activeNiche?'active':''}" data-niche="${id}">${esc(label)}<span class="ct">${ct}</span></button>`).join('');
+  $('niches').querySelectorAll('.niche').forEach(t=>t.addEventListener('click',()=>{
+    activeNiche=t.dataset.niche;
+    $('niches').querySelectorAll('.niche').forEach(x=>x.classList.toggle('active',x.dataset.niche===activeNiche));
+    applyFilter();
+  }));
+}
+
+// Suche/Filter (rein clientseitig): Volltext UND aktive Nische
+function applyFilter(){
+  const q = ($('filter').value||'').trim().toLowerCase();
+  $('grid').querySelectorAll('.shop').forEach(el=>{
+    const okQ = !q || (el.dataset.q||'').includes(q);
+    const okN = activeNiche==='all' || (el.dataset.ind||'gastronomie')===activeNiche;
+    el.style.display = (okQ && okN) ? '' : 'none';
+  });
+}
+$('filter').addEventListener('input', applyFilter);
+
+async function loadCockpit(triedRestore){
+  hide($('loginView'));
+  // Sofort-Anzeige: letzte bekannte Liste aus dem Cache rendern, frische Daten laden parallel.
+  const cached = localStorage.getItem('fs_cockpit_cache');
+  if(cached){
+    try{ renderBusinesses(JSON.parse(cached), true); hide($('boot')); show($('cockpitView')); }catch{}
+  } else { show($('boot')); $('boot').textContent='Lädt Betriebe …'; }
+
+  const res = await api('/businesses');
+  if(res.status===401 || res.status===403){
+    // evtl. wurde die Session durch Impersonation überschrieben -> gespeicherte Admin-Session zurückholen
+    if(!triedRestore && await restoreAdminSession()){ return loadCockpit(true); }
+    if(res.status===403){ localStorage.removeItem('fs_admin_persist'); localStorage.removeItem('fs_cockpit_cache'); await supabase.auth.signOut(); return gotoLogin('Dieser Login hat keinen Admin-Zugriff.'); }
+    hide($('cockpitView')); return gotoLogin();
+  }
+  if(!res.ok){ hide($('boot')); show($('cockpitView')); if(!cached) $('grid').innerHTML='<div class="loading">Fehler: '+esc(res.message||'')+'</div>'; return; }
+
+  // eingeloggt + Admin bestätigt -> Sitzung dauerhaft merken (bleibst eingeloggt)
+  try{ const { data:{ session:s } } = await supabase.auth.getSession(); saveAdminSession(s); }catch{}
+
+  const list = res.businesses||[];
+  localStorage.setItem('fs_cockpit_cache', JSON.stringify(list));
+  renderBusinesses(list, false);
   hide($('boot')); show($('cockpitView'));
 }
 
-// Login
+// Login — mit Anmelde-Sperre: 3 Fehlversuche -> 5 Min, danach 1 Versuch, sonst anrufen.
+const loginGuard = bindLoginGuard($('loginBtn'), (text)=>{ $('loginErr').textContent=text; });
 $('loginForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
+  if(!loginGuard.allowed()){ loginGuard.render(); return; }   // gesperrt -> nicht mal versuchen
   $('loginErr').textContent=''; $('loginBtn').disabled=true; $('loginBtn').textContent='Anmelden …';
   const { error } = await supabase.auth.signInWithPassword({ email:$('email').value.trim(), password:$('pw').value });
-  $('loginBtn').disabled=false; $('loginBtn').textContent='Anmelden';
-  if(error){ $('loginErr').textContent='Anmeldung fehlgeschlagen.'; return; }
+  $('loginBtn').textContent='Anmelden';
+  if(error){
+    const st=recordLoginFail();
+    if(st.blocked){ loginGuard.render(); }   // 5-Min-Sperre bzw. Anruf-Hinweis + Button sperren
+    else { $('loginErr').textContent='E-Mail oder Passwort stimmt nicht.'; $('loginBtn').disabled=false; }
+    return;
+  }
+  recordLoginSuccess();
   loadCockpit();
 });
-$('logoutBtn').addEventListener('click', async ()=>{ localStorage.removeItem('fs_admin_persist'); await supabase.auth.signOut(); gotoLogin(); });
-$('reloadBtn').addEventListener('click', ()=>{ const b=$('reloadBtn'); b.textContent='↻ …'; loadCockpit().finally(()=>{ b.textContent='↻ Aktualisieren'; }); });
+$('logoutBtn').addEventListener('click', async ()=>{ localStorage.removeItem('fs_admin_persist'); localStorage.removeItem('fs_cockpit_cache'); await supabase.auth.signOut(); gotoLogin(); });
+$('reloadBtn').addEventListener('click', ()=>{ const b=$('reloadBtn'); b.textContent='…'; loadCockpit().finally(()=>{ b.textContent='↻'; }); });
 
 // --- Upload-Modal ---
-let pickedFile = null, pickedLogo = null;
+// WICHTIG: Der Design-Streifen wird SOFORT bei Auswahl konvertiert und gespeichert
+// (designB64) — nicht erst beim Absenden. So kann er nicht mehr "verloren gehen".
+let pickedFile = null, pickedLogo = null, designB64 = null;
 const openModal = ()=>{ $('uErr').textContent=''; $('modal').classList.remove('hidden'); };
 const closeModal = ()=>{ $('modal').classList.add('hidden'); };
 $('uploadOpen').addEventListener('click', openModal);
 $('uCancel').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+
+// ---- Einstellungen-Panel: Karte wie in Wallet + Kartenkörper-Farbe live ändern ----
+let setBizId = null;
+function applyWalletColor(hex){
+  const txt = textOn(hex);
+  $('wCard').style.background = hex;
+  $('wCard').style.color = txt;
+  $('setHex').textContent = hex.toUpperCase();
+}
+function openSettings(id){
+  const b = BIZ.find(x=>x.id===id); if(!b) return;
+  setBizId = id;
+  $('setErr').textContent = '';
+  $('setSave').disabled = false; $('setSave').textContent = 'Farbe speichern';
+  $('wOrg').textContent = b.name || 'Betrieb';
+  // Logo (nur http(s) zulassen — kein innerHTML); sonst ausblenden
+  const lg = $('wLogo'), ok = b.logo_url && /^https?:\/\//i.test(String(b.logo_url).trim());
+  if(ok){ lg.src = String(b.logo_url).trim(); lg.style.display=''; } else { lg.removeAttribute('src'); lg.style.display='none'; }
+  // Strip frisch vom Server (cache-bust, damit Re-Builds sofort sichtbar sind)
+  $('wStrip').src = '/api/card-image?business='+encodeURIComponent(id)+'&t='+(BIZ.length+'-'+id.slice(0,8));
+  // Vorschau-Body: zeigt nur, wie Farbe + Textkontrast wirken
+  $('wL1').textContent = 'Treue'; $('wV1').textContent = '●●●○○'; $('wV2').textContent = 'Gratis';
+  const hex = (b.color_bg && /^#[0-9a-fA-F]{6}$/.test(b.color_bg)) ? b.color_bg : '#1c130f';
+  $('setColor').value = hex;
+  applyWalletColor(hex);
+  $('setIndustry').value = b.industry || 'gastronomie';
+  $('setModal').classList.remove('hidden');
+}
+const closeSettings = ()=>{ $('setModal').classList.add('hidden'); setBizId=null; };
+$('setColor').addEventListener('input', e=>applyWalletColor(e.target.value));
+$('setCancel').addEventListener('click', closeSettings);
+$('setModal').addEventListener('click', e=>{ if(e.target.id==='setModal') closeSettings(); });
+$('setSave').addEventListener('click', async ()=>{
+  if(!setBizId) return;
+  const hex = $('setColor').value;
+  const niche = $('setIndustry').value;
+  const b = BIZ.find(x=>x.id===setBizId);
+  const nicheChanged = b && (b.industry||'gastronomie') !== niche;
+  $('setErr').textContent=''; $('setSave').disabled=true; $('setSave').textContent='Speichere …';
+  // 1) Kartenkörper-Farbe
+  const r = await api('/update-business', { method:'POST', body: JSON.stringify({ business_id:setBizId, color_bg:hex })});
+  if(!r.ok){
+    $('setErr').textContent = 'Fehler (Farbe): '+(r.message||'unbekannt');
+    $('setSave').disabled=false; $('setSave').textContent='Speichern'; return;
+  }
+  // 2) Nische (nur wenn geändert)
+  if(nicheChanged){
+    const ri = await api('/set-industry', { method:'POST', body: JSON.stringify({ business_id:setBizId, industry:niche })});
+    if(!ri.ok){
+      $('setErr').textContent = 'Farbe gespeichert, aber Nische fehlgeschlagen: '+(ri.message||'unbekannt');
+      $('setSave').disabled=false; $('setSave').textContent='Speichern'; return;
+    }
+  }
+  // lokale Liste + Cache sofort aktualisieren (kein Reload nötig)
+  if(b){ b.color_bg=r.color_bg; b.color_text=r.color_text; b.industry=niche; }
+  try{ localStorage.setItem('fs_cockpit_cache', JSON.stringify(BIZ)); }catch{}
+  const card = $('grid').querySelector(`.gear[data-gear="${setBizId}"]`)?.closest('.shop');
+  if(card){
+    const dot = card.querySelector('.cdot'); if(dot) dot.style.background = r.color_bg;
+    card.dataset.ind = niche;
+    const badge = card.querySelector('.nbadge'); if(badge) badge.textContent = indLabel(niche);
+  }
+  if(nicheChanged){ renderNiches(); applyFilter(); }   // Tabs/Zähler aktualisieren
+  closeSettings();
+  toast(nicheChanged ? '✓ Gespeichert — Farbe & Nische aktualisiert.' : '✓ Farbe gespeichert — wirkt beim nächsten Karten-Update.');
+});
 // Durchschnittsfarbe des Designs als Auto-Vorschlag (anpassbar)
 function avgColor(file){
   return new Promise(res=>{
@@ -345,7 +620,9 @@ function makeDraggable(m){
     const move=ev=>{
       let x=(ev.clientX-rect.left)/rect.width, y=(ev.clientY-rect.top)/rect.height;
       x=Math.max(0.02,Math.min(0.98,x)); y=Math.max(0.05,Math.min(0.95,y));
-      m.style.left=x*100+'%'; m.style.top=y*100+'%';
+      m.style.left=x*100+'%';
+      // Höhe gilt für ALLE Haken: einen ziehen -> alle folgen (gleiche Linie, kein Regler nötig)
+      markers.forEach(o=>{ o.style.top=y*100+'%'; });
     };
     const up=()=>{ m.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); };
     m.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
@@ -363,26 +640,12 @@ $('openPlace').addEventListener('click', ()=>{
 $('placeDone').addEventListener('click', ()=>{
   placedPositions = getPositions();
   $('placeFull').classList.add('hidden');
-  $('placeStatus').style.color='#19e3c2';
+  $('placeStatus').style.color='var(--mint)';
   $('placeStatus').textContent=`✓ ${placedPositions.length} Stempel gesetzt (Größe ${$('uSize').value}). Du kannst nochmal öffnen zum Anpassen.`;
 });
 $('uGoal').addEventListener('change', ()=>{ if(!$('placeFull').classList.contains('hidden')) initMarkers(false); });
 
-$('uFile').addEventListener('change', async e=>{
-  pickedFile = e.target.files[0] || null;
-  if(pickedFile){
-    designURL = URL.createObjectURL(pickedFile);
-    placeBox.style.backgroundImage=`url(${designURL})`;
-    $('placeWrap').classList.remove('hidden');
-    placedPositions=null; markers=[]; placeBox.querySelectorAll('.pmark').forEach(x=>x.remove());
-    $('placeStatus').style.color='#ff8a8a'; $('placeStatus').textContent='Noch keine Stempel gesetzt — bitte erst setzen.';
-    const col=await avgColor(pickedFile); if(col) $('uColor').value=col;   // Auto-Farbe vorschlagen
-    placeBox.style.backgroundColor=$('uColor').value;                       // Ränder in Designfarbe (contain)
-  }
-});
-$('uColor').addEventListener('input', ()=>{ placeBox.style.backgroundColor=$('uColor').value; });
-$('uLogo').addEventListener('change', e=>{ pickedLogo = e.target.files[0] || null; });
-// Bild im Browser auf max. 1600px Breite verkleinern -> data-URL (hält Upload klein)
+// Bild im Browser auf max. Breite verkleinern -> data-URL (hält Upload klein)
 function resizeToDataURL(file, maxW=1600, mime='image/png', q=0.92){
   return new Promise((resolve,reject)=>{
     const img=new Image();
@@ -398,23 +661,69 @@ function resizeToDataURL(file, maxW=1600, mime='image/png', q=0.92){
     img.onerror=reject; img.src=URL.createObjectURL(file);
   });
 }
+function setPreview(b64){
+  if(b64){
+    $('uPreview').src=b64;
+    const kb=Math.round((b64.length*3/4)/1024);
+    $('uPrevMeta').textContent=`✓ Designstreifen angehängt (${kb} KB) — wird mitgeschickt.`;
+    show($('uPreviewWrap'));
+  } else {
+    hide($('uPreviewWrap')); $('uPreview').src=''; $('uPrevMeta').textContent='';
+  }
+}
+$('uFile').addEventListener('change', async e=>{
+  const f = e.target.files[0] || null;
+  if(!f){ return; } // Auswahl abgebrochen -> vorhandenes Design behalten
+  pickedFile = f; designB64 = null; setPreview(null);
+  designURL = URL.createObjectURL(f);
+  placeBox.style.backgroundImage=`url(${designURL})`;
+  $('placeWrap').classList.remove('hidden');
+  placedPositions=null; markers=[]; placeBox.querySelectorAll('.pmark').forEach(x=>x.remove());
+  $('placeStatus').style.color='var(--err)'; $('placeStatus').textContent='Noch keine Stempel gesetzt — bitte erst setzen.';
+  $('uPrevMeta').textContent='Konvertiere Design …'; show($('uPreviewWrap'));
+  try{
+    // SOFORT konvertieren + anzeigen -> Streifen ist sicher angehängt
+    designB64 = await resizeToDataURL(f, 1400, 'image/jpeg', 0.85);
+    setPreview(designB64);
+    $('uErr').textContent='';
+  }catch{
+    setPreview(null);
+    $('uErr').textContent='Dieses Bild konnte nicht gelesen werden (Format?). Bitte als PNG oder JPG exportieren und neu wählen.';
+    pickedFile=null;
+  }
+  const col=await avgColor(f); if(col) $('uColor').value=col;   // Auto-Farbe vorschlagen
+  placeBox.style.backgroundColor=$('uColor').value;             // Ränder in Designfarbe (contain)
+});
+$('uColor').addEventListener('input', ()=>{ placeBox.style.backgroundColor=$('uColor').value; });
+$('uLogo').addEventListener('change', e=>{ pickedLogo = e.target.files[0] || null; });
 $('uSubmit').addEventListener('click', async ()=>{
   const name=$('uName').value.trim();
   if(!name){ $('uErr').textContent='Bitte einen Namen eingeben.'; return; }
-  if(!pickedFile){ $('uErr').textContent='Bitte ein Design-Bild wählen.'; return; }
+  if(!pickedFile && !designB64){ $('uErr').textContent='Bitte ein Design-Bild wählen.'; return; }
   if(!placedPositions || !placedPositions.length){ $('uErr').textContent='Bitte erst die Stempel setzen (🔍 Design öffnen & Stempel setzen).'; return; }
   $('uErr').textContent=''; $('uSubmit').disabled=true; $('uSubmit').textContent='Lädt hoch …';
   try{
-    const image_b64 = await resizeToDataURL(pickedFile, 1400, 'image/jpeg', 0.85); // kompakt -> geht zuverlässig durch
+    // Fallback: falls die Sofort-Konvertierung fehlte, jetzt nachholen
+    if(!designB64 && pickedFile){
+      try{ designB64 = await resizeToDataURL(pickedFile, 1400, 'image/jpeg', 0.85); setPreview(designB64); }catch{}
+    }
+    if(!designB64 || designB64.length < 5000){
+      $('uErr').textContent='Designstreifen fehlt — bitte das Bild neu auswählen.';
+      $('uSubmit').disabled=false; $('uSubmit').textContent='Hochladen & bauen'; return;
+    }
     const logo_b64 = pickedLogo ? await resizeToDataURL(pickedLogo, 400) : null;
     const r = await api('/upload-design', { method:'POST', body: JSON.stringify({
-      name, goal:$('uGoal').value, color_bg:$('uColor').value, image_b64, logo_b64, note:$('uNote').value.trim(),
-      positions: placedPositions, rfr: currentRfr()
+      name, goal:$('uGoal').value, color_bg:$('uColor').value, image_b64:designB64, logo_b64, note:$('uNote').value.trim(),
+      positions: placedPositions, rfr: currentRfr(), industry:$('uIndustry').value
     })});
-    if(r.ok){
+    // Server bestätigt die Bild-Größe -> nur dann gilt der Upload als komplett
+    if(r.ok && r.bytes && r.bytes > 5000){
       closeModal();
-      $('uName').value=''; $('uNote').value=''; pickedFile=null; pickedLogo=null; placedPositions=null; $('placeWrap').classList.add('hidden'); placeBox.style.backgroundImage=''; $('uFile').value=''; $('uLogo').value='';
+      $('uName').value=''; $('uNote').value=''; pickedFile=null; pickedLogo=null; designB64=null; placedPositions=null;
+      setPreview(null); $('placeWrap').classList.add('hidden'); placeBox.style.backgroundImage=''; $('uFile').value=''; $('uLogo').value='';
       $('sub').textContent = `✓ „${name}" hochgeladen — wird gebaut und erscheint gleich hier.`;
+    } else if(r.ok){
+      $('uErr').textContent='Upload kam ohne Design beim Server an — bitte nochmal senden.';
     } else { $('uErr').textContent='Upload fehlgeschlagen ('+(r.status||'?')+'): '+esc(r.message||'Design evtl. zu groß — kleineres Bild versuchen.'); }
   }catch(e){ $('uErr').textContent='Fehler beim Verarbeiten des Bildes.'; }
   $('uSubmit').disabled=false; $('uSubmit').textContent='Hochladen & bauen';

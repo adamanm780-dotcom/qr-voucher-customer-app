@@ -14,6 +14,18 @@ async function dominantHex(buf) {
   try { const { dominant: d } = await sharp(buf).stats(); return '#' + [d.r, d.g, d.b].map(v => v.toString(16).padStart(2, '0')).join(''); }
   catch { return '#1c130f'; }
 }
+// Farbe vom UNTEREN Design-Rand (Karte verschmilzt nahtlos mit dem Design-Ende).
+// Nimmt die DOMINANTE Farbe (Histogramm-Modus) des unteren Bandes über die volle Breite —
+// robuster als ein 1px-Mittelwert, der Text/Kanten zu "Matsch" verrechnet.
+async function bottomColor(buf) {
+  try {
+    const m = await sharp(buf).metadata();
+    const h = Math.max(2, Math.round(m.height * 0.06));
+    const band = await sharp(buf).extract({ left: 0, top: m.height - h, width: m.width, height: h }).toBuffer();
+    const { dominant: d } = await sharp(band).stats();
+    return '#' + [d.r, d.g, d.b].map(v => v.toString(16).padStart(2, '0')).join('');
+  } catch { return await dominantHex(buf); }
+}
 function textFor(hex) {
   const n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? '#111111' : '#ffffff';
@@ -51,7 +63,7 @@ for (const mf of metas) {
     writeFileSync(imgPath, imgBuf);
 
     // Farbe automatisch aus dem Design (oder vom User vorgegeben)
-    const colorBg = meta.color_bg || await dominantHex(imgBuf);
+    const colorBg = await bottomColor(imgBuf);   // Karten-Farbe = unterer Design-Rand (auto, nahtlos)
     const colorText = textFor(colorBg);
     console.log(`  Auto-Farbe: ${colorBg} (Text ${colorText})`);
 
@@ -102,7 +114,7 @@ for (const mf of metas) {
     const password = 'FS-' + pick('ABCDEFGHJKLMNPQRSTUVWXYZ', 4) + pick('23456789', 3);
     const provCfg = join('_brand', `${slug}-prov.json`);
     writeFileSync(provCfg, JSON.stringify({ slug, name: meta.name, goal: meta.goal, colorBg,
-      colorText, reward: meta.reward, email, password, logoUrl }));
+      colorText, reward: meta.reward, email, password, logoUrl, industry: meta.industry || 'gastronomie' }));
     execSync(`node scripts/provision-custom.mjs "${provCfg}"`, { stdio: 'inherit' });
 
     // 3) Upload als erledigt markieren (nach processed/ verschieben)

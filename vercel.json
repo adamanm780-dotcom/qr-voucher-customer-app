@@ -7,9 +7,14 @@
     { "src": "api/provision.mjs", "use": "@vercel/node" },
     { "src": "api/admin.mjs", "use": "@vercel/node" },
     { "src": "api/card-image.mjs", "use": "@vercel/node", "config": { "includeFiles": "api/_assets/**" } },
+    { "src": "api/cron-timepass.mjs", "use": "@vercel/node" },
     { "src": "public/**", "use": "@vercel/static" }
   ],
+  "crons": [
+    { "path": "/api/cron-timepass", "schedule": "0 3 * * *" }
+  ],
   "routes": [
+    { "src": "/api/cron-timepass", "dest": "/api/cron-timepass.mjs" },
     { "src": "/api/pass", "dest": "/api/pass.mjs" },
     { "src": "/api/redeem", "dest": "/api/redeem.mjs" },
     { "src": "/api/v1/(.*)", "dest": "/api/v1.mjs" },

@@ -6,8 +6,17 @@
 import { PKPass } from 'passkit-generator';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-import { themeFor, assetKey, loadAssets } from '../lib/theme.mjs';
+import { themeFor, assetKey, loadAssets, campaignDir } from '../lib/theme.mjs';
 import { campaignMintAllowed } from '../lib/security.mjs';
+import { initialRemaining } from '../lib/cards.mjs';
+import { cardView } from '../lib/passview.mjs';
+
+// ISO-Datum -> "DD.MM.YYYY" (für Gültig-bis auf dem Pass). Leer bei ungültig.
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso); if (isNaN(d)) return '';
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 
 const PASS_TYPE_ID = 'pass.com.lila.gutschein';
 const TEAM_ID = '4X4Z2XA87V';
@@ -32,20 +41,10 @@ function newSerial(slug) {
 }
 
 function buildPass({ key, serial, type, data }) {
-  const isStamp = type === 'stampcard';
-  const structure = isStamp
-    ? {
-        headerFields: [{ key: 'count', label: 'STEMPEL', value: `${data.stamps ?? 0}/${data.stampGoal ?? 10}` }],
-        secondaryFields: [{ key: 'reward', label: 'BELOHNUNG', value: data.reward || 'Dein Lieblingsdrink' }],
-      }
-    : {
-        primaryFields: [],
-        // Lila: Wert steht im Design -> nur Gültigkeit. Default: Wert als Feld zeigen.
-        secondaryFields: [
-          ...(data.isDefault && data.value ? [{ key: 'value', label: 'WERT', value: data.value }] : []),
-          ...(data.validUntil ? [{ key: 'valid', label: 'GÜLTIG BIS', value: data.validUntil }] : []),
-        ],
-      };
+  // Layout + Strip kommen aus der gemeinsamen Quelle (lib/passview.mjs) — gleiche Logik wie v1.mjs.
+  const campLike = { type, config: data.config || {}, stamp_goal: data.stampGoal, reward: data.reward, value: data.value, title: data.title };
+  const passLike = { stamps: data.stamps, remaining: data.remaining };
+  const view = cardView(campLike, passLike, { isDefault: data.isDefault }, { startMs: data.startMs || null, nowMs: Date.now() });
   const passJson = {
     formatVersion: 1, passTypeIdentifier: PASS_TYPE_ID, teamIdentifier: TEAM_ID,
     organizationName: data.org || data.business || 'Lila Wiesbaden', description: data.title || 'lila.',
@@ -53,7 +52,7 @@ function buildPass({ key, serial, type, data }) {
     ...((data.isDefault || data.custom) && data.org ? { logoText: data.org } : {}),
     serialNumber: serial,
     foregroundColor: data.fg || 'rgb(61,42,115)', labelColor: data.label || 'rgb(90,65,140)', backgroundColor: data.bg || LILA,
-    [isStamp ? 'storeCard' : 'coupon']: structure,
+    [view.style]: view.structure,
     barcodes: [{ format: 'PKBarcodeFormatQR', message: serial, messageEncoding: 'iso-8859-1', altText: serial }],
     // Web-Service: erlaubt Apple, Updates zu holen (Live-Stempel). Nur wenn authToken vorhanden.
     ...(data.authToken ? {
@@ -61,15 +60,28 @@ function buildPass({ key, serial, type, data }) {
       authenticationToken: data.authToken,
     } : {}),
   };
-  // Stempelkarte: Strip-Bild zum aktuellen Fuellstand (strip_<voll>); sonst Standard-Strip.
-  const goal = data.stampGoal ?? 10;
-  const filled = Math.max(0, Math.min(data.stamps ?? 0, goal));
-  const stripName = isStamp ? `strip_${filled}` : 'strip';
   const pass = new PKPass(
-    { 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(key, stripName) },
+    { 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(key, view.stripName) },
     certs()
   );
   return pass.getAsBuffer();
+}
+
+// data-Felder + initialer Restzähler für eine aus DB gemintete Karte (enroll + campaign teilen das).
+function mintFor(camp, theme, authToken) {
+  const type = camp.type;
+  const config = camp.config || {};
+  const remaining = initialRemaining(type, config);
+  let validUntil = config.valid_until ? fmtDate(config.valid_until) : null;
+  if (type === 'coupon' && !validUntil) validUntil = '31.12.2026';   // Bestandsverhalten beibehalten
+  const data = {
+    title: camp.title, authToken, ...theme,
+    stampGoal: camp.stamp_goal, stamps: 0,
+    reward: camp.reward, value: camp.value,
+    remaining, config, validUntil,
+    startMs: null,   // Zeit-Pass: bei Ausgabe noch NICHT gestartet -> leere Karte (0 Kreuze)
+  };
+  return { remaining, data };
 }
 
 export default async function handler(req, res) {
@@ -101,15 +113,17 @@ export default async function handler(req, res) {
       const { data: biz } = await db.from('businesses').select('name,slug,color_bg,color_text').eq('id', camp.business_id).maybeSingle();
       const theme = themeFor(biz);
       type = camp.type;
-      key = assetKey(type, camp.stamp_goal, theme.prefix);
+      key = campaignDir(biz?.slug, camp.id) || assetKey(type, camp.stamp_goal, theme.prefix);
       serial = newSerial(biz?.slug);
       const authToken = crypto.randomBytes(16).toString('hex');
+      const minted = mintFor(camp, theme, authToken);
       // neuen pass-Datensatz anlegen
       await db.from('passes').insert({
         campaign_id: camp.id, business_id: camp.business_id, serial,
         auth_token: authToken, stamps: 0, status: 'active',
+        ...(minted.remaining != null ? { remaining: minted.remaining } : {}),
       });
-      data = { stampGoal: camp.stamp_goal, stamps: 0, reward: camp.reward, title: camp.title, authToken, ...theme };
+      data = minted.data;
     } else if (campaign) {
       const db = supa();
       const { data: camp, error } = await db.from('campaigns').select('*').eq('id', campaign).single();
@@ -122,17 +136,16 @@ export default async function handler(req, res) {
       const { data: biz } = await db.from('businesses').select('name,slug,color_bg,color_text').eq('id', camp.business_id).maybeSingle();
       const theme = themeFor(biz);
       type = camp.type;
-      key = assetKey(type, camp.stamp_goal, theme.prefix);
+      key = campaignDir(biz?.slug, camp.id) || assetKey(type, camp.stamp_goal, theme.prefix);
       serial = newSerial(biz?.slug);
       const authToken = crypto.randomBytes(16).toString('hex');
+      const minted = mintFor(camp, theme, authToken);
       await db.from('passes').insert({
         campaign_id: camp.id, business_id: camp.business_id, serial,
-        auth_token: authToken, stamps: 0,
-        status: type === 'coupon' ? 'active' : 'active',
+        auth_token: authToken, stamps: 0, status: 'active',
+        ...(minted.remaining != null ? { remaining: minted.remaining } : {}),
       });
-      data = type === 'stampcard'
-        ? { stampGoal: camp.stamp_goal, stamps: 0, reward: camp.reward, title: camp.title, authToken, ...theme }
-        : { value: camp.value, validUntil: '31.12.2026', title: camp.title, authToken, ...theme };
+      data = minted.data;
     } else {
       return res.status(400).json({ error: 'Parameter fehlt: demo, campaign oder enroll' });
     }

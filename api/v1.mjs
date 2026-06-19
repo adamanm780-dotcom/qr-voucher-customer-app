@@ -8,7 +8,8 @@
 // 5. Log:            POST   /v1/log
 import { createClient } from '@supabase/supabase-js';
 import { PKPass } from 'passkit-generator';
-import { themeFor, assetKey, loadAssets } from '../lib/theme.mjs';
+import { themeFor, assetKey, loadAssets, campaignDir } from '../lib/theme.mjs';
+import { cardView } from '../lib/passview.mjs';
 
 const PASS_TYPE_ID = 'pass.com.lila.gutschein';
 const TEAM_ID = '4X4Z2XA87V';
@@ -33,28 +34,25 @@ async function buildPassForSerial(db, serial) {
   if (!camp) return null;
   const { data: biz } = await db.from('businesses').select('name,slug,color_bg,color_text').eq('id', pass.business_id).maybeSingle();
   const theme = themeFor(biz);
-  const isStamp = camp.type === 'stampcard';
-  const goal = camp.stamp_goal || 10;
-  const structure = isStamp
-    ? { headerFields: [{ key:'count', label:'STEMPEL', value:`${pass.stamps||0}/${goal}` }],
-        secondaryFields: [{ key:'reward', label:'BELOHNUNG', value: camp.reward || 'Dein Lieblingsdrink' }] }
-    : { primaryFields: [], secondaryFields: [
-        ...(theme.isDefault && camp.value ? [{ key:'value', label:'WERT', value: camp.value }] : []),
-        { key:'valid', label:'GÜLTIG BIS', value:'31.12.2026' }] };
+  // Zeit-Pass (access mit config.tage): Fenster startet mit dem ERSTEN Scan (erste 'entry'-redemption).
+  let startMs = null;
+  if (camp.type === 'access' && camp.config && camp.config.tage) {
+    const { data: first } = await db.from('redemptions').select('created_at').eq('pass_id', pass.id).eq('action', 'entry').order('created_at', { ascending: true }).limit(1).maybeSingle();
+    if (first) startMs = Date.parse(first.created_at);
+  }
+  const view = cardView(camp, pass, theme, { startMs, nowMs: Date.now() });
   const passJson = {
     formatVersion:1, passTypeIdentifier:PASS_TYPE_ID, teamIdentifier:TEAM_ID,
     organizationName: theme.org, description: camp.title || theme.org,
     ...((theme.isDefault || theme.custom) && theme.org ? { logoText: theme.org } : {}),
     serialNumber: serial, foregroundColor: theme.fg, labelColor: theme.label, backgroundColor: theme.bg,
-    [isStamp?'storeCard':'coupon']: structure,
+    [view.style]: view.structure,
     barcodes:[{ format:'PKBarcodeFormatQR', message:serial, messageEncoding:'iso-8859-1', altText:serial }],
     webServiceURL:'https://qr-voucher-customer-app.vercel.app/api/v1',
     authenticationToken: pass.auth_token,
   };
-  // Stempelkarte: Strip zum aktuellen Stand (strip_<voll>); Gutschein: Standard-Strip.
-  const filled = Math.max(0, Math.min(pass.stamps || 0, goal));
-  const stripName = isStamp ? `strip_${filled}` : 'strip';
-  const pkpass = new PKPass({ 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(assetKey(camp.type, goal, theme.prefix), stripName) }, certs());
+  const key = campaignDir(biz?.slug, camp.id) || assetKey(camp.type, camp.stamp_goal || 10, theme.prefix);
+  const pkpass = new PKPass({ 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(key, view.stripName) }, certs());
   return { buf: pkpass.getAsBuffer(), updatedAt: pass.updated_at };
 }
 

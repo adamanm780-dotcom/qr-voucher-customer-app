@@ -17,6 +17,7 @@ const pick = (set, n) => Array.from({ length: n }, () => set[crypto.randomInt(se
 
 const cfg = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 const goal = cfg.goal || 5;
+const industry = cfg.industry || 'gastronomie';   // Branche/Nische (Phase 1) — Default Gastronomie
 const email = cfg.email || `${cfg.slug}@kunden.flowstate.app`;
 const password = cfg.password || ('FS-' + pick('ABCDEFGHJKLMNPQRSTUVWXYZ', 4) + pick('23456789', 3));
 
@@ -48,6 +49,7 @@ if (!biz) {
   const { data, error } = await db.from('businesses').insert({
     owner_id: userId, name: cfg.name, slug: cfg.slug,
     color_bg: cfg.colorBg, color_text: cfg.colorText, logo_url: cfg.logoUrl || null,
+    industry,
   }).select().single();
   if (error) { console.error('  Betrieb-Fehler:', error.message); process.exit(1); }
   biz = data;

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Dashboard · FlowState Wallet</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#05070d">
+<meta name="theme-color" content="#0a0d14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlowState">
@@ -14,25 +14,25 @@
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#05070d; --bg2:#080b13; --panel:#0b0f18; --panel-2:#0d121c;
+    --bg:#0a0d14; --bg2:#080b13; --panel:#0b0f18; --panel-2:#0d121c;
     --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.11);
     --text:#eaf2ff; --muted:#6b7691; --muted-2:#48526b;
-    --accent:#22e9ff; --accent-ink:#04222a;
-    --grad:linear-gradient(120deg, #22e9ff 0%, #7a6bff 55%, #c062ff 100%);
+    --accent:#3ce8c4; --accent-ink:#04241c;
+    --grad:linear-gradient(100deg, #3ce8c4 0%, #4f7dff 100%);
     --brand:#7a4fb5; --ok:#3ddc7f; --r:12px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Inter',-apple-system,sans-serif;font-size:13.5px;color:var(--text);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  body{font-family:'Manrope',-apple-system,sans-serif;font-size:13.5px;color:var(--text);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased;
     background:
-      radial-gradient(120% 70% at 88% -8%, rgba(122,107,255,.08), transparent 58%),
-      radial-gradient(90% 55% at 0% 0%, rgba(34,233,255,.05), transparent 52%),
+      radial-gradient(120% 70% at 88% -8%, rgba(79,125,255,.08), transparent 58%),
+      radial-gradient(90% 55% at 0% 0%, rgba(60,232,196,.05), transparent 52%),
       var(--bg);
     background-attachment:fixed}
-  h1,h2,h3{font-family:'Space Grotesk'}
-  ::selection{background:rgba(34,233,255,.25)}
+  h1,h2,h3{font-family:'Sora'}
+  ::selection{background:rgba(60,232,196,.25)}
 
   #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:50;color:var(--muted);font-size:13px;gap:11px}
   .spin{width:22px;height:22px;border:3px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite}
@@ -40,26 +40,26 @@
 
   /* ===== WILLKOMMEN ===== */
   #welcome{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;overflow:hidden;
-    background:radial-gradient(110% 80% at 50% -5%, rgba(34,233,255,.14) 0%, var(--bg) 58%)}
+    background:radial-gradient(110% 80% at 50% -5%, rgba(60,232,196,.14) 0%, var(--bg) 58%)}
   #welcome .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;pointer-events:none}
-  #welcome .orb.a{width:480px;height:480px;background:rgba(34,233,255,.25);top:-160px;left:50%;transform:translateX(-50%);animation:wob 12s ease-in-out infinite}
+  #welcome .orb.a{width:480px;height:480px;background:rgba(60,232,196,.25);top:-160px;left:50%;transform:translateX(-50%);animation:wob 12s ease-in-out infinite}
   @keyframes wob{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.12)}}
   #welcome .grid{position:absolute;inset:0;opacity:.4;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 80%)}
   #welcome>*{position:relative;z-index:1}
   #welcome.exit{opacity:0;transform:scale(1.05);pointer-events:none;transition:opacity .85s ease,transform .85s ease}
-  .w-logo{font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:38px;opacity:.95;display:flex;align-items:center;gap:10px}
-  .w-logo img{height:30px;width:auto;filter:drop-shadow(0 2px 12px rgba(34,233,255,.4))}
+  .w-logo{font-family:'Sora';font-weight:700;font-size:16px;margin-bottom:38px;opacity:.95;display:flex;align-items:center;gap:10px}
+  .w-logo img{height:30px;width:auto;filter:drop-shadow(0 2px 12px rgba(60,232,196,.4))}
   .w-logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .w-hello{font-family:'Space Grotesk';font-weight:600;font-size:clamp(28px,4.6vw,52px);line-height:1.06;letter-spacing:-.03em;max-width:20ch;margin-bottom:14px;opacity:0;transform:translateY(20px);animation:rise .85s .15s forwards cubic-bezier(.2,.7,.2,1)}
+  .w-hello{font-family:'Sora';font-weight:600;font-size:clamp(28px,4.6vw,52px);line-height:1.06;letter-spacing:-.03em;max-width:20ch;margin-bottom:14px;opacity:0;transform:translateY(20px);animation:rise .85s .15s forwards cubic-bezier(.2,.7,.2,1)}
   .w-hello em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .w-sub{color:var(--muted);font-size:clamp(14px,1.6vw,16px);max-width:38ch;line-height:1.6;margin-bottom:40px;opacity:0;transform:translateY(20px);animation:rise .85s .32s forwards cubic-bezier(.2,.7,.2,1)}
-  .go{position:relative;width:96px;height:96px;border-radius:50%;border:none;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Space Grotesk';font-size:21px;font-weight:700;opacity:0;transform:translateY(20px) scale(.9);animation:rise .85s .5s forwards cubic-bezier(.2,.7,.2,1);box-shadow:0 16px 46px rgba(122,107,255,.5);transition:transform .18s,box-shadow .2s}
-  .go:hover{transform:translateY(0) scale(1.06)!important;box-shadow:0 22px 64px rgba(192,98,255,.65)}
+  .go{position:relative;width:96px;height:96px;border-radius:50%;border:none;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Sora';font-size:21px;font-weight:700;opacity:0;transform:translateY(20px) scale(.9);animation:rise .85s .5s forwards cubic-bezier(.2,.7,.2,1);box-shadow:0 16px 46px rgba(79,125,255,.5);transition:transform .18s,box-shadow .2s}
+  .go:hover{transform:translateY(0) scale(1.06)!important;box-shadow:0 22px 64px rgba(79,125,255,.65)}
   .go:active{transform:scale(.94)!important}
-  .go::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(34,233,255,.5);animation:pulse 2.4s ease-out infinite}
+  .go::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(60,232,196,.5);animation:pulse 2.4s ease-out infinite}
   @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.4);opacity:0}}
   @keyframes rise{to{opacity:1;transform:translateY(0) scale(1)}}
-  #wave{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;transform:scale(.2);background:radial-gradient(circle at 50% 58%, var(--accent) 0%, rgba(34,233,255,.45) 36%, transparent 72%)}
+  #wave{position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;transform:scale(.2);background:radial-gradient(circle at 50% 58%, var(--accent) 0%, rgba(60,232,196,.45) 36%, transparent 72%)}
   #wave.flood{animation:flood 1.05s cubic-bezier(.4,0,.2,1) forwards}
   @keyframes flood{0%{opacity:0;transform:scale(.2)}35%{opacity:.8}100%{opacity:0;transform:scale(2.4)}}
 
@@ -68,19 +68,19 @@
   #app.show{opacity:1}
   .side{border-right:1px solid var(--line);padding:22px 13px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100dvh;
     background:linear-gradient(180deg,#0a0e17 0%, #070a11 100%)}
-  .fslogo{display:flex;align-items:center;gap:8px;padding:0 8px 14px;font-family:'Space Grotesk';font-weight:700;font-size:13px;letter-spacing:.01em}
-  .fslogo img{height:22px;width:auto;filter:drop-shadow(0 1px 6px rgba(34,233,255,.35))}
+  .fslogo{display:flex;align-items:center;gap:8px;padding:0 8px 14px;font-family:'Sora';font-weight:700;font-size:13px;letter-spacing:.01em}
+  .fslogo img{height:22px;width:auto;filter:drop-shadow(0 1px 6px rgba(60,232,196,.35))}
   .fslogo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .brandrow{display:flex;align-items:center;gap:11px;padding:14px 8px 18px;border-top:1px solid var(--line)}
-  .avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;overflow:hidden;background:var(--brand);color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:16px;flex-shrink:0}
+  .avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;overflow:hidden;background:var(--brand);color:#fff;font-family:'Sora';font-weight:700;font-size:16px;flex-shrink:0}
   .avatar img{width:100%;height:100%;object-fit:cover}
-  .bn{font-family:'Space Grotesk';font-weight:600;font-size:14px;line-height:1.2}
+  .bn{font-family:'Sora';font-weight:600;font-size:14px;line-height:1.2}
   .br{font-size:10.5px;color:var(--muted-2);letter-spacing:.02em}
   .nav{background:none;border:none;text-align:left;display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:9px;color:var(--muted);font-family:inherit;font-size:13.5px;cursor:pointer;width:100%;position:relative;transition:background .14s,color .14s,transform .08s}
   .nav svg{width:17px;height:17px;flex-shrink:0;transition:stroke .14s}
   .nav:hover{background:rgba(255,255,255,.04);color:var(--text)}
   .nav:active{transform:scale(.97)}
-  .nav.active{background:rgba(34,233,255,.10);color:var(--accent)}
+  .nav.active{background:rgba(60,232,196,.10);color:var(--accent)}
   .nav.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;border-radius:2px;background:var(--grad)}
   .nav.active svg{stroke:var(--accent)}
   .spacer{flex:1}
@@ -103,18 +103,18 @@
   .stat{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px 18px 17px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .28s}
   .stat:hover{border-color:var(--line-2);transform:translateY(-3px);box-shadow:0 16px 38px rgba(0,0,0,.5)}
   .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
-  .stat::after{content:"";position:absolute;top:-42%;right:-28%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(34,233,255,.12),transparent 68%);pointer-events:none}
-  .stat .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(34,233,255,.10);border:1px solid rgba(34,233,255,.16);margin-bottom:15px}
+  .stat::after{content:"";position:absolute;top:-42%;right:-28%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(60,232,196,.12),transparent 68%);pointer-events:none}
+  .stat .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(60,232,196,.10);border:1px solid rgba(60,232,196,.16);margin-bottom:15px}
   .stat .ico svg{width:18px;height:18px;stroke:var(--accent);fill:none}
   .stat .l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-  .stat .n{font-family:'Space Grotesk';font-size:33px;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .stat .n{font-family:'Sora';font-size:33px;font-weight:700;line-height:1;letter-spacing:-.02em}
 
   /* Erstellen — Typ-Toggle inline + Formular sofort sichtbar */
   .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px;gap:4px;margin-bottom:18px}
-  .seg button{background:none;border:none;color:var(--muted);font-family:'Space Grotesk';font-weight:600;font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,transform .08s}
+  .seg button{background:none;border:none;color:var(--muted);font-family:'Sora';font-weight:600;font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s,color .15s,transform .08s}
   .seg button svg{width:16px;height:16px}
   .seg button:active{transform:scale(.96)}
-  .seg button.on{background:rgba(34,233,255,.12);color:var(--accent)}
+  .seg button.on{background:rgba(60,232,196,.12);color:var(--accent)}
   .seg button.on svg{stroke:var(--accent)}
   .typehint{color:var(--muted);font-size:12.5px;margin-bottom:18px;line-height:1.5}
 
@@ -124,10 +124,10 @@
   label{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
   input,textarea{width:100%;padding:11px 12px;border-radius:9px;font-size:16px;font-family:inherit;background:#070b13;border:1px solid var(--line);color:var(--text);transition:border-color .16s,box-shadow .16s}
   input::placeholder,textarea::placeholder{color:#3a4258}
-  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,233,255,.14)}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(60,232,196,.14)}
   textarea{resize:vertical;min-height:58px}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border:none;border-radius:10px;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Space Grotesk';font-size:13.5px;font-weight:700;transition:transform .1s,box-shadow .18s,filter .15s}
-  .btn:hover:not(:disabled){box-shadow:0 8px 24px rgba(122,107,255,.38);filter:brightness(1.08)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border:none;border-radius:10px;cursor:pointer;background:var(--grad);color:var(--accent-ink);font-family:'Sora';font-size:13.5px;font-weight:700;transition:transform .1s,box-shadow .18s,filter .15s}
+  .btn:hover:not(:disabled){box-shadow:0 8px 24px rgba(79,125,255,.38);filter:brightness(1.08)}
   .btn:active:not(:disabled){transform:scale(.97)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
   .btn.ghost{background:transparent;border:1px solid var(--line-2);color:var(--text)}
@@ -137,14 +137,17 @@
   /* Gutschein-Vorlagen */
   .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
   .tpl{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;cursor:pointer;text-align:left;position:relative;overflow:hidden;transition:border-color .15s,transform .1s,box-shadow .2s;color:var(--text);font-family:inherit}
-  .tpl:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 28px rgba(34,233,255,.12)}
+  .tpl:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 28px rgba(60,232,196,.12)}
   .tpl:active{transform:translateY(0) scale(.98)}
-  .tpl .big{font-family:'Space Grotesk';font-weight:700;font-size:24px;line-height:1;margin-bottom:8px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+  .tpl .big{font-family:'Sora';font-weight:700;font-size:24px;line-height:1;margin-bottom:8px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
   .tpl .lbl{font-size:13px;color:var(--text);font-weight:500;margin-bottom:3px}
   .tpl .sub{font-size:11.5px;color:var(--muted)}
   .tpl.custom{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-style:dashed;color:var(--muted)}
   .tpl.custom svg{width:22px;height:22px;stroke:var(--accent);margin-bottom:8px}
   .tpl.custom .lbl{color:var(--text)}
+  .tplGallery .tplHead{font-size:12.5px;color:var(--muted);margin-bottom:12px;font-weight:600}
+  .tplDivider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em;margin:24px 0 16px}
+  .tplDivider::before,.tplDivider::after{content:"";flex:1;height:1px;background:var(--line)}
   /* Custom Modal */
   .cm-overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,4,8,.82);backdrop-filter:blur(5px);padding:24px}
   .cm-overlay.show{display:flex;animation:fade .25s ease}
@@ -158,23 +161,34 @@
   .item .grow{flex:1;min-width:0}
   .item .t{font-weight:600;font-size:14px;margin-bottom:2px}
   .item .m{font-size:12px;color:var(--muted)}
-  .pill{font-size:10.5px;padding:4px 10px;border-radius:999px;background:rgba(34,233,255,.12);color:var(--accent);font-weight:600;white-space:nowrap}
-  .pill.stamp{background:rgba(122,79,181,.2);color:#c9b6ec}
+  .pill{font-size:10.5px;padding:4px 10px;border-radius:999px;background:rgba(60,232,196,.12);color:var(--accent);font-weight:600;white-space:nowrap}
+  .pill.stamp{background:rgba(79,125,255,.16);color:#aac3ff}
 
   .scanwrap{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:24px;text-align:center;max-width:440px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
   #video{width:100%;max-width:340px;border-radius:12px;background:#000;aspect-ratio:1;object-fit:cover;margin:0 auto;display:block}
   .scanhint{color:var(--muted);font-size:12.5px;margin-top:13px;line-height:1.5}
   .scanresult{margin-top:16px;font-size:16px;line-height:1.45;min-height:18px;font-weight:600}
   .scanresult.ok{color:var(--accent)} .scanresult.err{color:#ff6b6b}
-  .rewardCard{margin-top:18px;padding:24px 18px;border-radius:18px;background:rgba(34,233,255,.10);border:1px solid rgba(34,233,255,.38);text-align:center;animation:rzoom .4s cubic-bezier(.2,.8,.2,1)}
+  .cardPreview{margin-top:16px;text-align:left;background:#0b0f17;border:1px solid var(--line);border-radius:14px;padding:16px 18px;animation:rzoom .35s cubic-bezier(.2,.8,.2,1)}
+  .cardPreview.bad{border-color:rgba(255,107,107,.45)}
+  .cpType{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .cardPreview.bad .cpType{color:#ff6b6b}
+  .cpTitle{font-family:'Sora',sans-serif;font-weight:600;font-size:16px;margin-top:3px;line-height:1.25}
+  .cpBiz{font-size:12px;color:var(--muted);margin-top:3px}
+  .cpStat{font-family:'Sora',sans-serif;font-weight:700;font-size:24px;margin-top:12px}
+  .cpReason{color:#ff6b6b;font-size:13.5px;font-weight:600;margin-top:10px}
+  .cpAmt{width:100%;margin-top:12px;text-align:center;font-size:17px}
+  .cpBtns{display:flex;gap:10px;margin-top:14px}
+  .cpBtns .btn{flex:1}
+  .rewardCard{margin-top:18px;padding:24px 18px;border-radius:18px;background:rgba(60,232,196,.10);border:1px solid rgba(60,232,196,.38);text-align:center;animation:rzoom .4s cubic-bezier(.2,.8,.2,1)}
   @keyframes rzoom{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
   .rewardCard .rwIcon{font-size:42px;line-height:1}
-  .rewardCard .rwLbl{margin-top:8px;font-family:'Space Grotesk';font-weight:700;letter-spacing:1.8px;text-transform:uppercase;font-size:12.5px;color:var(--accent)}
+  .rewardCard .rwLbl{margin-top:8px;font-family:'Sora';font-weight:700;letter-spacing:1.8px;text-transform:uppercase;font-size:12.5px;color:var(--accent)}
   .rewardCard .rwName{margin-top:7px;font-size:23px;font-weight:800;color:var(--text);line-height:1.25}
   .rewardCard .rwBtns{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   .rewardCard .rwBtns .btn{flex:1;min-width:150px}
 
-  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--grad);color:var(--accent-ink);padding:13px 20px;border-radius:11px;font-weight:700;font-family:'Space Grotesk';font-size:13.5px;box-shadow:0 12px 40px rgba(122,107,255,.4);opacity:0;transition:all .3s;z-index:60;pointer-events:none}
+  #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--grad);color:var(--accent-ink);padding:13px 20px;border-radius:11px;font-weight:700;font-family:'Sora';font-size:13.5px;box-shadow:0 12px 40px rgba(79,125,255,.4);opacity:0;transition:all .3s;z-index:60;pointer-events:none}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(2,4,8,.82);backdrop-filter:blur(5px);padding:24px}
   #modal.show{display:flex;animation:fade .25s ease}
@@ -196,7 +210,7 @@
     .brandrow{order:5;width:100%;padding:12px 4px 4px;margin-top:6px;border-top:1px solid var(--line)}
     .spacer,.wm{display:none}
     .nav{order:9;width:auto;flex:0 0 auto;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.04);font-size:13px}
-    .nav.active{background:rgba(34,233,255,.12)}
+    .nav.active{background:rgba(60,232,196,.12)}
     .nav.active::before{display:none}
     .main{padding:22px 16px calc(60px + env(safe-area-inset-bottom, 0px));max-width:100%}
     .row{grid-template-columns:1fr}
@@ -208,7 +222,7 @@
 
   <section id="welcome">
     <span class="orb a"></span><span class="grid"></span>
-    <div class="w-logo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b> Wallet</div>
+    <div class="w-logo"><img src="./assets/logo-mark.png" alt="FlowState">Flow<b>State</b> Wallet</div>
     <h1 class="w-hello">Herzlich willkommen, <em id="wName">—</em></h1>
     <p class="w-sub">Schön, dass du da bist. Viel Spaß mit deinem persönlichen Dashboard.</p>
     <button class="go" id="goBtn">GO</button>
@@ -217,7 +231,7 @@
 
   <div id="app">
     <aside class="side">
-      <div class="fslogo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
+      <div class="fslogo"><img src="./assets/logo-mark.png" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
       <div class="brandrow">
         <div class="avatar" id="avatar">L</div>
         <div><div class="bn" id="bizName">—</div><div class="br">Betriebs-Dashboard</div></div>
@@ -249,28 +263,48 @@
             <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l2.2 5.5L20 10l-5.8 1.5L12 17l-2.2-5.5L4 10l5.8-1.5z"/></svg></div>
             <div class="l">Aktive Aktionen</div><div class="n" id="statCampaigns">0</div>
           </div>
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M4 7V5a1 1 0 011-1h14a1 1 0 011 1v2M4 7h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg></div>
+            <div class="l">Karten ausgegeben</div><div class="n" id="statIssued">0</div>
+          </div>
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8M21 7v5h-5"/></svg></div>
+            <div class="l">Einlösungen gesamt</div><div class="n" id="statRedemptions">0</div>
+          </div>
+          <div class="stat">
+            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <div class="l">Ø Einlösungen/Karte</div><div class="n" id="statAvg">0</div>
+          </div>
         </div>
-        <div class="gk">Letzte Aktivität</div>
+        <div class="gk" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Letzte Aktivität</span>
+          <button class="btn ghost" id="exportBtn" style="padding:7px 13px;font-size:12px;letter-spacing:0;text-transform:none">↓ CSV-Export</button>
+        </div>
         <div id="activityList" class="list"><div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div></div>
       </section>
 
       <section class="page" id="page-create">
         <div class="gk">Neu</div>
         <div class="ph1">Aktion erstellen</div>
-        <p class="lead">Typ wählen — der Rest geht in Sekunden.</p>
-        <div class="seg">
-          <button type="button" class="on" id="seg-coupon"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4z"/></svg>Gutschein</button>
-          <button type="button" id="seg-stamp"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="7" cy="8" r="2.2"/><circle cx="14" cy="8" r="2.2"/><circle cx="7" cy="15" r="2.2"/><circle cx="14" cy="15" r="2.2"/></svg>Stempelkarte</button>
+        <p class="lead">Vorlage wählen — oder unten den Typ frei einstellen.</p>
+        <div id="tplGallery" class="tplGallery"></div>
+        <div class="tplDivider"><span>oder frei erstellen</span></div>
+        <div class="seg" id="mechSeg">
+          <button type="button" class="on" data-mech="coupon"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4z"/></svg>Gutschein</button>
+          <button type="button" data-mech="stampcard"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="7" cy="8" r="2.2"/><circle cx="14" cy="8" r="2.2"/><circle cx="7" cy="15" r="2.2"/><circle cx="14" cy="15" r="2.2"/></svg>Stempelkarte</button>
+          <button type="button" data-mech="multipass"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 14h2M12 14h5"/></svg>Mehrfachkarte</button>
+          <button type="button" data-mech="balance"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="16" cy="12" r="2"/></svg>Guthaben</button>
+          <button type="button" data-mech="access"><svg fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z"/></svg>Zugang</button>
         </div>
 
         <!-- GUTSCHEIN: Vorlagen-Kacheln -->
-        <div id="couponMode">
-          <p class="typehint">Wähle eine Vorlage — fertig. Oder erstelle einen eigenen.</p>
-          <div class="tpl-grid" id="couponTpls"></div>
+        <div id="couponMode" data-mech="coupon">
+          <p class="typehint">Gutschein für diesen Betrieb erstellen — Titel und Wert frei eingeben.</p>
+          <button type="button" class="btn" id="couponCustomBtn" style="width:auto">＋ Gutschein erstellen</button>
         </div>
 
         <!-- STEMPELKARTE: Minimal -->
-        <div id="stampMode" style="display:none">
+        <div id="stampMode" data-mech="stampcard" style="display:none">
           <p class="typehint">Stempelzahl wählen und Belohnung eintragen — fertig.</p>
           <form class="form" id="stampForm">
             <div class="field">
@@ -280,9 +314,52 @@
                 <button type="button" class="on" data-goal="10">10 Stempel</button>
               </div>
             </div>
-            <div class="field"><label for="sReward">Belohnung</label><input id="sReward" required placeholder="z. B. 1 Kaffee gratis"></div>
+            <div class="field"><label for="sReward">Belohnung</label><input id="sReward" required placeholder="z. B. 1 Gratis-Produkt"></div>
             <button class="btn" type="submit" id="stampBtn">Stempelkarte erstellen</button>
             <div class="formMsg" id="stampMsg"></div>
+          </form>
+        </div>
+
+        <!-- MEHRFACHKARTE -->
+        <div data-mech="multipass" style="display:none">
+          <p class="typehint">Karte mit mehreren Einlösungen — jede Nutzung zieht eine ab.</p>
+          <form class="form" id="multipassForm">
+            <div class="field"><label for="mpTitle">Titel</label><input id="mpTitle" required placeholder="z. B. 10er-Karte"></div>
+            <div class="field"><label for="mpUses">Anzahl Einlösungen</label><input id="mpUses" type="number" min="1" max="100" value="10" required></div>
+            <div class="field"><label for="mpReward">Was wird eingelöst? (optional)</label><input id="mpReward" placeholder="z. B. 1 Leistung"></div>
+            <button class="btn" type="submit" id="mpBtn">Mehrfachkarte erstellen</button>
+            <div class="formMsg" id="mpMsg"></div>
+          </form>
+        </div>
+
+        <!-- GUTHABEN -->
+        <div data-mech="balance" style="display:none">
+          <p class="typehint">Guthabenkarte — beim Scannen wird ein Betrag abgebucht.</p>
+          <form class="form" id="balanceForm">
+            <div class="field"><label for="balTitle">Titel</label><input id="balTitle" required placeholder="z. B. Guthabenkarte"></div>
+            <div class="row" style="display:flex;gap:12px">
+              <div class="field" style="flex:2"><label for="balAmount">Startguthaben</label><input id="balAmount" type="number" min="1" step="0.5" value="50" required></div>
+              <div class="field" style="flex:1"><label for="balUnit">Einheit</label><input id="balUnit" value="€" maxlength="4"></div>
+            </div>
+            <div class="field"><label for="balReward">Einlösbar für (optional)</label><input id="balReward" placeholder="z. B. Mittagessen"></div>
+            <button class="btn" type="submit" id="balBtn">Guthabenkarte erstellen</button>
+            <div class="formMsg" id="balMsg"></div>
+          </form>
+        </div>
+
+        <!-- ZUGANGSPASS -->
+        <div data-mech="access" style="display:none">
+          <p class="typehint">Zugangspass — beim Scannen wird der Zutritt bestätigt. Entweder „X Tage ab 1. Scan" (Zeit-Pass mit täglichen Kreuzen) ODER feste Daten.</p>
+          <form class="form" id="accessForm">
+            <div class="field"><label for="accTitle">Titel</label><input id="accTitle" required placeholder="z. B. 7-Tage-Pass"></div>
+            <div class="field"><label for="accDays">Gültig X Tage ab 1. Scan</label><input id="accDays" type="number" min="1" max="60" placeholder="z. B. 7 — leer = feste Daten unten"></div>
+            <div class="row" style="display:flex;gap:12px">
+              <div class="field" style="flex:1"><label for="accFrom">Gültig ab (optional)</label><input id="accFrom" type="date"></div>
+              <div class="field" style="flex:1"><label for="accUntil">Gültig bis (optional)</label><input id="accUntil" type="date"></div>
+            </div>
+            <div class="field"><label style="display:flex;align-items:center;gap:9px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13.5px;color:var(--txt)"><input id="accRepeat" type="checkbox" style="width:auto">Mehrfacher Zutritt erlaubt (nur bei festen Daten; sonst einmalig)</label></div>
+            <button class="btn" type="submit" id="accBtn">Zugangspass erstellen</button>
+            <div class="formMsg" id="accMsg"></div>
           </form>
         </div>
       </section>
@@ -321,6 +398,7 @@
             <button class="btn ghost" id="scanStop" style="display:none">Stoppen</button>
           </div>
           <div class="scanresult" id="scanResult"></div>
+          <div class="cardPreview" id="cardPreview" style="display:none"></div>
           <div class="rewardCard" id="rewardCard" style="display:none">
             <div class="rwIcon">🎉</div>
             <div class="rwLbl">Belohnung freigeschaltet</div>
@@ -357,10 +435,10 @@
     const { data:{ session } } = await supabase.auth.getSession();
     if (!session) location.replace('./index.html');
 
-    const { data:bizRows, error } = await supabase.from('businesses').select('id, name, slug, logo_url, color_bg, color_text');
+    const { data:bizRows, error } = await supabase.from('businesses').select('*');
     if (error || !bizRows || !bizRows.length){
-      // Admin-Login ohne eigenen Betrieb -> ins Cockpit umleiten.
-      const r = await fetch('/api/admin/businesses', { headers:{ 'Authorization':'Bearer '+session.access_token } }).catch(()=>null);
+      // Admin-Login ohne eigenen Betrieb -> ins Cockpit umleiten (leichter ping statt voller Liste).
+      const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token } }).catch(()=>null);
       if (r && r.status===200){ location.replace('./cockpit.html'); throw new Error('redirect to cockpit'); }
       document.getElementById('loading').textContent='Kein Betrieb mit diesem Login verknüpft.'; throw new Error('no business');
     }
@@ -375,7 +453,7 @@
       const b = document.createElement('button');
       b.textContent = '← Zurück zum Cockpit';
       Object.assign(b.style,{position:'fixed',left:'14px',bottom:'calc(14px + env(safe-area-inset-bottom))',zIndex:'99999',
-        background:'linear-gradient(135deg,#19e3c2,#5b8cff)',color:'#04130d',border:'none',borderRadius:'999px',
+        background:'linear-gradient(100deg,#3ce8c4,#4f7dff)',color:'#04241c',border:'none',borderRadius:'999px',
         padding:'13px 20px',font:'800 14px/1 -apple-system,sans-serif',boxShadow:'0 10px 28px rgba(0,0,0,.4)',cursor:'pointer'});
       b.addEventListener('click', async ()=>{
         b.textContent='Wechsle …';
@@ -395,24 +473,70 @@
     const toast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);};
     const esc=s=>(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
+    // Karten-MECHANIKEN (muss zu lib/cards.mjs passen). Label + ob "Sammel"-Pill.
+    const MECH={ stampcard:{label:'Stempelkarte',stamp:true}, coupon:{label:'Gutschein'},
+      multipass:{label:'Mehrfachkarte',stamp:true}, balance:{label:'Guthaben'}, access:{label:'Zugangspass'} };
+    const mechLabel=t=>(MECH[t]||MECH.coupon).label;
+    function campDesc(c){
+      const cf=c.config||{};
+      if(c.type==='stampcard') return `Stempelkarte · Ziel ${c.stamp_goal} · Belohnung: ${esc(c.reward||'—')}`;
+      if(c.type==='multipass') return `Mehrfachkarte · ${cf.max_uses||'?'} Einlösungen${c.reward?' · '+esc(c.reward):''}`;
+      if(c.type==='balance')   return `Guthaben · ${cf.start_amount||0} ${esc(cf.unit||'€')}${c.reward?' · '+esc(c.reward):''}`;
+      if(c.type==='access')    return `Zugangspass${cf.valid_until?' · bis '+esc(cf.valid_until):''} · ${cf.repeat?'mehrfach':'einmalig'}`;
+      return `Gutschein · ${esc(c.value||'—')}`;
+    }
+
     async function loadStats(){
-      const [{count:a},{count:r},{count:c}]=await Promise.all([
-        supabase.from('passes').select('*',{count:'exact',head:true}).eq('status','active'),
+      // WICHTIG: jede Query explizit auf den eigenen Betrieb einschränken (nicht nur auf RLS verlassen,
+      // sonst tauchen Zahlen/Codes anderer Betriebe auf — Cross-Tenant-Leak).
+      const [{count:a},{count:r},{count:c},{count:issued},{count:reds}]=await Promise.all([
+        supabase.from('passes').select('*',{count:'exact',head:true}).eq('business_id',biz.id).eq('status','active'),
         // "Eingelöst" = nur eingelöste Belohnungen voller Stempelkarten (Notiz "Belohnung: …")
-        supabase.from('redemptions').select('*',{count:'exact',head:true}).eq('action','redeem').ilike('note','Belohnung:%'),
-        supabase.from('campaigns').select('*',{count:'exact',head:true}).eq('active',true),
+        supabase.from('redemptions').select('*',{count:'exact',head:true}).eq('business_id',biz.id).eq('action','redeem').ilike('note','Belohnung:%'),
+        supabase.from('campaigns').select('*',{count:'exact',head:true}).eq('business_id',biz.id).eq('active',true),
+        supabase.from('passes').select('*',{count:'exact',head:true}).eq('business_id',biz.id),               // ausgegeben gesamt
+        supabase.from('redemptions').select('*',{count:'exact',head:true}).eq('business_id',biz.id),           // Einlösungen gesamt (alle Aktionen)
       ]);
       document.getElementById('statActive').textContent=a??0;
       document.getElementById('statRedeemed').textContent=r??0;
       document.getElementById('statCampaigns').textContent=c??0;
+      document.getElementById('statIssued').textContent=issued??0;
+      document.getElementById('statRedemptions').textContent=reds??0;
+      document.getElementById('statAvg').textContent = issued ? (Math.round((reds/issued)*10)/10).toString().replace('.',',') : '0';
     }
     async function loadCampaigns(){
-      const { data:camps }=await supabase.from('campaigns').select('id,type,title,value,stamp_goal,reward,enroll_token,created_at').order('created_at',{ascending:false});
+      const { data:camps }=await supabase.from('campaigns').select('id,type,title,value,stamp_goal,reward,enroll_token,config,created_at').eq('business_id',biz.id).order('created_at',{ascending:false});
       const list=document.getElementById('campaignList');
       if(!camps||!camps.length){ list.innerHTML='<div class="empty">Noch keine Aktionen. Erstelle deine erste unter „Erstellen".</div>'; return; }
-      list.innerHTML=camps.map(c=>`<div class="item"><div class="grow"><div class="t">${esc(c.title)}</div><div class="m">${c.type==='stampcard'?`Stempelkarte · Ziel ${c.stamp_goal} · Belohnung: ${esc(c.reward||'—')}`:`Gutschein · ${esc(c.value||'—')}`}</div></div><span class="pill ${c.type==='stampcard'?'stamp':''}">${c.type==='stampcard'?'Stempelkarte':'Gutschein'}</span><button class="btn ghost" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}">QR</button></div>`).join('');
+      list.innerHTML=camps.map(c=>`<div class="item"><div class="grow"><div class="t">${esc(c.title)}</div><div class="m">${campDesc(c)}</div></div><span class="pill ${MECH[c.type]?.stamp?'stamp':''}">${esc(mechLabel(c.type))}</span><button class="btn ghost" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}">QR</button></div>`).join('');
     }
-    await loadStats(); await loadCampaigns();
+    // Letzte Aktivität: die jüngsten Stempel/Einlösungen/Karten — war vorher immer leer.
+    async function loadActivity(){
+      const { data:acts }=await supabase.from('redemptions')
+        .select('action,note,created_at,passes(serial)')
+        .eq('business_id',biz.id)
+        .order('created_at',{ascending:false}).limit(8);
+      const list=document.getElementById('activityList');
+      if(!acts||!acts.length){ list.innerHTML='<div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div>'; return; }
+      const fmt=ts=>{
+        const d=new Date(ts), m=(Date.now()-d.getTime())/60000;
+        if(m<1) return 'gerade eben';
+        if(m<60) return 'vor '+Math.floor(m)+' Min.';
+        if(m<1440) return 'vor '+Math.floor(m/60)+' Std.';
+        return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr';
+      };
+      list.innerHTML=acts.map(a=>{
+        const serial=a.passes?.serial||'';
+        const reward=(a.note||'').startsWith('Belohnung:');
+        const t = a.action==='enroll' ? 'Neue Karte in Wallet geladen'
+                : a.action==='stamp'  ? 'Stempel vergeben · '+esc(a.note||'')
+                : reward              ? '🎁 '+esc(a.note)
+                :                       'Gutschein eingelöst'+(a.note?' · '+esc(a.note):'');
+        const pill = a.action==='enroll' ? '+ Karte' : a.action==='stamp' ? 'Stempel' : 'Einlösung';
+        return `<div class="item"><div class="grow"><div class="t">${t}</div><div class="m">${esc(serial)}${serial?' · ':''}${fmt(a.created_at)}</div></div><span class="pill ${a.action==='stamp'?'stamp':''}">${pill}</span></div>`;
+      }).join('');
+    }
+    await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
 
     document.getElementById('loading').style.display='none';
     document.getElementById('welcome').style.display='flex';
@@ -430,19 +554,74 @@
       document.getElementById('page-'+p).classList.add('active');
     }));
 
-    // --- Typ-Umschalter Gutschein / Stempelkarte ---
-    document.getElementById('seg-coupon').addEventListener('click',()=>{
-      document.getElementById('seg-coupon').classList.add('on');
-      document.getElementById('seg-stamp').classList.remove('on');
-      document.getElementById('couponMode').style.display='block';
-      document.getElementById('stampMode').style.display='none';
+    // --- Mechanik-Umschalter (Gutschein / Stempelkarte / Mehrfachkarte / Guthaben / Zugang) ---
+    function showMech(m){
+      document.querySelectorAll('#mechSeg button').forEach(b=>b.classList.toggle('on', b.dataset.mech===m));
+      document.querySelectorAll('[data-mech]').forEach(el=>{ if(el.closest('#mechSeg')) return; el.style.display = el.dataset.mech===m ? 'block' : 'none'; });
+    }
+    // Verfügbare Mechaniken je Nische — Gastronomie bleibt bewusst bei Gutschein + Stempelkarte.
+    const MECH_BY_IND={ gastronomie:['coupon','stampcard'], cafe:['coupon','stampcard'],
+      arbeitgeber:['balance','coupon','access'], kantine:['balance','coupon','stampcard'],
+      fitness:['stampcard','multipass','coupon','access'], beauty:['stampcard','multipass','coupon'],
+      waschanlage:['multipass','balance','coupon'], freizeit:['coupon','multipass','balance','access'],
+      event:['balance','multipass','access','coupon'], verein:['multipass','coupon','balance'],
+      bildung:['coupon','multipass','balance'], sonstige:['coupon','stampcard','multipass','balance','access'] };
+    const allowedMech = MECH_BY_IND[biz.industry] || ['coupon','stampcard'];
+    document.querySelectorAll('#mechSeg button').forEach(b=>{
+      b.style.display = allowedMech.includes(b.dataset.mech) ? '' : 'none';
+      b.addEventListener('click',()=>showMech(b.dataset.mech));
     });
-    document.getElementById('seg-stamp').addEventListener('click',()=>{
-      document.getElementById('seg-stamp').classList.add('on');
-      document.getElementById('seg-coupon').classList.remove('on');
-      document.getElementById('stampMode').style.display='block';
-      document.getElementById('couponMode').style.display='none';
-    });
+    showMech(allowedMech[0]);
+
+    // --- Phase 4: Branchen-Begriffe (Kunden-Synonym) + Schnellstart-Vorlagen ---
+    const TERMS={ gastronomie:'Gäste',cafe:'Gäste',arbeitgeber:'Mitarbeiter',kantine:'Gäste',fitness:'Mitglieder',
+      beauty:'Kunden',waschanlage:'Kunden',freizeit:'Besucher',event:'Besucher',verein:'Mitglieder',bildung:'Teilnehmer',sonstige:'Nutzer' };
+    const IND_LABEL={ gastronomie:'Gastronomie',cafe:'Café',arbeitgeber:'Mitarbeiter-Benefits',kantine:'Kantine',fitness:'Fitnessstudio',
+      beauty:'Beauty',waschanlage:'Autowaschanlage',freizeit:'Freizeit',event:'Event',verein:'Verein',bildung:'Schule/Uni',sonstige:'deinen Betrieb' };
+    const term=()=>TERMS[biz.industry]||'Gäste';
+    const TEMPLATES=[
+      { label:'Stempelkarte', sub:'10 sammeln, 1 gratis', ind:'all', mech:'stampcard', fill:{goalSeg:10,sReward:'1 Gratis-Produkt'} },
+      { label:'10% Rabatt', sub:'Sofort-Gutschein', ind:'all', mech:'coupon', create:{type:'coupon',title:'10% Rabatt',value:'10%'} },
+      { label:'Neukunden-Gutschein', sub:'Willkommen', ind:'all', mech:'coupon', create:{type:'coupon',title:'Neukunden-Gutschein',value:'Willkommensgeschenk'} },
+      { label:'Empfehlungs-Gutschein', sub:'Freunde werben', ind:'all', mech:'coupon', create:{type:'coupon',title:'Empfehlungs-Gutschein',value:'Dankeschön'} },
+      { label:'Essensguthaben 50 €', sub:'monatliches Guthaben', ind:['arbeitgeber','kantine'], mech:'balance', fill:{balTitle:'Essensguthaben',balAmount:50,balUnit:'€',balReward:'Mittagessen'} },
+      { label:'Mittagessen-Gutschein', sub:'1 Menü', ind:['arbeitgeber','kantine'], mech:'coupon', create:{type:'coupon',title:'Mittagessen-Gutschein',value:'1 Menü'} },
+      { label:'Gratis-Probetraining', sub:'1 Einheit', ind:['fitness'], mech:'coupon', create:{type:'coupon',title:'Gratis-Probetraining',value:'1 Einheit'} },
+      { label:'5er-Kurskarte', sub:'5 Kurse + 1 Bonus', ind:['fitness'], mech:'multipass', fill:{mpTitle:'5er-Kurskarte',mpUses:6,mpReward:'1 Kurs'} },
+      { label:'Treuekarte', sub:'5 Besuche, 1 gratis', ind:['beauty'], mech:'stampcard', fill:{goalSeg:5,sReward:'1 Gratis-Behandlung'} },
+      { label:'Geburtstags-Gutschein', sub:'einmalig', ind:['beauty','gastronomie','cafe'], mech:'coupon', create:{type:'coupon',title:'Geburtstags-Gutschein',value:'Geschenk'} },
+      { label:'10er-Wäschekarte', sub:'10 Wäschen, 1 gratis', ind:['waschanlage'], mech:'multipass', fill:{mpTitle:'10er-Wäschekarte',mpUses:11,mpReward:'1 Autowäsche'} },
+      { label:'Wäsche-Guthaben 50 €', sub:'Wertkarte', ind:['waschanlage'], mech:'balance', fill:{balTitle:'Wäsche-Guthaben',balAmount:50,balUnit:'€'} },
+      { label:'Getränke-Gutschein', sub:'1 Getränk', ind:['freizeit','event','gastronomie','cafe'], mech:'coupon', create:{type:'coupon',title:'Getränke-Gutschein',value:'1 Getränk'} },
+      { label:'VIP-Tagespass', sub:'Zugang', ind:['freizeit','event'], mech:'access', fill:{accTitle:'VIP-Zugang',accRepeat:false} },
+      { label:'Event-Guthaben 20 €', sub:'Verzehr', ind:['event'], mech:'balance', fill:{balTitle:'Event-Guthaben',balAmount:20,balUnit:'€'} },
+      { label:'Mensa-Gutschein', sub:'1 Essen', ind:['bildung','verein'], mech:'coupon', create:{type:'coupon',title:'Mensa-Gutschein',value:'1 Essen'} },
+      { label:'10er-Getränkemarke', sub:'10 Getränke', ind:['verein','event','bildung'], mech:'multipass', fill:{mpTitle:'10er-Getränkemarke',mpUses:10,mpReward:'1 Getränk'} },
+    ];
+    function applyTemplate(t){
+      if(t.create){ createCampaign({...t.create}); return; }
+      showMech(t.mech);
+      for(const [k,v] of Object.entries(t.fill||{})){
+        if(k==='goalSeg'){ document.querySelectorAll('#goalSeg button').forEach(b=>b.classList.toggle('on',String(b.dataset.goal)===String(v))); continue; }
+        const el=document.getElementById(k); if(!el) continue;
+        if(el.type==='checkbox') el.checked=!!v; else el.value=v;
+      }
+      document.querySelector(`#mechSeg button[data-mech="${t.mech}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    function renderTemplates(){
+      const ind=biz.industry||'gastronomie';
+      // PERSONALISIERT: eigene Vorlagen des Betriebs zuerst; nur falls keine gesetzt -> Branchen-Defaults.
+      const custom = Array.isArray(biz.templates) ? biz.templates : [];
+      const rel = custom.length ? custom : TEMPLATES.filter(t=>t.ind==='all'||(Array.isArray(t.ind)&&t.ind.includes(ind)));
+      const g=document.getElementById('tplGallery');
+      if(!rel.length){ g.innerHTML=''; return; }
+      const head = custom.length ? `Vorlagen für ${esc(biz.name)}` : `Schnellstart für ${esc(IND_LABEL[ind]||'deinen Betrieb')}`;
+      g.innerHTML=`<div class="tplHead">${head}</div><div class="tpl-grid">`+
+        rel.map((t,i)=>`<button class="tpl" data-tpl="${i}"><div class="lbl">${esc(t.label)}</div><div class="sub">${esc(t.sub||'')}</div></button>`).join('')+`</div>`;
+      g.querySelectorAll('[data-tpl]').forEach(b=>b.addEventListener('click',()=>applyTemplate(rel[+b.dataset.tpl])));
+    }
+    renderTemplates();
+    { const sl=document.querySelector('#page-scan .lead'); if(sl) sl.textContent=`Scanne die Karte deiner ${term()} — Vorschau erscheint, dann bestätigen.`; }
     // 5/10-Stempel-Umschalter
     document.querySelectorAll('#goalSeg button').forEach(b=>b.addEventListener('click',()=>{
       document.querySelectorAll('#goalSeg button').forEach(x=>x.classList.remove('on'));
@@ -455,40 +634,13 @@
       const { error:insErr }=await supabase.from('campaigns').insert(payload);
       if(insErr){ toast('Fehler: '+insErr.message); return false; }
       toast('Aktion erstellt ✓');
-      await loadStats(); await loadCampaigns();
+      await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
       document.querySelector('.nav[data-page="manage"]').click();
       return true;
     }
 
-    // --- Gutschein-Vorlagen ---
-    const COUPON_TEMPLATES=[
-      { big:'10%', lbl:'10% Rabatt', sub:'auf den Einkauf', value:'10%' },
-      { big:'20%', lbl:'20% Rabatt', sub:'auf alles', value:'20%' },
-      { big:'☕', lbl:'Gratis Kaffee', sub:'1 Heißgetränk', value:'Gratis Kaffee' },
-      { big:'🥤', lbl:'1 Getränk gratis', sub:'aufs Haus', value:'1 Getränk gratis' },
-      { big:'5€', lbl:'5€ Gutschein', sub:'Wertgutschein', value:'5€' },
-      { big:'2für1', lbl:'2 für 1', sub:'Buy one get one', value:'2 für 1' },
-    ];
-    const grid=document.getElementById('couponTpls');
-    grid.innerHTML = COUPON_TEMPLATES.map((t,i)=>`
-      <button class="tpl" data-i="${i}">
-        <span class="big">${t.big}</span>
-        <div class="lbl">${t.lbl}</div>
-        <div class="sub">${t.sub}</div>
-      </button>`).join('') + `
-      <button class="tpl custom" id="tplCustom">
-        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
-        <div class="lbl">Eigener Gutschein</div>
-        <div class="sub">frei eingeben</div>
-      </button>`;
-    grid.addEventListener('click',async(e)=>{
-      const card=e.target.closest('.tpl'); if(!card) return;
-      if(card.id==='tplCustom'){ document.getElementById('customModal').classList.add('show'); return; }
-      const t=COUPON_TEMPLATES[+card.dataset.i];
-      card.style.opacity='.5';
-      await createCampaign({ type:'coupon', title:t.lbl, value:t.value });
-      card.style.opacity='1';
-    });
+    // --- Gutschein erstellen (öffnet das Eingabe-Modal; keine generischen Fremd-Vorlagen mehr) ---
+    document.getElementById('couponCustomBtn').addEventListener('click',()=>document.getElementById('customModal').classList.add('show'));
 
     // --- Eigener Gutschein (Modal) ---
     const cm=document.getElementById('customModal');
@@ -517,6 +669,41 @@
       if(ok) e.target.reset();
     });
 
+    // --- Dauer-QR-Token für neue Mechaniken (jeder Scan = eigene Karte) ---
+    const tok=()=>crypto.randomUUID().replace(/-/g,'').slice(0,16);
+    const submitMech=async(formId,btnId,msgId,build,resetMsg)=>{
+      document.getElementById(formId).addEventListener('submit',async(e)=>{
+        e.preventDefault();
+        const btn=document.getElementById(btnId),msg=document.getElementById(msgId);
+        const payload=build(); if(!payload){ return; }
+        const orig=btn.textContent; btn.disabled=true; btn.textContent='Speichern …'; msg.className='formMsg'; msg.textContent='';
+        const ok=await createCampaign(payload);
+        btn.disabled=false; btn.textContent=orig;
+        if(ok) e.target.reset();
+      });
+    };
+    submitMech('multipassForm','mpBtn','mpMsg',()=>{
+      const uses=parseInt(document.getElementById('mpUses').value)||0;
+      if(uses<1){ toast('Bitte Anzahl Einlösungen angeben.'); return null; }
+      return { type:'multipass', title:document.getElementById('mpTitle').value.trim(), reward:document.getElementById('mpReward').value.trim()||null,
+        enroll_token:tok(), config:{ max_uses:uses } };
+    });
+    submitMech('balanceForm','balBtn','balMsg',()=>{
+      const amount=Number(document.getElementById('balAmount').value)||0;
+      if(amount<=0){ toast('Bitte Startguthaben angeben.'); return null; }
+      const unit=document.getElementById('balUnit').value.trim()||'€';
+      return { type:'balance', title:document.getElementById('balTitle').value.trim(), reward:document.getElementById('balReward').value.trim()||null,
+        enroll_token:tok(), config:{ start_amount:amount, unit } };
+    });
+    submitMech('accessForm','accBtn','accMsg',()=>{
+      const days=parseInt(document.getElementById('accDays').value)||0;
+      // Zeit-Pass (X Tage ab 1. Scan) ODER feste Daten/einmalig
+      const config = days>0
+        ? { tage:days }
+        : { valid_from:document.getElementById('accFrom').value||null, valid_until:document.getElementById('accUntil').value||null, repeat:document.getElementById('accRepeat').checked };
+      return { type:'access', title:document.getElementById('accTitle').value.trim(), enroll_token:tok(), config };
+    });
+
     const modal=document.getElementById('modal');
     document.getElementById('campaignList').addEventListener('click',(e)=>{
       const b=e.target.closest('[data-qr]');if(!b)return;
@@ -530,8 +717,8 @@
         : `${location.origin}/api/pass?campaign=${campId}`;
       document.getElementById('qrBox').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}" alt="QR">`;
       document.getElementById('qrSub').textContent = token
-        ? 'Dauer-QR: Gäste scannen → Stempelkarte landet in der Wallet. (Druck ihn aus für den Tresen!)'
-        : 'Gäste scannen → Gutschein landet in der Wallet.';
+        ? `Dauer-QR: ${term()} scannen → eigene Karte landet in der Wallet. (Druck ihn aus für den Tresen!)`
+        : `${term()} scannen → Karte landet in der Wallet.`;
       // direkter Test-Link drunter (auf iPhone in Safari oeffnen)
       let tl=document.getElementById('qrTestLink');
       if(!tl){ tl=document.createElement('a'); tl.id='qrTestLink'; tl.target='_blank';
@@ -573,7 +760,7 @@
       const m=serial.match(/[A-Z]{2,8}-[A-Z0-9]{4,}/i);
       if(m) serial=m[0].toUpperCase();
       stopScan();                 // Einzel-Scan: nach einem Treffer Kamera stoppen
-      await redeem(serial);       // Ergebnis bleibt sichtbar, „Scanner starten" für den nächsten Gast
+      await inspectCard(serial);  // erst Vorschau (was ist die Karte?), dann bestätigen
     }
 
     async function tick(){
@@ -599,13 +786,73 @@
     const rewardCard=document.getElementById('rewardCard');
     function hideReward(){ rewardCard.style.display='none'; rewardSerial=null; }
 
-    async function redeem(serial, redeemReward=false){
-      hideReward();
+    // --- Universeller Scanner: erst LESEN (inspect), Vorschau zeigen, dann bestätigen ---
+    const cardPreview=document.getElementById('cardPreview');
+    function hidePreview(){ cardPreview.style.display='none'; cardPreview.innerHTML=''; }
+    const ACT_LABEL={ stamp:'Stempeln', redeem:'Einlösen', use:'Einlösen (−1)', debit:'Abbuchen', entry:'Zutritt bestätigen' };
+    function statLine(c){
+      if(c.type==='stampcard') return c.full?'Karte voll — Belohnung bereit':`${c.stamps}/${c.goal} Stempel`;
+      if(c.type==='multipass') return `${c.remaining}× übrig`;
+      if(c.type==='balance')   return `${c.remaining} ${c.unit} Guthaben`;
+      if(c.type==='access')    return c.dayInfo ? c.dayInfo+(c.validUntil?` · bis ${c.validUntil}`:'') : (c.validUntil?`Gültig bis ${c.validUntil}`:'Zugangspass');
+      return c.value?`Wert: ${c.value}`:'Gutschein';
+    }
+    async function inspectCard(serial){
+      hideReward(); hidePreview();
       scanResult.className='scanresult'; scanResult.textContent='Prüfe '+serial+' …';
       try{
         const { data:{ session:s } } = await supabase.auth.getSession();
-        const r=await fetch('/api/redeem',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(s?.access_token||'')},body:JSON.stringify({serial,redeemReward})});
+        const r=await fetch('/api/redeem',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(s?.access_token||'')},body:JSON.stringify({serial,inspect:true})});
         const j=await r.json();
+        if(!j.ok || !j.card){
+          scanResult.className='scanresult err'; scanResult.textContent='✗ '+(j.message||'Karte nicht nutzbar');
+          toast(j.action==='foreign'?'Anderer Betrieb':'Fehler'); return;
+        }
+        const c=j.card; scanResult.textContent='';
+        const bad=!c.usable;
+        const actLabel = c.full ? 'Belohnung' : (ACT_LABEL[c.action]||'Einlösen');
+        let html=`<div class="cpType">${esc(c.label)}</div>
+          <div class="cpTitle">${esc(c.title||'')}</div>
+          <div class="cpBiz">${c.business?esc(c.business)+' · ':''}${esc(c.serial)}</div>
+          <div class="cpStat">${esc(statLine(c))}</div>`;
+        if(bad){
+          html+=`<div class="cpReason">✗ ${esc(c.reason||'Nicht nutzbar')}</div>
+            <div class="cpBtns"><button class="btn ghost" id="cpCancel">Schließen</button></div>`;
+        } else {
+          if(c.needsAmount) html+=`<input class="cpAmt" id="cpAmt" type="number" min="0.5" step="0.5" placeholder="Betrag in ${esc(c.unit)}">`;
+          html+=`<div class="cpBtns"><button class="btn ghost" id="cpCancel">Abbrechen</button><button class="btn" id="cpConfirm">${esc(actLabel)}</button></div>`;
+        }
+        cardPreview.className='cardPreview'+(bad?' bad':'');
+        cardPreview.innerHTML=html; cardPreview.style.display='block';
+        document.getElementById('cpCancel').addEventListener('click',hidePreview);
+        const cf=document.getElementById('cpConfirm');
+        if(cf) cf.addEventListener('click',async()=>{
+          let amt=null;
+          if(c.needsAmount){ amt=Number(String(document.getElementById('cpAmt').value).replace(',','.')); if(!(amt>0)){ toast('Bitte Betrag eingeben'); return; } }
+          hidePreview();
+          await redeem(c.serial,false,amt);
+        });
+      }catch(e){
+        scanResult.className='scanresult err'; scanResult.textContent='✗ Netzwerkfehler: '+e.message;
+      }
+    }
+
+    async function redeem(serial, redeemReward=false, amount=null){
+      hideReward(); hidePreview();
+      scanResult.className='scanresult'; scanResult.textContent='Prüfe '+serial+' …';
+      try{
+        const { data:{ session:s } } = await supabase.auth.getSession();
+        const r=await fetch('/api/redeem',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(s?.access_token||'')},body:JSON.stringify({serial,redeemReward,...(amount!=null?{amount}:{})})});
+        const j=await r.json();
+        // Guthaben: Server fragt nach dem abzubuchenden Betrag -> erfragen und erneut senden.
+        if(!j.ok && j.action==='need_amount'){
+          const unit=j.pass?.unit||'€'; const left=j.pass?.remaining??'';
+          const inp=prompt(`Wie viel abbuchen? (Guthaben: ${left} ${unit})`,'');
+          if(inp===null){ scanResult.className='scanresult'; scanResult.textContent=''; return; }
+          const amt=Number(String(inp).replace(',','.'));
+          if(!(amt>0)){ scanResult.className='scanresult err'; scanResult.textContent='✗ Ungültiger Betrag.'; return; }
+          return redeem(serial,false,amt);
+        }
         if(j.ok){
           if(j.action==='reward_ready'){
             // Karte voll -> Belohnung anbieten (einlösen oder behalten)
@@ -616,13 +863,15 @@
           } else {
             scanResult.className='scanresult ok';
             scanResult.textContent='✓ '+j.message;
-            toast(j.action==='reward_redeemed'?'Belohnung eingelöst ✓':(j.action==='redeemed'?'Eingelöst ✓':'Stempel +1 ✓'));
+            const tmap={reward_redeemed:'Belohnung eingelöst ✓',redeemed:'Eingelöst ✓',stamp:'Stempel +1 ✓',use:'Einlösung ✓',debit:'Abgebucht ✓',entry:'Zutritt bestätigt ✓'};
+            toast(tmap[j.action]||'OK ✓');
           }
-          await loadStats(); await loadCampaigns();
+          await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
         } else {
           scanResult.className='scanresult err';
           scanResult.textContent='✗ '+(j.message||'Fehler');
-          toast(j.action==='already'?'Schon eingelöst':'Fehler');
+          const emap={already:'Schon eingelöst',depleted:'Karte aufgebraucht',insufficient:'Zu wenig Guthaben',expired:'Abgelaufen',foreign:'Anderer Betrieb'};
+          toast(emap[j.action]||'Fehler');
         }
       }catch(e){
         scanResult.className='scanresult err';
@@ -640,10 +889,24 @@
     // Manuelle Eingabe als Fallback (falls Kamera nicht geht)
     document.getElementById('manualBtn').addEventListener('click',()=>{
       const code=document.getElementById('manualCode').value.trim().toUpperCase();
-      if(code) redeem(code);
+      if(code) inspectCard(code);
     });
     document.getElementById('manualCode').addEventListener('keydown',(e)=>{
-      if(e.key==='Enter'){ const code=e.target.value.trim().toUpperCase(); if(code) redeem(code); }
+      if(e.key==='Enter'){ const code=e.target.value.trim().toUpperCase(); if(code) inspectCard(code); }
+    });
+    // --- CSV-Export der Einlösungen (Phase 5) ---
+    document.getElementById('exportBtn').addEventListener('click', async ()=>{
+      const btn=document.getElementById('exportBtn'); const o=btn.textContent; btn.textContent='Export …'; btn.disabled=true;
+      try{
+        const { data:rows }=await supabase.from('redemptions').select('action,note,created_at,passes(serial)').eq('business_id',biz.id).order('created_at',{ascending:false}).limit(5000);
+        const cell=v=>{ const s=(v==null?'':String(v)); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+        const lines=[['Datum','Aktion','Karte','Notiz'].join(';')].concat((rows||[]).map(r=>[new Date(r.created_at).toLocaleString('de-DE'), r.action, r.passes?.serial||'', r.note||''].map(cell).join(';')));
+        const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+        const url=URL.createObjectURL(blob); const a=document.createElement('a');
+        a.href=url; a.download=`einloesungen-${biz.slug||'export'}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        toast(`CSV exportiert ✓ (${(rows||[]).length} Einträge)`);
+      }catch(e){ toast('Export-Fehler'); }
+      btn.textContent=o; btn.disabled=false;
     });
     document.getElementById('logoutBtn').addEventListener('click',async()=>{stopScan();localStorage.removeItem('fs_admin_session');await supabase.auth.signOut();location.replace('./index.html');});
   </script>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FlowState Wallet · Login</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#05070d">
+<meta name="theme-color" content="#0a0d14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlowState">
@@ -14,18 +14,18 @@
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#05070d; --bg2:#080b13; --text:#eaf2ff; --muted:#6b7691; --muted-2:#48526b;
-    --accent:#22e9ff; --accent-ink:#04222a; --line:rgba(255,255,255,.07);
-    --grad:linear-gradient(120deg, #22e9ff 0%, #7a6bff 55%, #c062ff 100%);
-    --err:#ff6b6b; --r:13px;
+    --bg:#0a0d14; --bg2:#0c1019; --text:#f2f5fa; --muted:#8a93a8; --muted-2:#5a6377;
+    --accent:#3ce8c4; --accent-ink:#04241c; --line:rgba(255,255,255,.07);
+    --grad:linear-gradient(100deg, #3ce8c4 0%, #4f7dff 100%);
+    --err:#ff7e7e; --r:13px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%}
   body{
-    font-family:'Inter',-apple-system,sans-serif;font-size:14px;
+    font-family:'Manrope',-apple-system,sans-serif;font-size:14px;
     background:var(--bg);color:var(--text);
     display:grid;grid-template-columns:1.1fr .9fr;min-height:100dvh;
     -webkit-font-smoothing:antialiased;
@@ -38,8 +38,8 @@
   }
   /* animierter Glow */
   .brand .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;pointer-events:none}
-  .brand .orb.a{width:420px;height:420px;background:rgba(34,233,255,.22);top:-120px;left:-100px;animation:float1 14s ease-in-out infinite}
-  .brand .orb.b{width:320px;height:320px;background:rgba(80,120,255,.16);bottom:-90px;right:-60px;animation:float2 18s ease-in-out infinite}
+  .brand .orb.a{width:420px;height:420px;background:rgba(60,232,196,.22);top:-120px;left:-100px;animation:float1 14s ease-in-out infinite}
+  .brand .orb.b{width:320px;height:320px;background:rgba(79,125,255,.16);bottom:-90px;right:-60px;animation:float2 18s ease-in-out infinite}
   @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px)}}
   @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-40px)}}
   .brand .grid{position:absolute;inset:0;pointer-events:none;opacity:.5;
@@ -47,29 +47,30 @@
     background-size:44px 44px;mask-image:radial-gradient(75% 75% at 28% 22%,#000,transparent 78%)}
   .brand>*{position:relative;z-index:1}
 
-  .logo{font-family:'Space Grotesk';font-weight:700;font-size:18px;letter-spacing:-.01em;display:flex;align-items:center;gap:11px}
-  .logo img{height:30px;width:auto;filter:drop-shadow(0 2px 10px rgba(34,233,255,.35))}
+  .logo{font-family:'Sora';font-weight:700;font-size:18px;letter-spacing:-.01em;display:flex;align-items:center;gap:11px}
+  .logo img{height:30px;width:auto;filter:drop-shadow(0 2px 10px rgba(60,232,196,.35))}
   .logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
 
-  .pitch{max-width:18ch}
+  .pitch{max-width:480px}
+  .pitch h1{max-width:15ch}
   .kicker{display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;font-weight:500}
   .kicker::before{content:"";width:24px;height:1px;background:var(--grad)}
-  .pitch h1{font-family:'Space Grotesk';font-weight:600;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spacing:-.03em}
+  .pitch h1{font-family:'Sora';font-weight:600;font-size:clamp(30px,3.4vw,46px);line-height:1.04;letter-spacing:-.03em}
   .pitch h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .pitch p{color:var(--muted);font-size:14.5px;line-height:1.65;max-width:42ch;margin-top:18px}
 
   .meta{display:flex;align-items:center;gap:20px}
-  .claim{font-family:'Space Grotesk';font-size:13px;color:var(--muted);letter-spacing:.01em}
+  .claim{font-family:'Sora';font-size:13px;color:var(--muted);letter-spacing:.01em}
   .claim b{color:var(--text);font-weight:600}
   .badge{font-size:11px;color:var(--muted-2);display:flex;align-items:center;gap:7px}
   .badge .lk{width:5px;height:5px;border-radius:50%;background:#3ddc7f;box-shadow:0 0 8px #3ddc7f}
 
   /* ---------- AUTH PANEL ---------- */
   .auth{display:flex;align-items:center;justify-content:center;padding:40px;
-    background:radial-gradient(100% 55% at 50% -8%, rgba(34,233,255,.07), transparent 55%), var(--bg2)}
+    background:radial-gradient(100% 55% at 50% -8%, rgba(60,232,196,.07), transparent 55%), var(--bg2)}
   .card{width:100%;max-width:340px;opacity:0;transform:translateY(14px);animation:in .7s .1s forwards cubic-bezier(.2,.7,.2,1)}
   @keyframes in{to{opacity:1;transform:translateY(0)}}
-  .card h2{font-family:'Space Grotesk';font-weight:600;font-size:25px;letter-spacing:-.015em;margin-bottom:5px}
+  .card h2{font-family:'Sora';font-weight:600;font-size:25px;letter-spacing:-.015em;margin-bottom:5px}
   .card .sub{color:var(--muted);font-size:13.5px;margin-bottom:28px}
   label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 7px;font-weight:500}
   .field{margin-bottom:15px}
@@ -79,14 +80,14 @@
     transition:border-color .18s,box-shadow .18s,background .18s;
   }
   input::placeholder{color:#3a4258}
-  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,233,255,.15);background:#0d121c}
+  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(60,232,196,.15);background:#0d121c}
   button{
     width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;
     background:var(--grad);color:var(--accent-ink);font-size:14.5px;font-weight:700;
-    font-family:'Space Grotesk';letter-spacing:.01em;margin-top:8px;
+    font-family:'Sora';letter-spacing:.01em;margin-top:8px;
     transition:transform .1s ease,box-shadow .2s ease,filter .15s;
   }
-  button:hover:not(:disabled){box-shadow:0 8px 26px rgba(122,107,255,.4);filter:brightness(1.08)}
+  button:hover:not(:disabled){box-shadow:0 8px 26px rgba(79,125,255,.4);filter:brightness(1.08)}
   button:active:not(:disabled){transform:scale(.975)}
   button:disabled{opacity:.55;cursor:not-allowed}
   .msg{margin-top:14px;font-size:13px;min-height:17px;line-height:1.4}
@@ -103,7 +104,7 @@
 <body>
   <aside class="brand">
     <span class="orb a"></span><span class="orb b"></span><span class="grid"></span>
-    <div class="logo"><img src="./assets/flowstate-logo.webp" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
+    <div class="logo"><img src="./assets/logo-mark.png" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
     <div class="pitch">
       <div class="kicker">Wallet-Plattform</div>
       <h1>Gutscheine, die <span>direkt</span> in der Wallet landen.</h1>
@@ -135,13 +136,15 @@
 
   <script type="module">
     import { supabase } from './js/supabase-client.js';
+    import { bindLoginGuard, recordLoginFail, recordLoginSuccess } from './js/login-guard.js';
 
     // Admins -> Cockpit, Betriebe -> ihr Dashboard.
     async function routeAfterLogin(){
       const { data:{ session } } = await supabase.auth.getSession();
       if(!session) return;
       try{
-        const r = await fetch('/api/admin/businesses', { headers:{ 'Authorization':'Bearer '+session.access_token }});
+        // leichter Admin-Check (lädt KEINE Betriebsliste -> Login fühlt sich sofort an)
+        const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token }});
         if(r.status===200){ location.replace('./cockpit.html'); return; }
       }catch{}
       location.replace('./dashboard.html');
@@ -151,18 +154,24 @@
     if (session) routeAfterLogin();
 
     const form=document.getElementById('loginForm'), btn=document.getElementById('submitBtn'), msg=document.getElementById('msg');
+    // Anmelde-Sperre: 3 Fehlversuche -> 5 Min, danach 1 Versuch, sonst anrufen.
+    const guard=bindLoginGuard(btn, (text)=>{ msg.className='msg error'; msg.textContent=text; });
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
+      if(!guard.allowed()){ guard.render(); return; }   // gesperrt -> nicht mal versuchen
       msg.className='msg'; msg.textContent=''; btn.disabled=true; btn.textContent='Einloggen …';
       const email=document.getElementById('email').value.trim();
       const password=document.getElementById('password').value;
       localStorage.removeItem('fs_admin_session'); // frischer Login -> evtl. alten Admin-Marker entfernen
       const { error }=await supabase.auth.signInWithPassword({ email, password });
+      btn.textContent='Einloggen';
       if (error){
-        msg.className='msg error';
-        msg.textContent='Anmeldung fehlgeschlagen: '+(error.message==='Invalid login credentials'?'E-Mail oder Passwort stimmt nicht.':error.message);
-        btn.disabled=false; btn.textContent='Einloggen'; return;
+        const st=recordLoginFail();
+        if(st.blocked){ guard.render(); }   // zeigt 5-Min-Sperre bzw. Anruf-Hinweis + sperrt Button
+        else { msg.className='msg error'; msg.textContent='E-Mail oder Passwort stimmt nicht.'; btn.disabled=false; }
+        return;
       }
+      recordLoginSuccess();
       msg.className='msg ok'; msg.textContent='Erfolgreich — weiterleiten …';
       routeAfterLogin();
     });

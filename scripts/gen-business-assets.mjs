@@ -19,6 +19,7 @@ const env = Object.fromEntries(
 );
 
 const SW = 1125, SH = 432, SIZES = [375, 750, 1125], SUF = { 375: '', 750: '@2x', 1125: '@3x' };
+const PAL = { palette: true, quality: 82, effort: 8, compressionLevel: 9 }; // kompaktes PNG (Bundle-Größe!)
 const GREEN = '#2fbf71', WHITE = '#ffffff';
 const FONT = 'DejaVu Sans, Arial, Helvetica, sans-serif';
 
@@ -102,7 +103,8 @@ async function generateBackground(cfg) {
   return Buffer.from(j.data[0].b64_json, 'base64');
 }
 
-// --- Hintergrund auf Strip-Maß bringen: 'contain' = NICHTS abschneiden (Ränder in Designfarbe) ---
+// --- Hintergrund auf Strip-Maß bringen: 'contain' = NICHTS abschneiden (Ränder in Designfarbe).
+// Das ist die funktionierende Version (Design hochladen -> Stempel setzen -> erscheint genau so). ---
 async function bgToStrip(rawBuf, bg = '#101010') {
   return await sharp(rawBuf).resize(SW, SH, { fit: 'contain', position: 'centre', background: bg }).png().toBuffer();
 }
@@ -185,7 +187,7 @@ async function main() {
   // KEINE eigenen Stempel drüberlegen. Stempelstand zeigt der Pass oben als Zahl.
   if (cfg.asIs) {
     for (const w of SIZES) {
-      const out = w === SW ? stripBg : await sharp(stripBg).resize({ width: w }).png().toBuffer();
+      const out = w === SW ? await sharp(stripBg).png(PAL).toBuffer() : await sharp(stripBg).resize({ width: w }).png(PAL).toBuffer();
       for (let n = 0; n <= L.total; n++) writeFileSync(join(dir, `strip_${n}${SUF[w]}.png`), out);
       writeFileSync(join(dir, `strip${SUF[w]}.png`), out);
     }
@@ -218,7 +220,7 @@ async function main() {
     for (let n = 0; n <= L.total; n++) {
       const full = n === 0 ? stripBg : await sharp(stripBg).composite([{ input: Buffer.from(draw(n)) }]).png().toBuffer();
       for (const w of SIZES) {
-        const out = w === SW ? full : await sharp(full).resize({ width: w }).png().toBuffer();
+        const out = w === SW ? await sharp(full).png(PAL).toBuffer() : await sharp(full).resize({ width: w }).png(PAL).toBuffer();
         writeFileSync(join(dir, `strip_${n}${SUF[w]}.png`), out);
         if (n === 0) writeFileSync(join(dir, `strip${SUF[w]}.png`), out);
       }
@@ -236,7 +238,7 @@ async function main() {
     const overlay = Buffer.from(overlaySvg(cfg, L, n));
     const full = await sharp(stripBg).composite([{ input: overlay }]).png().toBuffer(); // 1125x432
     for (const w of SIZES) {
-      const out = w === SW ? full : await sharp(full).resize({ width: w }).png().toBuffer();
+      const out = w === SW ? await sharp(full).png(PAL).toBuffer() : await sharp(full).resize({ width: w }).png(PAL).toBuffer();
       writeFileSync(join(dir, `strip_${n}${SUF[w]}.png`), out);
     }
   }
@@ -244,7 +246,7 @@ async function main() {
   for (const w of SIZES) {
     const overlay = Buffer.from(overlaySvg(cfg, L, 0));
     const full = await sharp(stripBg).composite([{ input: overlay }]).png().toBuffer();
-    const out = w === SW ? full : await sharp(full).resize({ width: w }).png().toBuffer();
+    const out = w === SW ? await sharp(full).png(PAL).toBuffer() : await sharp(full).resize({ width: w }).png(PAL).toBuffer();
     writeFileSync(join(dir, `strip${SUF[w]}.png`), out);
   }
   // Icons

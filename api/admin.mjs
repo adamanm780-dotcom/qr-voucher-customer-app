@@ -11,6 +11,9 @@ import { createClient } from '@supabase/supabase-js';
 const APP = 'https://qr-voucher-customer-app.vercel.app';
 const svc = () => createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 
+// Branchen/Nischen (Phase 1) — kanonische IDs. Neue Nischen hier + im Cockpit ergänzen.
+const INDUSTRIES = ['gastronomie', 'cafe', 'arbeitgeber', 'kantine', 'fitness', 'beauty', 'waschanlage', 'freizeit', 'event', 'verein', 'bildung', 'sonstige'];
+
 function adminList() {
   return (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 }
@@ -40,23 +43,39 @@ export default async function handler(req, res) {
   if (gate.error) return res.status(gate.code).json({ ok: false, message: gate.error });
 
   try {
+    // --- Leichter Admin-Check (fürs Login-Routing — kein Datenballast) ---
+    if (req.method === 'GET' && path === 'ping') {
+      return res.status(200).json({ ok: true });
+    }
+
     // --- Überblick: alle Betriebe ---
     if (req.method === 'GET' && (path === 'businesses' || path === '')) {
+      // '*' (statt fester Spaltenliste), damit ein noch nicht migriertes 'industry' die Query nicht crasht.
       const { data: bizs, error } = await db.from('businesses')
-        .select('id,name,slug,logo_url,color_bg,color_text,owner_id,created_at')
+        .select('*')
         .order('created_at', { ascending: true });
       if (error) return res.status(500).json({ ok: false, message: error.message });
 
-      const out = [];
-      for (const b of bizs || []) {
-        let email = null;
-        try { const u = await db.auth.admin.getUserById(b.owner_id); email = u?.data?.user?.email || null; } catch {}
-        const [{ count: passes }, { count: camps }] = await Promise.all([
-          db.from('passes').select('*', { count: 'exact', head: true }).eq('business_id', b.id).eq('status', 'active'),
-          db.from('campaigns').select('*', { count: 'exact', head: true }).eq('business_id', b.id).eq('active', true),
-        ]);
-        out.push({ ...b, owner_email: email, activePasses: passes || 0, activeCampaigns: camps || 0 });
-      }
+      // Statt 2 Count-Queries PRO Betrieb (wurde mit jedem Betrieb langsamer):
+      // alles in 3 parallelen Aufrufen holen und im Code gruppieren.
+      const [usersRes, passRes, campRes] = await Promise.all([
+        db.auth.admin.listUsers({ page: 1, perPage: 1000 }).catch(() => null),
+        db.from('passes').select('business_id').eq('status', 'active').limit(20000),
+        db.from('campaigns').select('business_id').eq('active', true).limit(20000),
+      ]);
+      const emailById = new Map();
+      for (const u of usersRes?.data?.users || []) emailById.set(u.id, u.email || null);
+      const tally = (rows) => {
+        const m = new Map();
+        for (const r of rows || []) m.set(r.business_id, (m.get(r.business_id) || 0) + 1);
+        return m;
+      };
+      const passCount = tally(passRes?.data), campCount = tally(campRes?.data);
+      const out = (bizs || []).map((b) => ({
+        ...b, owner_email: emailById.get(b.owner_id) || null,
+        industry: b.industry || 'gastronomie',
+        activePasses: passCount.get(b.id) || 0, activeCampaigns: campCount.get(b.id) || 0,
+      }));
       return res.status(200).json({ ok: true, businesses: out });
     }
 
@@ -85,7 +104,7 @@ export default async function handler(req, res) {
     // --- Design hochladen -> in Storage ablegen (Claude baut daraus den Betrieb) ---
     if (req.method === 'POST' && path === 'upload-design') {
       const body = await readBody(req);
-      const { name, goal, reward, color_bg, image_b64, logo_b64, note, positions, rfr } = body;
+      const { name, goal, reward, color_bg, image_b64, logo_b64, note, positions, rfr, industry } = body;
       if (!name || !name.trim()) return res.status(400).json({ ok: false, message: 'Name fehlt' });
       if (!image_b64) return res.status(400).json({ ok: false, message: 'Bild fehlt' });
       const raw = String(image_b64).replace(/^data:image\/\w+;base64,/, '');
@@ -94,7 +113,8 @@ export default async function handler(req, res) {
       const id = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
       const hasLogo = !!logo_b64;
       const validPos = Array.isArray(positions) ? positions.filter(p => p && typeof p.x === 'number' && typeof p.y === 'number').map(p => ({ x: p.x, y: p.y })) : null;
-      const meta = { id, name: name.trim(), goal: Number(goal) === 10 ? 10 : 5, reward: (reward || 'Gratis-Belohnung').trim(), color_bg: color_bg || null, hasLogo, note: (note || '').trim(), positions: validPos, rfr: (typeof rfr === 'number' ? rfr : null), ts: new Date().toISOString(), status: 'pending' };
+      const ind = INDUSTRIES.includes(industry) ? industry : 'gastronomie';
+      const meta = { id, name: name.trim(), goal: Number(goal) === 10 ? 10 : 5, reward: (reward || 'Gratis-Belohnung').trim(), color_bg: color_bg || null, industry: ind, hasLogo, note: (note || '').trim(), positions: validPos, rfr: (typeof rfr === 'number' ? rfr : null), ts: new Date().toISOString(), status: 'pending' };
       const up1 = await db.storage.from('design-uploads').upload(`pending/${id}.png`, buf, { contentType: 'image/png', upsert: true });
       if (up1.error) return res.status(500).json({ ok: false, message: 'Upload-Fehler: ' + up1.error.message });
       if (hasLogo) {
@@ -102,7 +122,36 @@ export default async function handler(req, res) {
         await db.storage.from('design-uploads').upload(`pending/${id}-logo.png`, Buffer.from(lraw, 'base64'), { contentType: 'image/png', upsert: true });
       }
       await db.storage.from('design-uploads').upload(`pending/${id}.json`, Buffer.from(JSON.stringify(meta, null, 2)), { contentType: 'application/json', upsert: true });
-      return res.status(200).json({ ok: true, id, message: 'Design hochgeladen — wird gebaut.' });
+      // bytes zurückmelden -> Client bestätigt, dass der Designstreifen wirklich angekommen ist
+      return res.status(200).json({ ok: true, id, bytes: buf.length, message: 'Design hochgeladen — wird gebaut.' });
+    }
+
+    // --- Karten-Farbe (Kartenkörper unter dem Design) ändern ---
+    // color_bg wird zur Pass-Laufzeit LIVE aus der DB gelesen -> kein Deploy nötig, wirkt beim nächsten Karten-Update.
+    if (req.method === 'POST' && path === 'update-business') {
+      const { business_id, color_bg } = await readBody(req);
+      if (!business_id) return res.status(400).json({ ok: false, message: 'business_id fehlt' });
+      const hex = String(color_bg || '').trim();
+      if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return res.status(400).json({ ok: false, message: 'Ungültige Farbe (erwarte #RRGGBB).' });
+      const { data: biz } = await db.from('businesses').select('id,slug,name').eq('id', business_id).maybeSingle();
+      if (!biz) return res.status(404).json({ ok: false, message: 'Betrieb nicht gefunden' });
+      // Lila hat im Pass feste Farben (theme.mjs) -> DB-Änderung würde nichts bewirken. Ehrlich blocken.
+      if (biz.slug === 'lila-wiesbaden') return res.status(403).json({ ok: false, message: 'Lila hat feste Marken-Farben und kann hier nicht geändert werden.' });
+      const n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      const color_text = (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? '#111111' : '#ffffff';
+      const { error } = await db.from('businesses').update({ color_bg: hex, color_text }).eq('id', biz.id);
+      if (error) return res.status(500).json({ ok: false, message: error.message });
+      return res.status(200).json({ ok: true, color_bg: hex, color_text, message: 'Farbe gespeichert — wirkt beim nächsten Karten-Update.' });
+    }
+
+    // --- Branche/Nische eines Betriebs ändern (Phase 1) ---
+    if (req.method === 'POST' && path === 'set-industry') {
+      const { business_id, industry } = await readBody(req);
+      if (!business_id) return res.status(400).json({ ok: false, message: 'business_id fehlt' });
+      if (!INDUSTRIES.includes(industry)) return res.status(400).json({ ok: false, message: 'Unbekannte Nische.' });
+      const { error } = await db.from('businesses').update({ industry }).eq('id', business_id);
+      if (error) return res.status(500).json({ ok: false, message: error.message });
+      return res.status(200).json({ ok: true, industry });
     }
 
     // --- Betrieb löschen (Betrieb + Login + Kampagnen + Pässe + Registrierungen) ---
