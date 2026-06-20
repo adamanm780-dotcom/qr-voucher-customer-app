@@ -5,6 +5,9 @@ node_modules/
 *.log
 .vercel
 
+# NIEMALS Kundendaten-Backups committen (enthalten personenbezogene Daten)
+backups/
+
 # NIEMALS Zertifikate/Keys/Passes committen
 certs/
 build/
