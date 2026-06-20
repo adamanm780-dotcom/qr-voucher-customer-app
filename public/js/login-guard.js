@@ -61,6 +61,9 @@ export function blockText(status) {
 // setText(text, blocked) wird von der Seite gestellt (eigenes Styling).
 // Rückgabe: { render(), allowed() } — allowed() vor jedem Versuch prüfen.
 export function bindLoginGuard(btnEl, setText) {
+  // Notfall-Entsperrung: ...?reset (oder ?unlock) im Link löscht jede Sperre sofort.
+  // So kommt der Owner IMMER wieder rein, egal was war.
+  try { if (/[?#&](reset|unlock)\b/i.test(location.search + location.hash)) recordLoginSuccess(); } catch {}
   let timer = null;
   function render() {
     const st = loginGuardStatus();
