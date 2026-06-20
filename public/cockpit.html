@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FlowState · Cockpit</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0a0d14">
+<meta name="theme-color" content="#0a0b0e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlowState">
@@ -193,6 +193,39 @@
     .search input{width:100%}
     #uploadOpen{flex:1}
   }
+</style>
+<!-- ===== FlowState Premium v2 — Enterprise-Refresh (Override-Layer) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0e; --panel:#101216; --panel-2:#14171c;
+    --line:rgba(255,255,255,.06); --line-2:rgba(255,255,255,.11);
+    --txt:#f1f3f6; --text:#f1f3f6; --muted:#8b93a1; --muted-2:#5b6373;
+    --mint:#34e0c0; --blue:#34e0c0; --grad:#34e0c0; --ink:#042621;
+    --accent:#34e0c0; --accent-soft:rgba(52,224,192,.10); --accent-line:rgba(52,224,192,.22);
+    --radius:10px;
+  }
+  body{font-family:'Hanken Grotesk',-apple-system,sans-serif !important;
+    background:radial-gradient(120% 60% at 50% -12%, rgba(255,255,255,.022), transparent 60%), var(--bg) !important}
+  h1,h2,h3,.brandbar b{font-family:'Hanken Grotesk',sans-serif !important;letter-spacing:-.02em}
+  .shop .stat .n,.shop .n{font-family:'JetBrains Mono',monospace !important}
+  ::selection{background:rgba(52,224,192,.22)}
+  /* Buttons / Tabs flach */
+  .btn{background:var(--mint) !important;color:var(--ink) !important;border-radius:9px !important;font-family:'Hanken Grotesk',sans-serif !important;box-shadow:none !important;font-weight:700 !important}
+  .btn:hover{box-shadow:0 8px 22px rgba(52,224,192,.18) !important;filter:brightness(1.05);transform:translateY(-1px)}
+  .niche.active{background:var(--mint) !important;color:var(--ink) !important;box-shadow:none !important;border-color:transparent !important}
+  .niche.active .ct{background:rgba(4,38,33,.22) !important}
+  /* Betriebs-Karten */
+  .shop{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--radius) !important}
+  .shop:hover{box-shadow:0 14px 34px rgba(0,0,0,.42) !important;border-color:var(--line-2) !important}
+  .shop .nbadge{border-radius:6px !important}
+  /* Karten / Inputs / Modale */
+  .card{border-radius:14px !important}
+  input,select,textarea{background:var(--bg) !important;border:1px solid var(--line) !important;border-radius:9px !important}
+  input:focus,select:focus,textarea:focus{border-color:var(--mint) !important;box-shadow:0 0 0 3px rgba(52,224,192,.12) !important}
+  .ghost{border-radius:9px !important;font-family:'Hanken Grotesk',sans-serif !important}
+  .sheet,.modalcard{border-radius:14px !important}
+  .tag{border-radius:8px !important}
 </style>
 </head>
 <body>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FlowState Wallet · Login</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0a0d14">
+<meta name="theme-color" content="#0a0b0e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlowState">
@@ -99,6 +99,37 @@
     .brand{display:none}
     .auth{min-height:100dvh}
   }
+</style>
+<!-- ===== FlowState Premium v2 — Enterprise-Refresh (Override-Layer) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0e; --bg2:#070809; --text:#f1f3f6; --muted:#8b93a1; --muted-2:#5b6373;
+    --accent:#34e0c0; --accent-ink:#042621; --line:rgba(255,255,255,.06);
+    --line-2:rgba(255,255,255,.11); --grad:#34e0c0; --err:#ff7e7e; --r:10px;
+  }
+  body{font-family:'Hanken Grotesk',-apple-system,sans-serif !important}
+  /* Brand-Panel: ruhig, keine Orbs */
+  .brand{background:radial-gradient(120% 90% at 18% 8%, rgba(255,255,255,.03), var(--bg) 60%) !important;border-right:1px solid var(--line) !important}
+  .brand .orb{display:none !important}
+  .brand .grid{opacity:.14 !important}
+  .logo{font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:-.02em}
+  .logo img{filter:none !important}
+  .logo b{-webkit-text-fill-color:var(--text) !important;color:var(--text) !important;background:none !important}
+  .kicker{color:var(--muted-2) !important;letter-spacing:.16em;font-weight:600}
+  .kicker::before{background:var(--accent) !important}
+  .pitch h1{font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:-.03em;color:var(--text)}
+  .pitch h1 span{-webkit-text-fill-color:var(--accent) !important;color:var(--accent) !important;background:none !important}
+  .claim{font-family:'Hanken Grotesk',sans-serif !important}
+  .badge .lk{box-shadow:none !important}
+  /* Auth-Karte */
+  .auth{background:radial-gradient(100% 55% at 50% -10%, rgba(52,224,192,.05), transparent 55%), var(--bg2) !important}
+  .card h2{font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:-.02em}
+  input{background:var(--bg) !important;border:1px solid var(--line) !important;border-radius:9px !important}
+  input:focus{border-color:var(--accent) !important;box-shadow:0 0 0 3px rgba(52,224,192,.12) !important;background:var(--bg) !important}
+  button{background:var(--accent) !important;color:var(--accent-ink) !important;border-radius:9px !important;
+    font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;box-shadow:none !important}
+  button:hover:not(:disabled){box-shadow:0 8px 22px rgba(52,224,192,.18) !important;filter:brightness(1.05)}
 </style>
 </head>
 <body>

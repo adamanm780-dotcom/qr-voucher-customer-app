@@ -8,6 +8,13 @@ node_modules/
 # NIEMALS Kundendaten-Backups committen (enthalten personenbezogene Daten)
 backups/
 
+# Temp/Verifizierungs-Artefakte (lokal, nicht ins Repo)
+_shots/
+_inspect-*.png
+_v-*.png
+scripts/_devserver.cjs
+.playwright-mcp/
+
 # NIEMALS Zertifikate/Keys/Passes committen
 certs/
 build/

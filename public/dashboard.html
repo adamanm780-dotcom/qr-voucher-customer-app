@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Dashboard · FlowState Wallet</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0a0d14">
+<meta name="theme-color" content="#0a0b0e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FlowState">
@@ -216,6 +216,97 @@
     .row{grid-template-columns:1fr}
   }
 </style>
+<!-- ===== FlowState Premium v2 — Enterprise-Refresh (Override-Layer, ändert KEINE Funktion) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b0e; --bg2:#070809; --panel:#101216; --panel-2:#14171c;
+    --line:rgba(255,255,255,.06); --line-2:rgba(255,255,255,.11);
+    --text:#f1f3f6; --muted:#8b93a1; --muted-2:#5b6373;
+    --accent:#34e0c0; --accent-ink:#042621;
+    --accent-soft:rgba(52,224,192,.10); --accent-line:rgba(52,224,192,.22);
+    --grad:#34e0c0; --r:10px;
+  }
+  /* Ein professionelles Typo-System (Hanken Grotesk + JetBrains Mono für Zahlen) */
+  body{font-family:'Hanken Grotesk',-apple-system,sans-serif !important;font-size:14px;
+    background:radial-gradient(120% 60% at 50% -12%, rgba(255,255,255,.022), transparent 60%), var(--bg) !important;}
+  h1,h2,h3,.ph1,.bn,.w-hello,.cpTitle,.rwName,.modalcard h3,.cm-card h3{font-family:'Hanken Grotesk',sans-serif !important;letter-spacing:-.022em}
+  .stat .n,.cpStat,.cpAmt{font-family:'JetBrains Mono',monospace !important}
+  ::selection{background:rgba(52,224,192,.22)}
+
+  /* Willkommen: ruhig & premium statt Orbs/Pulse */
+  #welcome{background:radial-gradient(110% 80% at 50% 0%, rgba(255,255,255,.028), var(--bg) 62%) !important}
+  #welcome .orb{display:none !important}
+  #welcome .grid{opacity:.16 !important}
+  .w-logo b,.fslogo b{-webkit-text-fill-color:var(--text) !important;color:var(--text) !important;background:none !important}
+  .w-logo img,.fslogo img{filter:none !important}
+  .w-hello em{-webkit-text-fill-color:var(--accent) !important;color:var(--accent) !important;background:none !important;font-style:normal}
+  .go{width:auto !important;height:auto !important;border-radius:10px !important;padding:15px 32px !important;
+    font-family:'Hanken Grotesk',sans-serif !important;font-size:14px !important;font-weight:700 !important;letter-spacing:.06em;
+    background:var(--accent) !important;color:var(--accent-ink) !important;box-shadow:none !important}
+  .go::after{display:none !important}
+  .go:hover{transform:translateY(-1px) !important;box-shadow:0 10px 26px rgba(52,224,192,.20) !important;filter:brightness(1.05)}
+  #wave{background:radial-gradient(circle at 50% 55%, rgba(52,224,192,.16), transparent 70%) !important}
+
+  /* Sidebar (nur Farben/Active — Layout/Responsive unangetastet) */
+  .side{background:var(--bg2) !important}
+  .nav.active{background:var(--accent-soft) !important;color:var(--accent) !important}
+  .nav.active::before{background:var(--accent) !important}
+  .nav.active svg{stroke:var(--accent) !important}
+  .wm .dot{box-shadow:none !important}
+  .avatar{border-radius:9px !important}
+
+  /* Section-Köpfe */
+  .gk{color:var(--muted-2) !important;letter-spacing:.15em;font-weight:600}
+  .gk::before{background:var(--accent) !important}
+  .ph1{font-weight:700 !important;letter-spacing:-.025em}
+
+  /* KPI-Karten: flach, Mono-Zahl, kein Glow */
+  .stat{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important;box-shadow:none !important;padding:17px !important}
+  .stat::before,.stat::after{display:none !important}
+  .stat:hover{transform:none !important;border-color:var(--line-2) !important;box-shadow:none !important}
+  .stat .ico{background:transparent !important;border:1px solid var(--line) !important;border-radius:8px !important;width:30px;height:30px;margin-bottom:13px}
+  .stat .ico svg{stroke:var(--muted) !important}
+  .stat .l{color:var(--muted-2) !important;letter-spacing:.05em}
+  .stat .n{font-weight:600 !important;font-size:27px !important;letter-spacing:-.01em}
+
+  /* Buttons flach */
+  .btn{background:var(--accent) !important;color:var(--accent-ink) !important;border-radius:8px !important;font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;box-shadow:none !important}
+  .btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(52,224,192,.16) !important;filter:brightness(1.05)}
+  .btn.ghost{background:transparent !important;border:1px solid var(--line-2) !important;color:var(--text) !important}
+  .btn.ghost:hover:not(:disabled){background:rgba(255,255,255,.04) !important}
+
+  /* Formulare */
+  .form{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important;box-shadow:none !important}
+  input,textarea{background:var(--bg2) !important;border:1px solid var(--line) !important;border-radius:8px !important}
+  input:focus,textarea:focus{border-color:var(--accent) !important;box-shadow:0 0 0 3px rgba(52,224,192,.12) !important}
+  .seg{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:9px !important}
+  .seg button{font-family:'Hanken Grotesk',sans-serif !important}
+  .seg button.on{background:var(--accent-soft) !important;color:var(--accent) !important}
+  .seg button.on svg{stroke:var(--accent) !important}
+
+  /* Vorlagen / Listen / Items */
+  .tpl{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important}
+  .tpl:hover{border-color:var(--accent) !important;transform:translateY(-1px) !important;box-shadow:none !important}
+  .tpl .big{-webkit-text-fill-color:var(--accent) !important;color:var(--accent) !important;background:none !important}
+  .item{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important;box-shadow:none !important}
+  .item:hover{transform:none !important;border-color:var(--line-2) !important;box-shadow:none !important}
+  .pill{background:rgba(255,255,255,.05) !important;color:var(--muted) !important;border:1px solid var(--line) !important;font-weight:600}
+  .pill.stamp{background:var(--accent-soft) !important;color:var(--accent) !important;border-color:var(--accent-line) !important}
+
+  /* Scanner / Belohnung */
+  .scanwrap{background:var(--panel) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important;box-shadow:none !important}
+  .cardPreview{background:var(--bg2) !important;border:1px solid var(--line) !important;border-radius:var(--r) !important}
+  .cpType{color:var(--accent) !important}
+  .rewardCard{background:var(--accent-soft) !important;border:1px solid var(--accent-line) !important;border-radius:var(--r) !important}
+  .rewardCard .rwLbl{color:var(--accent) !important}
+  .rewardCard .rwIcon{font-size:0 !important}
+  .rewardCard .rwIcon svg{width:40px;height:40px;stroke:var(--accent);fill:none;vertical-align:middle}
+
+  /* Toast / Modale */
+  #toast{background:var(--text) !important;color:#0a0b0e !important;border-radius:9px !important;box-shadow:0 14px 40px rgba(0,0,0,.5) !important;font-family:'Hanken Grotesk',sans-serif !important}
+  .modalcard,.cm-card{background:var(--panel) !important;border:1px solid var(--line-2) !important;border-radius:14px !important}
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
@@ -400,7 +491,7 @@
           <div class="scanresult" id="scanResult"></div>
           <div class="cardPreview" id="cardPreview" style="display:none"></div>
           <div class="rewardCard" id="rewardCard" style="display:none">
-            <div class="rwIcon">🎉</div>
+            <div class="rwIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.2 8 22l4-2.2L16 22l-1-7.8"/><path d="M9.6 9l1.7 1.7L14.6 7.4"/></svg></div>
             <div class="rwLbl">Belohnung freigeschaltet</div>
             <div class="rwName" id="rewardName"></div>
             <div class="rwBtns">
@@ -530,7 +621,7 @@
         const reward=(a.note||'').startsWith('Belohnung:');
         const t = a.action==='enroll' ? 'Neue Karte in Wallet geladen'
                 : a.action==='stamp'  ? 'Stempel vergeben · '+esc(a.note||'')
-                : reward              ? '🎁 '+esc(a.note)
+                : reward              ? esc(a.note)
                 :                       'Gutschein eingelöst'+(a.note?' · '+esc(a.note):'');
         const pill = a.action==='enroll' ? '+ Karte' : a.action==='stamp' ? 'Stempel' : 'Einlösung';
         return `<div class="item"><div class="grow"><div class="t">${t}</div><div class="m">${esc(serial)}${serial?' · ':''}${fmt(a.created_at)}</div></div><span class="pill ${a.action==='stamp'?'stamp':''}">${pill}</span></div>`;
