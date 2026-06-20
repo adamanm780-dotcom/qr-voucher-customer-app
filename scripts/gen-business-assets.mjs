@@ -131,6 +131,18 @@ function paintedCheck(cx, cy, r, fill = '#3aa84a') {
     + `<path d="${path}" fill="none" stroke="${fill}" stroke-width="${r * 0.33}" stroke-linecap="round" stroke-linejoin="round"/>`
     + `</g>`;
 }
+// Gemaltes / gestempeltes Kreuz (X) — handgemachter Look, für Karten mit Kreuzen statt Haken
+function paintedCross(cx, cy, r, fill = '#1c1c1c') {
+  const k = r, dark = '#000000';
+  const p1 = `M ${cx - 0.66 * k} ${cy - 0.66 * k} L ${cx + 0.66 * k} ${cy + 0.66 * k}`;
+  const p2 = `M ${cx + 0.66 * k} ${cy - 0.66 * k} L ${cx - 0.66 * k} ${cy + 0.66 * k}`;
+  return `<g>`
+    + `<path d="${p1}" fill="none" stroke="${dark}" stroke-width="${r * 0.46}" stroke-linecap="round" opacity="0.35"/>`
+    + `<path d="${p2}" fill="none" stroke="${dark}" stroke-width="${r * 0.46}" stroke-linecap="round" opacity="0.35"/>`
+    + `<path d="${p1}" fill="none" stroke="${fill}" stroke-width="${r * 0.30}" stroke-linecap="round"/>`
+    + `<path d="${p2}" fill="none" stroke="${fill}" stroke-width="${r * 0.30}" stroke-linecap="round"/>`
+    + `</g>`;
+}
 function overlaySvg(cfg, L, filled) {
   const rowsY = L.rows;
   const fill = cfg.fillColor || cfg.accent || GREEN;
@@ -212,9 +224,10 @@ async function main() {
     const positions = (cfg.stampPositions && cfg.stampPositions.length)
       ? cfg.stampPositions.map(p => ({ cx: Math.round(p.x * SW), cy: Math.round(p.y * SH) }))
       : xfr.map((fx, i) => ({ cx: Math.round(fx * SW), cy: Math.round((yfrArr ? yfrArr[i] : yfr) * SH) }));
+    const markFn = cfg.mark === 'cross' ? paintedCross : paintedCheck;
     const draw = (n) => {
       let s = '';
-      for (let i = 0; i < Math.min(n, positions.length); i++) s += paintedCheck(positions[i].cx, positions[i].cy, r);
+      for (let i = 0; i < Math.min(n, positions.length); i++) s += markFn(positions[i].cx, positions[i].cy, r, cfg.markColor);
       return `<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}"><defs><filter id="cs" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/></filter></defs><g filter="url(#cs)">${s}</g></svg>`;
     };
     for (let n = 0; n <= L.total; n++) {

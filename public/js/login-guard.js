@@ -10,6 +10,7 @@
 const KEY = 'fs_login_guard';
 const MAX_BEFORE_LOCK = 3;          // Fehlversuche bis zur 5-Min-Sperre
 const LOCK_MS = 5 * 60 * 1000;      // Sperrdauer
+const HARD_MS = 30 * 60 * 1000;     // "Anrufen"-Block erholt sich nach 30 Min selbst -> sperrt NIEMANDEN dauerhaft aus
 
 export const SUPPORT_PHONE = '0176 45289172';
 export const SUPPORT_TEL = '+4917645289172';
@@ -20,7 +21,11 @@ function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {
 // Aktueller Sperr-Status: { allowed, blocked: 'lock'|'hard'|null, retryMs? }
 export function loginGuardStatus() {
   const s = load();
-  if (s.hard) return { allowed: false, blocked: 'hard' };
+  if (s.hardUntil) {
+    if (Date.now() < s.hardUntil) return { allowed: false, blocked: 'hard', retryMs: s.hardUntil - Date.now() };
+    try { localStorage.removeItem(KEY); } catch {}   // Block abgelaufen -> kompletter Neustart, Gerät wieder frei
+    return { allowed: true, blocked: null };
+  }
   if (s.lockUntil && Date.now() < s.lockUntil) return { allowed: false, blocked: 'lock', retryMs: s.lockUntil - Date.now() };
   return { allowed: true, blocked: null };
 }
@@ -28,8 +33,8 @@ export function loginGuardStatus() {
 // Nach einem FEHLGESCHLAGENEN Versuch aufrufen. Gibt den neuen Status zurück.
 export function recordLoginFail() {
   const s = load();
-  // Schon 3 Fehlversuche gehabt (Sperre war abgelaufen) und es kommt ein weiterer -> Hard-Block.
-  if ((s.fails || 0) >= MAX_BEFORE_LOCK) { s.hard = true; save(s); return loginGuardStatus(); }
+  // Schon 3 Fehlversuche gehabt (Sperre war abgelaufen) und es kommt ein weiterer -> Hard-Block (auto-Reset nach 30 Min).
+  if ((s.fails || 0) >= MAX_BEFORE_LOCK) { s.hardUntil = Date.now() + HARD_MS; save(s); return loginGuardStatus(); }
   s.fails = (s.fails || 0) + 1;
   if (s.fails >= MAX_BEFORE_LOCK) s.lockUntil = Date.now() + LOCK_MS;
   save(s);

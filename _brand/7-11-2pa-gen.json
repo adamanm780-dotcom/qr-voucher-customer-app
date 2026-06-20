@@ -1,0 +1,26 @@
+{
+  "slug": "7-11-2pa",
+  "name": "7/11",
+  "goal": 5,
+  "colorBg": "#f8f8f8",
+  "colorText": "#111111",
+  "reward": "3 Tage Pass",
+  "bgPath": "_brand/7-11-2pa.png",
+  "fillOnly": true,
+  "mark": "cross",
+  "stampRfr": 0.026,
+  "stampPositions": [
+    {
+      "x": 0.7704,
+      "y": 0.7668
+    },
+    {
+      "x": 0.849,
+      "y": 0.7668
+    },
+    {
+      "x": 0.9275,
+      "y": 0.7668
+    }
+  ]
+}
