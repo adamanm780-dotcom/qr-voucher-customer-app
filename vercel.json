@@ -7,6 +7,7 @@
     { "src": "api/provision.mjs", "use": "@vercel/node" },
     { "src": "api/admin.mjs", "use": "@vercel/node" },
     { "src": "api/card-image.mjs", "use": "@vercel/node", "config": { "includeFiles": "api/_assets/**" } },
+    { "src": "api/qr.mjs", "use": "@vercel/node" },
     { "src": "api/cron-timepass.mjs", "use": "@vercel/node" },
     { "src": "public/**", "use": "@vercel/static" }
   ],
@@ -23,6 +24,7 @@
     { "src": "/api/admin/(.*)", "dest": "/api/admin.mjs" },
     { "src": "/api/admin", "dest": "/api/admin.mjs" },
     { "src": "/api/card-image", "dest": "/api/card-image.mjs" },
+    { "src": "/api/qr", "dest": "/api/qr.mjs" },
     { "src": "/", "dest": "/public/index.html" },
     { "src": "/pass-test", "dest": "/public/pass-test.html" },
     { "src": "/dashboard", "dest": "/public/dashboard.html" },

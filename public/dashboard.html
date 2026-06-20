@@ -715,7 +715,7 @@
       const url = token
         ? `${location.origin}/api/pass?enroll=${token}`
         : `${location.origin}/api/pass?campaign=${campId}`;
-      document.getElementById('qrBox').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}" alt="QR">`;
+      document.getElementById('qrBox').innerHTML=`<img src="/api/qr?size=240&data=${encodeURIComponent(url)}" alt="QR">`;
       document.getElementById('qrSub').textContent = token
         ? `Dauer-QR: ${term()} scannen → eigene Karte landet in der Wallet. (Druck ihn aus für den Tresen!)`
         : `${term()} scannen → Karte landet in der Wallet.`;
