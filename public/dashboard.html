@@ -440,6 +440,55 @@
   html[data-theme="light"] .scanwrap{ box-shadow:0 1px 2px rgba(0,0,0,.05), 0 12px 30px rgba(0,0,0,.05) !important; }
   html[data-theme="light"] .side{ background:var(--bg) !important; }
 </style>
+<!-- ===== FlowState v5 — Strukturelles Premium-Redesign (randlos/editorial, Trade-Republic-Aufbau) ===== -->
+<style>
+  .main{ padding:60px 64px 120px !important; max-width:1080px !important; }
+  @media(max-width:760px){ .main{ padding:26px 20px 90px !important; } }
+
+  /* Sidebar: minimal, randlos, viel Luft */
+  .side{ border-right:1px solid var(--line) !important; padding:30px 22px !important; gap:1px !important; }
+  .fslogo{ padding:0 6px 28px !important; font-size:14px !important; }
+  .brandrow{ border:none !important; border-bottom:1px solid var(--line) !important; padding:0 6px 22px !important; margin-bottom:14px !important; }
+  .nav{ background:transparent !important; border-radius:0 !important; padding:11px 6px !important; color:var(--muted) !important; font-size:14.5px !important; }
+  .nav:hover{ background:transparent !important; color:var(--text) !important; }
+  .nav.active{ background:transparent !important; color:var(--text) !important; font-weight:600 !important; }
+  .nav.active::before{ content:"" !important; left:-22px !important; top:11px !important; bottom:11px !important; width:2px !important; border-radius:0 !important; background:var(--accent) !important; }
+  .nav.active svg{ stroke:var(--accent) !important; }
+  .wm{ border:none !important; }
+
+  /* Übersicht — editorial */
+  .ov-eyebrow{ font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted-2); font-weight:600; }
+  .ov-hero{ margin:20px 0 60px; }
+  .ov-num{ font-family:'Hanken Grotesk',sans-serif; font-size:clamp(84px,13vw,168px); font-weight:800; line-height:.84; letter-spacing:-.055em; color:var(--text); font-variant-numeric:tabular-nums; }
+  .ov-cap{ font-size:16px; color:var(--muted); margin-top:20px; }
+
+  .ov-chart{ margin-bottom:56px; }
+  .ov-chart-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
+  .ov-chart-head>span:first-child{ font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted-2); font-weight:600; }
+  .ov-tot{ font-family:'Hanken Grotesk',sans-serif; font-size:22px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; }
+  .ov-chart .chart{ margin-top:14px !important; color:var(--accent) !important; }
+  .ov-chart .chart-empty{ color:var(--muted-2) !important; padding:60px 0 !important; }
+
+  .ov-metrics{ display:grid; grid-template-columns:repeat(5,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:30px 0; margin-bottom:60px; }
+  @media(max-width:760px){ .ov-metrics{ grid-template-columns:repeat(2,1fr); gap:30px 16px; } }
+  .ov-m{ display:flex; flex-direction:column; gap:10px; }
+  .ov-mn{ font-family:'Hanken Grotesk',sans-serif; font-size:clamp(28px,3.2vw,40px); font-weight:800; letter-spacing:-.035em; color:var(--text); line-height:1; font-variant-numeric:tabular-nums; }
+  .ov-ml{ font-size:12px; color:var(--muted-2); letter-spacing:.02em; }
+
+  .ov-feedhead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .ov-feedhead>span{ font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted-2); font-weight:600; }
+  .ov-link{ background:transparent !important; border:none !important; color:var(--accent) !important; font-family:inherit; font-size:13px !important; font-weight:600; cursor:pointer; padding:6px 0 !important; }
+  .ov-link:hover{ filter:brightness(1.15); }
+
+  /* Aktivität: randlose Liste mit Haarlinien (keine Karten) */
+  #page-overview .list{ display:block !important; }
+  #page-overview .item{ background:transparent !important; border:none !important; border-bottom:1px solid var(--line) !important; border-radius:0 !important; padding:18px 0 !important; box-shadow:none !important; gap:14px !important; }
+  #page-overview .item:hover{ background:transparent !important; transform:none !important; box-shadow:none !important; }
+  #page-overview .item .t{ font-size:15px !important; font-weight:600 !important; }
+  #page-overview .item .m{ color:var(--muted-2) !important; font-size:12.5px !important; }
+  #page-overview .pill{ background:transparent !important; border:1px solid var(--line-2) !important; color:var(--muted) !important; }
+  #page-overview .pill.stamp{ background:transparent !important; border-color:var(--accent-line) !important; color:var(--accent) !important; }
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
@@ -471,29 +520,26 @@
 
     <div class="main">
       <section class="page active" id="page-overview">
-        <div class="gk">Dashboard</div>
-        <div class="ph1">Übersicht</div>
-        <p class="lead">Deine Gutscheine und Stempelkarten auf einen Blick.</p>
-        <!-- Echter Aktivitäts-Graph (aus Live-Daten) -->
-        <div class="panelcard chartcard">
-          <div class="chart-klabel">Aktivität · letzte 14 Tage</div>
-          <div class="chart-kval" id="chartTotal">–</div>
-          <div class="chart-ksub">Stempel &amp; Einlösungen pro Tag</div>
+        <div class="ov-eyebrow">Übersicht</div>
+        <div class="ov-hero">
+          <div class="ov-num" id="statActive">0</div>
+          <div class="ov-cap">Karten aktuell im Umlauf</div>
+        </div>
+
+        <div class="ov-chart">
+          <div class="ov-chart-head"><span>Aktivität · letzte 14 Tage</span><span class="ov-tot" id="chartTotal">–</span></div>
           <div id="activityChart" class="chart"><div class="chart-empty">Lädt …</div></div>
         </div>
-        <!-- Kennzahlen -->
-        <div class="kpis">
-          <div class="kpi"><div class="kn" id="statActive">0</div><div class="kl">Im Umlauf</div></div>
-          <div class="kpi"><div class="kn" id="statIssued">0</div><div class="kl">Karten ausgegeben</div></div>
-          <div class="kpi"><div class="kn" id="statRedemptions">0</div><div class="kl">Einlösungen</div></div>
-          <div class="kpi"><div class="kn" id="statRedeemed">0</div><div class="kl">Belohnungen</div></div>
-          <div class="kpi"><div class="kn" id="statCampaigns">0</div><div class="kl">Aktive Aktionen</div></div>
-          <div class="kpi"><div class="kn" id="statAvg">0</div><div class="kl">Ø / Karte</div></div>
+
+        <div class="ov-metrics">
+          <div class="ov-m"><span class="ov-mn" id="statIssued">0</span><span class="ov-ml">Ausgegeben</span></div>
+          <div class="ov-m"><span class="ov-mn" id="statRedemptions">0</span><span class="ov-ml">Einlösungen</span></div>
+          <div class="ov-m"><span class="ov-mn" id="statRedeemed">0</span><span class="ov-ml">Belohnungen</span></div>
+          <div class="ov-m"><span class="ov-mn" id="statCampaigns">0</span><span class="ov-ml">Aktionen</span></div>
+          <div class="ov-m"><span class="ov-mn" id="statAvg">0</span><span class="ov-ml">Ø / Karte</span></div>
         </div>
-        <div class="gk" style="display:flex;align-items:center;justify-content:space-between">
-          <span>Letzte Aktivität</span>
-          <button class="btn ghost" id="exportBtn" style="padding:7px 13px;font-size:12px;letter-spacing:0;text-transform:none">↓ CSV-Export</button>
-        </div>
+
+        <div class="ov-feedhead"><span>Letzte Aktivität</span><button class="ov-link" id="exportBtn">CSV&nbsp;↓</button></div>
         <div id="activityList" class="list"><div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div></div>
       </section>
 
