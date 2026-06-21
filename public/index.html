@@ -168,6 +168,33 @@
   button:hover:not(:disabled){ filter:brightness(1.06) !important; box-shadow:none !important; }
   .badge .lk{ background:var(--accent) !important; box-shadow:none !important; }
 </style>
+<!-- ===== FlowState v6 — Stiller Luxus (warm-monochrom, Serif) ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15120e; --bg2:#1b1712; --text:#ebe6da; --muted:#988f7e; --muted-2:#6a6353;
+    --accent:#ebe6da; --accent-ink:#15120e; --line:rgba(235,230,218,.11); --line-2:rgba(235,230,218,.22);
+    --accent-soft:rgba(235,230,218,.09);
+  }
+  body{ background:var(--bg) !important; color:var(--text); }
+  .brand{ background:var(--bg) !important; border-color:var(--line) !important; }
+  .brand .grid{ opacity:.07 !important; }
+  .logo{ font-family:'Fraunces',Georgia,serif !important; font-weight:600 !important; letter-spacing:0 !important; }
+  .logo img{ display:none !important; }
+  .logo b{ background:none !important; -webkit-text-fill-color:var(--text) !important; color:var(--text) !important; font-weight:600 !important; }
+  .kicker{ color:var(--muted-2) !important; letter-spacing:.24em !important; }
+  .kicker::before{ background:var(--accent) !important; }
+  .pitch h1{ font-family:'Fraunces',Georgia,serif !important; font-optical-sizing:auto !important; font-weight:500 !important; font-size:clamp(36px,4.4vw,58px) !important; letter-spacing:-.01em !important; color:var(--text) !important; line-height:1.04 !important; }
+  .pitch h1 span{ -webkit-text-fill-color:var(--text) !important; color:var(--text) !important; font-style:italic !important; background:none !important; }
+  .pitch p{ color:var(--muted) !important; }
+  .auth{ background:var(--bg) !important; }
+  .card h2{ font-family:'Fraunces',Georgia,serif !important; font-weight:600 !important; letter-spacing:0 !important; }
+  input{ background:var(--bg2) !important; border-color:var(--line) !important; }
+  input:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  button{ background:var(--accent) !important; color:var(--accent-ink) !important; font-weight:600 !important; }
+  button:hover:not(:disabled){ filter:brightness(1.04) !important; box-shadow:none !important; }
+  .badge .lk{ background:var(--accent) !important; box-shadow:none !important; }
+</style>
 </head>
 <body>
   <aside class="brand">

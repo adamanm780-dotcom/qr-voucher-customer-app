@@ -489,6 +489,53 @@
   #page-overview .pill{ background:transparent !important; border:1px solid var(--line-2) !important; color:var(--muted) !important; }
   #page-overview .pill.stamp{ background:transparent !important; border-color:var(--accent-line) !important; color:var(--accent) !important; }
 </style>
+<!-- ===== FlowState v6 — LUXUS (UHNW): warmes Espresso-Schwarz, Champagner-Gold, Serif-Display ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15120e; --bg2:#1b1712; --panel:#1a1611; --panel-2:#201b15;
+    --line:rgba(235,230,218,.11); --line-2:rgba(235,230,218,.22);
+    --text:#ebe6da; --muted:#988f7e; --muted-2:#6a6353;
+    --accent:#ebe6da; --accent-ink:#15120e;
+    --accent-soft:rgba(235,230,218,.09); --accent-line:rgba(235,230,218,.30);
+  }
+  body{ background:var(--bg) !important; color:var(--text); }
+  ::selection{ background:rgba(235,230,218,.16); }
+
+  /* Serif-Display = glossy-magazine / Luxus */
+  .ov-num,.ov-mn,.ov-tot,.ph1,h1,h2,h3,.cpTitle,.rwName,.modalcard h3,.cm-card h3{ font-family:'Fraunces',Georgia,serif !important; font-optical-sizing:auto !important; }
+  .ov-num{ font-weight:500 !important; letter-spacing:-.015em !important; line-height:.88 !important; }
+  .ov-mn{ font-weight:500 !important; letter-spacing:0 !important; }
+  .ov-tot{ font-weight:500 !important; }
+  .ph1{ font-weight:600 !important; letter-spacing:-.01em !important; }
+
+  /* Logo: monochrome Wortmarke in Serif (kein Tech-Teal mehr) */
+  .fslogo,.w-logo{ font-family:'Fraunces',Georgia,serif !important; font-weight:600 !important; letter-spacing:.005em !important; }
+  .fslogo img,.w-logo img{ display:none !important; }
+  .fslogo b,.w-logo b{ background:none !important; -webkit-text-fill-color:var(--text) !important; color:var(--text) !important; font-weight:600 !important; }
+
+  /* Akzent = Champagner-Gold, sehr sparsam */
+  .nav.active{ color:var(--text) !important; }
+  .nav.active::before{ background:var(--accent) !important; }
+  .nav.active svg{ stroke:var(--accent) !important; }
+  .ov-eyebrow,.ov-chart-head>span:first-child,.ov-feedhead>span{ color:var(--muted-2) !important; letter-spacing:.24em !important; }
+  .ov-link{ color:var(--accent) !important; }
+  .ov-chart .chart{ color:var(--accent) !important; }
+  .areachart .axis{ stroke:var(--line-2) !important; }
+  .btn{ background:var(--accent) !important; color:var(--accent-ink) !important; font-weight:600 !important; }
+  .seg button.on,.seg button.on svg{ color:var(--accent) !important; stroke:var(--accent) !important; }
+  .nav.active,.seg button.on{ }
+  #page-overview .pill.stamp{ color:var(--accent) !important; border-color:var(--accent-line) !important; }
+  .pill{ color:var(--muted) !important; border-color:var(--line-2) !important; }
+  .wm .dot{ background:var(--accent) !important; box-shadow:none !important; }
+  input:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  .go{ background:var(--accent) !important; color:var(--accent-ink) !important; }
+  .w-hello em{ -webkit-text-fill-color:var(--accent) !important; color:var(--accent) !important; }
+  .cpType,.scanresult.ok{ color:var(--accent) !important; }
+  .rewardCard{ background:var(--accent-soft) !important; border-color:var(--accent-line) !important; }
+  .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:var(--accent) !important; stroke:var(--accent) !important; }
+  #toast{ background:var(--text) !important; color:var(--bg) !important; }
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
