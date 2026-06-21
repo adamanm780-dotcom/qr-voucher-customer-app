@@ -352,6 +352,94 @@
   .kn{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:600;letter-spacing:-.02em;line-height:1}
   .kl{font-size:10.5px;color:var(--muted-2);margin-top:6px;letter-spacing:.05em;text-transform:uppercase}
 </style>
+<!-- ===== FlowState v4 — Premium-Redesign (Fintech-Grade, umschaltbar schwarz/weiß) ===== -->
+<style>
+  :root{
+    --bg:#000000; --bg2:#0a0a0c; --panel:#0c0c0f; --panel-2:#121216;
+    --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.16);
+    --text:#ffffff; --muted:#8e8e98; --muted-2:#56565f;
+    --accent:#19e6ad; --accent-ink:#00140e;
+    --accent-soft:rgba(25,230,173,.13); --accent-line:rgba(25,230,173,.34);
+  }
+  html[data-theme="light"]{
+    --bg:#f6f6f4; --bg2:#eeeeec; --panel:#ffffff; --panel-2:#fafafa;
+    --line:rgba(0,0,0,.09); --line-2:rgba(0,0,0,.16);
+    --text:#08080a; --muted:#5c5c66; --muted-2:#9a9aa3;
+    --accent:#00b585; --accent-ink:#ffffff;
+    --accent-soft:rgba(0,181,133,.10); --accent-line:rgba(0,181,133,.30);
+  }
+  body{ background:var(--bg) !important; color:var(--text); }
+  ::selection{ background:var(--accent-soft); }
+
+  /* Mehr Luft + breiterer Atem */
+  .main{ padding:56px 56px 110px !important; max-width:1000px !important; }
+  @media(max-width:760px){ .main{ padding:24px 18px 80px !important; } }
+  .gk{ letter-spacing:.18em !important; color:var(--muted-2) !important; margin-bottom:14px !important; }
+  .gk::before{ background:var(--accent) !important; }
+  .ph1{ font-size:clamp(30px,3.6vw,44px) !important; font-weight:800 !important; letter-spacing:-.035em !important; }
+  .lead{ color:var(--muted) !important; font-size:15px !important; margin-bottom:40px !important; }
+
+  .side{ background:var(--bg) !important; border-right:1px solid var(--line) !important; }
+  .nav.active{ background:var(--accent-soft) !important; color:var(--accent) !important; }
+  .nav.active::before{ background:var(--accent) !important; }
+  .nav.active svg{ stroke:var(--accent) !important; }
+
+  /* HERO-Chartkarte: eine große Leitzahl + edler Graph */
+  .panelcard{ background:var(--panel) !important; border:1px solid var(--line) !important; border-radius:18px !important; padding:30px 32px !important; box-shadow:none !important; }
+  .chartcard{ margin-bottom:22px !important; }
+  .chart-klabel{ font-size:11px !important; letter-spacing:.16em !important; color:var(--muted-2) !important; }
+  .chart-kval{ font-family:'Hanken Grotesk',sans-serif !important; font-size:clamp(58px,7.2vw,90px) !important; font-weight:800 !important; line-height:.94 !important; letter-spacing:-.045em !important; margin-top:10px !important; color:var(--text) !important; font-variant-numeric:tabular-nums; }
+  .chart-ksub{ font-size:13.5px !important; color:var(--muted) !important; margin-top:9px !important; }
+  .chart{ margin-top:26px !important; color:var(--accent); }
+  .areachart{ width:100% !important; height:auto !important; display:block; overflow:visible; }
+  .areachart .aline{ stroke:currentColor !important; stroke-width:2.2 !important; vector-effect:non-scaling-stroke; }
+  .areachart .axis{ stroke:var(--line-2) !important; stroke-dasharray:2 4 !important; vector-effect:non-scaling-stroke; }
+  .areachart .adot{ fill:currentColor !important; }
+  .chart-xlabels{ color:var(--muted-2) !important; margin-top:14px !important; }
+
+  /* KPI-Reihe — größer, ruhiger */
+  .kpis{ background:var(--line) !important; border:1px solid var(--line) !important; border-radius:18px !important; margin-bottom:34px !important; box-shadow:none !important; }
+  .kpi{ background:var(--panel) !important; padding:22px !important; }
+  .kn{ font-family:'Hanken Grotesk',sans-serif !important; font-size:30px !important; font-weight:800 !important; letter-spacing:-.03em !important; color:var(--text) !important; font-variant-numeric:tabular-nums; }
+  .kl{ font-size:11px !important; color:var(--muted-2) !important; margin-top:8px !important; letter-spacing:.04em !important; }
+
+  /* Buttons — kraftvoller Akzent */
+  .btn{ background:var(--accent) !important; color:var(--accent-ink) !important; border-radius:11px !important; font-weight:700 !important; padding:13px 22px !important; box-shadow:none !important; }
+  .btn:hover:not(:disabled){ filter:brightness(1.06) !important; box-shadow:none !important; }
+  .btn.ghost{ background:transparent !important; border:1px solid var(--line-2) !important; color:var(--text) !important; }
+  .btn.ghost:hover:not(:disabled){ background:var(--accent-soft) !important; }
+
+  /* Flächen / Listen */
+  .form,.scanwrap,.cardPreview,.modalcard,.cm-card,.item{ background:var(--panel) !important; border:1px solid var(--line) !important; box-shadow:none !important; }
+  .item{ border-radius:14px !important; padding:16px 18px !important; }
+  .pill,.pill.stamp{ background:var(--accent-soft) !important; color:var(--accent) !important; border:1px solid var(--accent-line) !important; }
+
+  input,textarea{ background:var(--bg2) !important; border:1px solid var(--line) !important; }
+  input:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  .seg{ background:var(--panel) !important; border:1px solid var(--line) !important; }
+  .seg button.on{ background:var(--accent-soft) !important; color:var(--accent) !important; }
+  .seg button.on svg{ stroke:var(--accent) !important; }
+  .tpl{ background:var(--panel) !important; border:1px solid var(--line) !important; }
+  .tpl:hover{ border-color:var(--accent) !important; }
+
+  /* Welcome / Scanner / Reward */
+  .go{ background:var(--accent) !important; color:var(--accent-ink) !important; box-shadow:none !important; }
+  .w-hello em{ -webkit-text-fill-color:var(--accent) !important; color:var(--accent) !important; background:none !important; }
+  #wave{ background:radial-gradient(circle at 50% 55%, var(--accent-soft), transparent 70%) !important; }
+  .scanresult.ok,.cpType{ color:var(--accent) !important; }
+  .rewardCard{ background:var(--accent-soft) !important; border:1px solid var(--accent-line) !important; }
+  .rewardCard .rwLbl{ color:var(--accent) !important; }
+  .rewardCard .rwIcon svg{ stroke:var(--accent) !important; }
+  #toast{ background:var(--text) !important; color:var(--bg) !important; }
+
+  /* Hell-Variante: weiche Schatten für Kartentiefe */
+  html[data-theme="light"] .panelcard,
+  html[data-theme="light"] .kpis,
+  html[data-theme="light"] .item,
+  html[data-theme="light"] .form,
+  html[data-theme="light"] .scanwrap{ box-shadow:0 1px 2px rgba(0,0,0,.05), 0 12px 30px rgba(0,0,0,.05) !important; }
+  html[data-theme="light"] .side{ background:var(--bg) !important; }
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
@@ -612,21 +700,33 @@
       return `Gutschein · ${esc(c.value||'—')}`;
     }
 
-    // Echter Flächen-Graph (SVG, monochrom) aus einer Tageswert-Reihe.
+    // Premium-Flächen-Graph (SVG): weiche Catmull-Rom-Kurve, Akzentfarbe via currentColor,
+    // gestrichelte Baseline (Trade-Republic-Stil). Farbe kommt aus CSS (.areachart{color:accent}).
     function renderArea(el, vals){
-      const W=760,H=200,padX=4,padTop=16,padBot=22, n=vals.length, max=Math.max(1,...vals);
+      const W=760,H=210,padX=3,padTop=20,padBot=18, n=vals.length, max=Math.max(1,...vals);
       const X=i=> padX + (n<=1?0:i*((W-2*padX)/(n-1)));
       const Y=v=> padTop + (1 - v/max)*(H-padTop-padBot);
-      let d=''; vals.forEach((v,i)=> d+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' ');
-      const base=(H-padBot).toFixed(1);
-      const area=d+`L ${X(n-1).toFixed(1)} ${base} L ${X(0).toFixed(1)} ${base} Z`;
+      const pts=vals.map((v,i)=>[X(i),Y(v)]);
+      const smooth=p=>{
+        if(p.length<2) return p.length?`M ${p[0][0]} ${p[0][1]}`:'';
+        let d=`M ${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}`;
+        for(let i=0;i<p.length-1;i++){
+          const p0=p[i-1]||p[i],p1=p[i],p2=p[i+1],p3=p[i+2]||p2;
+          const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+          const c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+          d+=` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+        }
+        return d;
+      };
+      const line=smooth(pts), base=(H-padBot).toFixed(1);
+      const area=line+` L ${X(n-1).toFixed(1)} ${base} L ${X(0).toFixed(1)} ${base} Z`;
       el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="areachart">
         <defs><linearGradient id="afill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#fff" stop-opacity=".17"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+          <stop offset="0" stop-color="currentColor" stop-opacity=".24"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
         <line x1="0" y1="${base}" x2="${W}" y2="${base}" class="axis"/>
         <path d="${area}" fill="url(#afill)"/>
-        <path d="${d}" class="aline" fill="none"/>
-        <circle cx="${X(n-1).toFixed(1)}" cy="${Y(vals[n-1]).toFixed(1)}" r="3.4" class="adot"/>
+        <path d="${line}" class="aline" fill="none"/>
+        <circle cx="${X(n-1).toFixed(1)}" cy="${Y(vals[n-1]).toFixed(1)}" r="4" class="adot"/>
       </svg>`;
     }
     async function loadChart(){

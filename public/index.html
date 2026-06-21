@@ -146,6 +146,28 @@
   input:focus{border-color:rgba(255,255,255,.5) !important;box-shadow:0 0 0 3px rgba(255,255,255,.08) !important}
   button:hover:not(:disabled){box-shadow:0 8px 22px rgba(255,255,255,.12) !important}
 </style>
+<!-- ===== FlowState v4 — Premium True-Black + kraftvoller Akzent ===== -->
+<style>
+  :root{
+    --bg:#000000; --bg2:#0a0a0c; --text:#ffffff; --muted:#8e8e98; --muted-2:#56565f;
+    --accent:#19e6ad; --accent-ink:#00140e; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.16);
+    --accent-soft:rgba(25,230,173,.13);
+  }
+  body{ background:var(--bg) !important; }
+  .brand{ background:var(--bg) !important; border-right:1px solid var(--line) !important; }
+  .brand .grid{ opacity:.10 !important; }
+  .kicker{ color:var(--muted-2) !important; }
+  .kicker::before{ background:var(--accent) !important; }
+  .pitch h1{ font-size:clamp(34px,4vw,54px) !important; font-weight:800 !important; letter-spacing:-.04em !important; color:var(--text) !important; }
+  .pitch h1 span{ -webkit-text-fill-color:var(--accent) !important; color:var(--accent) !important; background:none !important; }
+  .auth{ background:var(--bg) !important; }
+  .card h2{ font-size:clamp(26px,3vw,32px) !important; font-weight:800 !important; letter-spacing:-.025em !important; }
+  input{ background:var(--bg2) !important; border:1px solid var(--line) !important; }
+  input:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  button{ background:var(--accent) !important; color:var(--accent-ink) !important; font-weight:700 !important; }
+  button:hover:not(:disabled){ filter:brightness(1.06) !important; box-shadow:none !important; }
+  .badge .lk{ background:var(--accent) !important; box-shadow:none !important; }
+</style>
 </head>
 <body>
   <aside class="brand">
