@@ -84,13 +84,18 @@ for (const mf of metas) {
       }
       logoPath = join('_brand', `${slug}-logo.png`);
       writeFileSync(logoPath, inner); // fürs Pass-Icon (makeIcon legt es auf Farbquadrat)
-      // Dashboard-Avatar: Logo zentriert auf abgerundetem Farbquadrat
-      const S = 256, pad = provided ? 26 : 18;
-      const fitted = await sharp(inner).resize(S - 2 * pad, S - 2 * pad, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
-      const avatar = await sharp(Buffer.from(`<svg width="${S}" height="${S}"><rect width="${S}" height="${S}" rx="${Math.round(S * 0.22)}" fill="${colorBg}"/></svg>`))
-        .composite([{ input: fitted, gravity: 'centre' }]).png().toBuffer();
-      await db.storage.from('brand-logos').upload(`${slug}.png`, avatar, { contentType: 'image/png', upsert: true });
-      logoUrl = db.storage.from('brand-logos').getPublicUrl(`${slug}.png`).data.publicUrl;
+      // Dashboard-Avatar NUR bei echtem hochgeladenem Logo setzen.
+      // KEIN Crop aus dem Design mehr (sah unprofessionell aus) -> sonst bleibt
+      // logo_url null = sauberer Initial-Avatar. Echtes Profilbild kommt separat
+      // via scripts/set-ig-logo.mjs aus Instagram.
+      if (provided) {
+        const S = 256, pad = 26;
+        const fitted = await sharp(inner).resize(S - 2 * pad, S - 2 * pad, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+        const avatar = await sharp(Buffer.from(`<svg width="${S}" height="${S}"><rect width="${S}" height="${S}" rx="${Math.round(S * 0.22)}" fill="${colorBg}"/></svg>`))
+          .composite([{ input: fitted, gravity: 'centre' }]).png().toBuffer();
+        await db.storage.from('brand-logos').upload(`${slug}.png`, avatar, { contentType: 'image/png', upsert: true });
+        logoUrl = db.storage.from('brand-logos').getPublicUrl(`${slug}.png`).data.publicUrl;
+      }
     } catch (e) { console.log('  Logo übersprungen:', e.message); }
 
     // Vom User im Upload selbst gesetzte Stempel-Positionen (bevorzugt), sonst pos-Datei.
