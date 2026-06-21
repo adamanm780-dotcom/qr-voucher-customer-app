@@ -307,6 +307,51 @@
   #toast{background:var(--text) !important;color:#0a0b0e !important;border-radius:9px !important;box-shadow:0 14px 40px rgba(0,0,0,.5) !important;font-family:'Hanken Grotesk',sans-serif !important}
   .modalcard,.cm-card{background:var(--panel) !important;border:1px solid var(--line-2) !important;border-radius:14px !important}
 </style>
+<!-- ===== FlowState v3 — Monochrom (Trade-Republic-Stil): schwarz/weiß, Logo behält Farbe, echte Graphen ===== -->
+<style>
+  :root{
+    --bg:#0a0a0c; --bg2:#0d0d10; --panel:#121215; --panel-2:#161619;
+    --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.13);
+    --text:#fafafa; --muted:#9a9aa2; --muted-2:#62626b;
+    --accent:#ffffff; --accent-ink:#000000;
+    --accent-soft:rgba(255,255,255,.08); --accent-line:rgba(255,255,255,.16);
+  }
+  /* Logo behält Markenfarbe (einziges farbiges Element) */
+  .w-logo b,.fslogo b{background:linear-gradient(100deg,#3ce8c4,#4f7dff) !important;-webkit-background-clip:text !important;background-clip:text !important;-webkit-text-fill-color:transparent !important;color:transparent !important}
+  /* Teal-Reste aus v2 neutralisieren -> monochrom */
+  .w-hello em{-webkit-text-fill-color:#fff !important;color:#fff !important}
+  .go:hover{box-shadow:0 10px 26px rgba(255,255,255,.12) !important}
+  #wave{background:radial-gradient(circle at 50% 55%, rgba(255,255,255,.10), transparent 70%) !important}
+  .btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(255,255,255,.12) !important}
+  input:focus,textarea:focus{border-color:rgba(255,255,255,.5) !important;box-shadow:0 0 0 3px rgba(255,255,255,.08) !important}
+  .stat .n,.cpType{color:var(--text) !important}
+  .pill.stamp{background:rgba(255,255,255,.08) !important;color:#fff !important;border-color:var(--line-2) !important}
+  .rewardCard{background:rgba(255,255,255,.04) !important;border-color:var(--line-2) !important}
+  .rewardCard .rwLbl{color:#fff !important}
+  .rewardCard .rwIcon svg{stroke:#fff !important}
+  .cpType{color:var(--muted) !important}
+
+  /* ===== Aktivitäts-Graph ===== */
+  .panelcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .chartcard{margin-bottom:16px}
+  .chart-klabel{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);font-weight:600}
+  .chart-kval{font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:600;line-height:1.02;margin-top:6px;letter-spacing:-.03em}
+  .chart-ksub{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .chart{margin-top:16px;position:relative}
+  .areachart{width:100%;height:auto;display:block;overflow:visible}
+  .areachart .aline{stroke:#fff;stroke-width:1.7;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+  .areachart .axis{stroke:rgba(255,255,255,.09);stroke-width:1;vector-effect:non-scaling-stroke}
+  .areachart .adot{fill:#fff}
+  .chart-xlabels{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--muted-2);font-family:'JetBrains Mono',monospace}
+  .chart-empty{color:var(--muted-2);font-size:13px;padding:48px 0;text-align:center}
+
+  /* ===== Kennzahlen-Tabelle (TR-Stil: dünne Trennlinien) ===== */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:26px}
+  .kpi{background:var(--panel);padding:17px 18px}
+  .kn{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .kl{font-size:10.5px;color:var(--muted-2);margin-top:6px;letter-spacing:.05em;text-transform:uppercase}
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
@@ -341,31 +386,21 @@
         <div class="gk">Dashboard</div>
         <div class="ph1">Übersicht</div>
         <p class="lead">Deine Gutscheine und Stempelkarten auf einen Blick.</p>
-        <div class="grid3">
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 11h18"/></svg></div>
-            <div class="l">Im Umlauf</div><div class="n" id="statActive">0</div>
-          </div>
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7S11 3 8.5 3 5.5 5 6 7m6 0s1-4 3.5-4S18 5 17.5 7"/></svg></div>
-            <div class="l">Eingelöst gesamt</div><div class="n" id="statRedeemed">0</div>
-          </div>
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l2.2 5.5L20 10l-5.8 1.5L12 17l-2.2-5.5L4 10l5.8-1.5z"/></svg></div>
-            <div class="l">Aktive Aktionen</div><div class="n" id="statCampaigns">0</div>
-          </div>
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M4 7V5a1 1 0 011-1h14a1 1 0 011 1v2M4 7h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1z"/></svg></div>
-            <div class="l">Karten ausgegeben</div><div class="n" id="statIssued">0</div>
-          </div>
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8M21 7v5h-5"/></svg></div>
-            <div class="l">Einlösungen gesamt</div><div class="n" id="statRedemptions">0</div>
-          </div>
-          <div class="stat">
-            <div class="ico"><svg viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-            <div class="l">Ø Einlösungen/Karte</div><div class="n" id="statAvg">0</div>
-          </div>
+        <!-- Echter Aktivitäts-Graph (aus Live-Daten) -->
+        <div class="panelcard chartcard">
+          <div class="chart-klabel">Aktivität · letzte 14 Tage</div>
+          <div class="chart-kval" id="chartTotal">–</div>
+          <div class="chart-ksub">Stempel &amp; Einlösungen pro Tag</div>
+          <div id="activityChart" class="chart"><div class="chart-empty">Lädt …</div></div>
+        </div>
+        <!-- Kennzahlen -->
+        <div class="kpis">
+          <div class="kpi"><div class="kn" id="statActive">0</div><div class="kl">Im Umlauf</div></div>
+          <div class="kpi"><div class="kn" id="statIssued">0</div><div class="kl">Karten ausgegeben</div></div>
+          <div class="kpi"><div class="kn" id="statRedemptions">0</div><div class="kl">Einlösungen</div></div>
+          <div class="kpi"><div class="kn" id="statRedeemed">0</div><div class="kl">Belohnungen</div></div>
+          <div class="kpi"><div class="kn" id="statCampaigns">0</div><div class="kl">Aktive Aktionen</div></div>
+          <div class="kpi"><div class="kn" id="statAvg">0</div><div class="kl">Ø / Karte</div></div>
         </div>
         <div class="gk" style="display:flex;align-items:center;justify-content:space-between">
           <span>Letzte Aktivität</span>
@@ -577,6 +612,39 @@
       return `Gutschein · ${esc(c.value||'—')}`;
     }
 
+    // Echter Flächen-Graph (SVG, monochrom) aus einer Tageswert-Reihe.
+    function renderArea(el, vals){
+      const W=760,H=200,padX=4,padTop=16,padBot=22, n=vals.length, max=Math.max(1,...vals);
+      const X=i=> padX + (n<=1?0:i*((W-2*padX)/(n-1)));
+      const Y=v=> padTop + (1 - v/max)*(H-padTop-padBot);
+      let d=''; vals.forEach((v,i)=> d+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' ');
+      const base=(H-padBot).toFixed(1);
+      const area=d+`L ${X(n-1).toFixed(1)} ${base} L ${X(0).toFixed(1)} ${base} Z`;
+      el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="areachart">
+        <defs><linearGradient id="afill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".17"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <line x1="0" y1="${base}" x2="${W}" y2="${base}" class="axis"/>
+        <path d="${area}" fill="url(#afill)"/>
+        <path d="${d}" class="aline" fill="none"/>
+        <circle cx="${X(n-1).toFixed(1)}" cy="${Y(vals[n-1]).toFixed(1)}" r="3.4" class="adot"/>
+      </svg>`;
+    }
+    async function loadChart(){
+      const DAYS=14;
+      const start=new Date(); start.setHours(0,0,0,0); start.setDate(start.getDate()-(DAYS-1));
+      const { data:rows }=await supabase.from('redemptions').select('created_at').eq('business_id',biz.id).gte('created_at',start.toISOString());
+      const buckets=new Array(DAYS).fill(0);
+      (rows||[]).forEach(r=>{ const d=new Date(r.created_at); d.setHours(0,0,0,0); const i=Math.round((d-start)/864e5); if(i>=0&&i<DAYS) buckets[i]++; });
+      const total=buckets.reduce((a,b)=>a+b,0);
+      const tEl=document.getElementById('chartTotal'); if(tEl) tEl.textContent=total;
+      const el=document.getElementById('activityChart'); if(!el) return;
+      if(!total){ el.innerHTML='<div class="chart-empty">Noch keine Aktivität in den letzten 14 Tagen.</div>'; return; }
+      renderArea(el, buckets);
+      const fmt=d=>d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+      const lab=document.createElement('div'); lab.className='chart-xlabels';
+      lab.innerHTML=`<span>${fmt(start)}</span><span>${fmt(new Date(start.getTime()+7*864e5))}</span><span>heute</span>`;
+      el.appendChild(lab);
+    }
     async function loadStats(){
       // WICHTIG: jede Query explizit auf den eigenen Betrieb einschränken (nicht nur auf RLS verlassen,
       // sonst tauchen Zahlen/Codes anderer Betriebe auf — Cross-Tenant-Leak).
@@ -627,7 +695,7 @@
         return `<div class="item"><div class="grow"><div class="t">${t}</div><div class="m">${esc(serial)}${serial?' · ':''}${fmt(a.created_at)}</div></div><span class="pill ${a.action==='stamp'?'stamp':''}">${pill}</span></div>`;
       }).join('');
     }
-    await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
+    await Promise.all([loadStats(), loadChart(), loadCampaigns(), loadActivity()]);
 
     document.getElementById('loading').style.display='none';
     document.getElementById('welcome').style.display='flex';
@@ -725,7 +793,7 @@
       const { error:insErr }=await supabase.from('campaigns').insert(payload);
       if(insErr){ toast('Fehler: '+insErr.message); return false; }
       toast('Aktion erstellt ✓');
-      await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
+      await Promise.all([loadStats(), loadChart(), loadCampaigns(), loadActivity()]);
       document.querySelector('.nav[data-page="manage"]').click();
       return true;
     }
@@ -957,7 +1025,7 @@
             const tmap={reward_redeemed:'Belohnung eingelöst ✓',redeemed:'Eingelöst ✓',stamp:'Stempel +1 ✓',use:'Einlösung ✓',debit:'Abgebucht ✓',entry:'Zutritt bestätigt ✓'};
             toast(tmap[j.action]||'OK ✓');
           }
-          await Promise.all([loadStats(), loadCampaigns(), loadActivity()]);
+          await Promise.all([loadStats(), loadChart(), loadCampaigns(), loadActivity()]);
         } else {
           scanResult.className='scanresult err';
           scanResult.textContent='✗ '+(j.message||'Fehler');

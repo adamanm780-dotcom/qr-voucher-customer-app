@@ -131,6 +131,21 @@
     font-family:'Hanken Grotesk',sans-serif !important;font-weight:700 !important;box-shadow:none !important}
   button:hover:not(:disabled){box-shadow:0 8px 22px rgba(52,224,192,.18) !important;filter:brightness(1.05)}
 </style>
+<!-- ===== FlowState v3 — Monochrom (Trade-Republic-Stil) ===== -->
+<style>
+  :root{
+    --bg:#0a0a0c; --bg2:#0d0d10; --text:#fafafa; --muted:#9a9aa2; --muted-2:#62626b;
+    --accent:#ffffff; --accent-ink:#000000; --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.13);
+  }
+  /* Logo behält Farbe (einziges farbiges Element) */
+  .logo b{background:linear-gradient(100deg,#3ce8c4,#4f7dff) !important;-webkit-background-clip:text !important;background-clip:text !important;-webkit-text-fill-color:transparent !important;color:transparent !important}
+  /* Headline monochrom (kein Teal-Wort mehr) */
+  .pitch h1 span{-webkit-text-fill-color:#fff !important;color:#fff !important;background:none !important}
+  .kicker::before{background:#fff !important}
+  .badge .lk{background:#fff !important}
+  input:focus{border-color:rgba(255,255,255,.5) !important;box-shadow:0 0 0 3px rgba(255,255,255,.08) !important}
+  button:hover:not(:disabled){box-shadow:0 8px 22px rgba(255,255,255,.12) !important}
+</style>
 </head>
 <body>
   <aside class="brand">
