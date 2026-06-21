@@ -287,6 +287,48 @@
   input,select,textarea{ background:var(--bg) !important; border-color:var(--line) !important; }
   input:focus,select:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
 </style>
+<!-- ===== FlowState v7 — Soft Light (Wallet-Referenz): hell, rund, weich, Bold-Sans, Grün ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#e8e8ef; --panel:#ffffff; --panel-2:#f5f5f9;
+    --line:rgba(22,22,42,.07); --line-2:rgba(22,22,42,.12);
+    --txt:#16161a; --text:#16161a; --muted:#7c7c88; --muted-2:#a6a6b1;
+    --mint:#27c06a; --blue:#27c06a; --grad:#27c06a; --ink:#ffffff;
+    --accent:#27c06a; --accent-soft:rgba(39,192,106,.14); --accent-line:rgba(39,192,106,.30);
+    --radius:22px;
+  }
+  *,*::before,*::after{ font-family:'Plus Jakarta Sans',-apple-system,sans-serif !important; }
+  body{ background:radial-gradient(130% 90% at 50% -8%, #f3f3f8, #e4e4ec 70%) !important; color:var(--txt) !important; }
+  .brandbar b{ color:var(--txt) !important; -webkit-text-fill-color:var(--txt) !important; background:none !important; font-weight:800 !important; }
+  .brandbar img{ display:none !important; }
+  .brandbar .tag{ background:#fff !important; border-color:var(--line) !important; color:var(--muted) !important; box-shadow:0 2px 5px rgba(22,22,50,.04) !important; }
+  .head h1,.login h1{ color:var(--txt) !important; font-weight:800 !important; letter-spacing:-.03em !important; }
+  .head .sub,.login p{ color:var(--muted) !important; }
+  .card{ background:#fff !important; border:1px solid var(--line) !important; box-shadow:0 2px 5px rgba(22,22,50,.04), 0 16px 34px rgba(22,22,50,.07) !important; }
+  /* Betriebs-Karten: weiß, rund, weicher Schatten */
+  .shop{ background:#fff !important; border:1px solid var(--line) !important; border-radius:var(--radius) !important; box-shadow:0 2px 5px rgba(22,22,50,.04), 0 16px 34px rgba(22,22,50,.07) !important; }
+  .shop:hover{ transform:translateY(-2px) !important; border-color:var(--line-2) !important; box-shadow:0 6px 12px rgba(22,22,50,.06), 0 22px 44px rgba(22,22,50,.10) !important; }
+  .shop .name{ color:var(--txt) !important; font-weight:800 !important; }
+  .shop .slug{ color:var(--muted) !important; }
+  .shop .stat .n,.shop .n{ color:var(--txt) !important; font-weight:800 !important; letter-spacing:-.03em !important; }
+  .shop .l{ color:var(--muted) !important; }
+  .shop .nbadge{ background:var(--accent-soft) !important; color:#178a48 !important; border:none !important; }
+  .shop .enter{ color:var(--accent) !important; font-weight:700 !important; }
+  .shop .del,.shop .fb,.shop .gear,.shop .cred{ color:var(--muted-2) !important; }
+  /* Tabs / Buttons */
+  .niche{ background:#fff !important; border:1px solid var(--line) !important; color:var(--muted) !important; box-shadow:0 2px 5px rgba(22,22,50,.03) !important; }
+  .niche:hover{ color:var(--txt) !important; }
+  .niche.active{ background:var(--txt) !important; color:#fff !important; border-color:transparent !important; }
+  .niche.active .ct{ background:rgba(255,255,255,.2) !important; }
+  .btn{ background:var(--txt) !important; color:#fff !important; border-radius:999px !important; font-weight:700 !important; box-shadow:none !important; }
+  .btn:hover{ filter:brightness(1.12) !important; box-shadow:none !important; transform:translateY(-1px) !important; }
+  .ghost{ background:#fff !important; border:1px solid var(--line) !important; color:var(--txt) !important; border-radius:12px !important; box-shadow:0 2px 5px rgba(22,22,50,.04) !important; }
+  .search input{ background:#fff !important; }
+  input,select,textarea{ background:#fff !important; border:1px solid var(--line) !important; color:var(--txt) !important; border-radius:14px !important; }
+  input:focus,select:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  .sheet,.modalcard{ background:#fff !important; border:1px solid var(--line) !important; }
+</style>
 </head>
 <body>
 <div class="wrap">
