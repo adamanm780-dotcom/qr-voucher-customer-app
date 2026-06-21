@@ -329,6 +329,47 @@
   input:focus,select:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
   .sheet,.modalcard{ background:#fff !important; border:1px solid var(--line) !important; }
 </style>
+<!-- ===== FlowState v8 — Glassmorphism ===== -->
+<style>
+  :root{
+    --bg:#0a0b0f; --panel:rgba(255,255,255,.055); --panel-2:rgba(255,255,255,.09);
+    --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.18);
+    --txt:#f2f3f7; --text:#f2f3f7; --muted:#9aa0ac; --muted-2:#646a76;
+    --mint:#2fd47a; --blue:#2fd47a; --grad:#2fd47a; --ink:#04130a;
+    --accent:#2fd47a; --accent-soft:rgba(47,212,122,.16); --accent-line:rgba(47,212,122,.42);
+    --glass:rgba(255,255,255,.055); --glass-border:rgba(255,255,255,.12); --radius:24px;
+  }
+  body{ background:#0a0b0f !important; color:var(--txt) !important; position:relative; }
+  body::before{ content:''; position:fixed; inset:-10%; z-index:0; pointer-events:none;
+    background:radial-gradient(34% 30% at 14% 8%, rgba(150,170,190,.15), transparent 70%),
+      radial-gradient(30% 28% at 88% 4%, rgba(47,212,122,.12), transparent 70%),
+      radial-gradient(40% 38% at 76% 102%, rgba(110,130,170,.15), transparent 70%);
+    filter:blur(50px); }
+  .wrap{ position:relative; z-index:1; }
+  .brandbar b{ color:var(--txt) !important; -webkit-text-fill-color:var(--txt) !important; }
+  .brandbar img{ display:none !important; }
+  .brandbar .tag{ background:var(--glass) !important; -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); border-color:var(--glass-border) !important; color:var(--muted) !important; box-shadow:none !important; }
+  .head h1,.login h1{ color:var(--txt) !important; font-weight:800 !important; }
+  .head .sub,.login p{ color:var(--muted) !important; }
+  /* GLAS-Betriebskarten */
+  .card,.shop{ background:var(--glass) !important; -webkit-backdrop-filter:blur(26px) saturate(160%) !important; backdrop-filter:blur(26px) saturate(160%) !important; border:1px solid var(--glass-border) !important; border-radius:var(--radius) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 26px 60px rgba(0,0,0,.5) !important; }
+  .shop:hover{ transform:translateY(-2px) !important; background:var(--panel-2) !important; }
+  .shop .name{ color:var(--txt) !important; font-weight:800 !important; } .shop .slug{ color:var(--muted) !important; }
+  .shop .stat .n,.shop .n{ color:var(--txt) !important; font-weight:800 !important; }
+  .shop .l{ color:var(--muted) !important; }
+  .shop .nbadge{ background:var(--accent-soft) !important; color:var(--accent) !important; border:none !important; }
+  .shop .enter{ color:var(--accent) !important; font-weight:700 !important; }
+  .shop .del,.shop .fb,.shop .gear,.shop .cred{ color:var(--muted-2) !important; }
+  .niche{ background:var(--glass) !important; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border:1px solid var(--glass-border) !important; color:var(--muted) !important; box-shadow:none !important; }
+  .niche:hover{ color:var(--txt) !important; }
+  .niche.active{ background:var(--accent) !important; color:var(--ink) !important; border-color:transparent !important; }
+  .btn{ background:var(--accent) !important; color:var(--ink) !important; border-radius:999px !important; font-weight:700 !important; box-shadow:0 8px 24px rgba(47,212,122,.28) !important; }
+  .btn:hover{ filter:brightness(1.06) !important; transform:translateY(-1px) !important; }
+  .ghost{ background:var(--glass) !important; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border:1px solid var(--glass-border) !important; color:var(--txt) !important; box-shadow:none !important; }
+  input,select,textarea{ background:rgba(255,255,255,.05) !important; border:1px solid var(--glass-border) !important; color:var(--txt) !important; }
+  input:focus,select:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  .sheet,.modalcard{ background:rgba(20,22,28,.82) !important; -webkit-backdrop-filter:blur(30px) !important; backdrop-filter:blur(30px) !important; border:1px solid var(--glass-border) !important; color:var(--txt) !important; }
+</style>
 </head>
 <body>
 <div class="wrap">

@@ -630,6 +630,105 @@
   .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:#178a48 !important; stroke:#178a48 !important; }
   #toast{ background:var(--text) !important; color:#fff !important; }
 </style>
+<!-- ===== FlowState v8 — Glassmorphism (Proton-Pass-Referenz #2): milchige Glas-Karten, Tiefe, atmosphärisch ===== -->
+<style>
+  :root{
+    --bg:#0a0b0f; --text:#f2f3f7; --muted:#9aa0ac; --muted-2:#646a76;
+    --accent:#2fd47a; --accent-ink:#04130a; --accent-soft:rgba(47,212,122,.16); --accent-line:rgba(47,212,122,.42);
+    --glass:rgba(255,255,255,.055); --glass-2:rgba(255,255,255,.09); --glass-border:rgba(255,255,255,.11);
+    --r:26px;
+  }
+  body{ background:#0a0b0f !important; color:var(--text) !important; position:relative; }
+  /* atmosphärischer Hintergrund -> gibt dem Glas etwas zum „milchig machen" */
+  body::before{ content:''; position:fixed; inset:-10% !important; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(38% 32% at 16% 8%, rgba(150,170,190,.16), transparent 70%),
+      radial-gradient(34% 30% at 88% 4%, rgba(47,212,122,.12), transparent 70%),
+      radial-gradient(46% 40% at 72% 102%, rgba(110,130,170,.16), transparent 70%),
+      radial-gradient(40% 36% at 0% 70%, rgba(90,110,150,.12), transparent 70%);
+    filter:blur(50px) saturate(120%); }
+  #app,#welcome,#wave,#toast,#modal,.cm-overlay{ position:relative; z-index:1; }
+
+  /* GLAS-KARTE */
+  .glasscard{ background:var(--glass) !important; -webkit-backdrop-filter:blur(28px) saturate(165%) !important; backdrop-filter:blur(28px) saturate(165%) !important;
+    border:1px solid var(--glass-border) !important; border-radius:var(--r) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 26px 64px rgba(0,0,0,.5) !important; }
+
+  /* Sidebar -> transparent über dem Atmosphäre-BG */
+  .side{ background:rgba(10,11,15,.35) !important; -webkit-backdrop-filter:blur(20px) !important; backdrop-filter:blur(20px) !important; border-right:1px solid var(--glass-border) !important; }
+  .fslogo,.fslogo b,.bn{ color:var(--text) !important; -webkit-text-fill-color:var(--text) !important; }
+  .br,.wm,.wm b{ color:var(--muted) !important; }
+  .brandrow{ border-color:var(--glass-border) !important; }
+  .avatar{ box-shadow:0 8px 22px rgba(0,0,0,.5) !important; }
+  .nav{ color:var(--muted) !important; border-radius:14px !important; }
+  .nav:hover{ background:rgba(255,255,255,.05) !important; color:var(--text) !important; }
+  .nav.active{ background:var(--glass-2) !important; -webkit-backdrop-filter:blur(14px) !important; backdrop-filter:blur(14px) !important; color:var(--text) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.1) !important; }
+  .nav.active svg{ stroke:var(--accent) !important; } .nav svg{ stroke:currentColor !important; }
+  .wm .dot{ background:var(--accent) !important; box-shadow:0 0 10px var(--accent) !important; }
+
+  /* HERO-Glaskarte */
+  .herocard{ padding:30px 34px !important; margin-bottom:18px !important; }
+  .hc-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .ov-eyebrow{ color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; font-size:15px !important; font-weight:600 !important; }
+  .hc-badge{ display:inline-flex; align-items:center; gap:7px; background:var(--accent-soft) !important; color:var(--accent) !important; padding:7px 13px; border-radius:999px; font-size:12.5px; font-weight:700; }
+  .hc-badge i{ width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); display:inline-block; }
+  .ov-num{ font-weight:800 !important; color:var(--text) !important; letter-spacing:-.045em !important; font-size:clamp(72px,10vw,120px) !important; line-height:.9 !important; }
+  .ov-cap{ color:var(--muted) !important; font-size:15.5px !important; margin-top:6px !important; }
+
+  /* Chart-Glaskarte */
+  .ov-chart{ padding:26px 30px !important; margin-bottom:18px !important; }
+  .ov-chart-head>span:first-child{ color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; font-size:14.5px !important; font-weight:600 !important; }
+  .ov-tot{ color:var(--text) !important; font-weight:800 !important; }
+  .ov-chart .chart{ color:var(--accent) !important; margin-top:18px !important; }
+  .areachart .aline{ stroke:var(--accent) !important; stroke-width:2.6 !important; }
+  .areachart .axis{ stroke:rgba(255,255,255,.14) !important; }
+  .areachart .adot{ fill:var(--accent) !important; }
+  .chart-xlabels,.chart-empty{ color:var(--muted-2) !important; }
+
+  /* Kennzahlen -> Glas-Kacheln im Raster */
+  .ov-metrics{ display:grid !important; grid-template-columns:repeat(5,1fr) !important; gap:12px !important; background:transparent !important; border:none !important; padding:0 !important; box-shadow:none !important; margin-bottom:26px !important; }
+  @media(max-width:760px){ .ov-metrics{ grid-template-columns:repeat(2,1fr) !important; } }
+  .ov-m{ padding:18px 18px !important; border-radius:20px !important; }
+  .ov-mn{ font-weight:800 !important; color:var(--text) !important; letter-spacing:-.03em !important; font-size:clamp(24px,2.4vw,30px) !important; }
+  .ov-ml{ color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; font-size:12.5px !important; margin-top:7px !important; }
+
+  /* Aktivität -> Glas-Reihen */
+  .ov-feedhead>span{ color:var(--muted) !important; text-transform:none !important; letter-spacing:0 !important; font-size:14.5px !important; font-weight:600 !important; }
+  .ov-link{ color:var(--accent) !important; font-weight:700 !important; }
+  #page-overview .list{ display:flex !important; flex-direction:column; gap:10px !important; }
+  #page-overview .item{ background:var(--glass) !important; -webkit-backdrop-filter:blur(20px) saturate(150%) !important; backdrop-filter:blur(20px) saturate(150%) !important; border:1px solid var(--glass-border) !important; border-radius:18px !important; padding:16px 20px !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 14px 34px rgba(0,0,0,.32) !important; }
+  #page-overview .item:hover{ transform:translateY(-1px) !important; background:var(--glass-2) !important; }
+  #page-overview .item .t{ color:var(--text) !important; font-weight:700 !important; }
+  #page-overview .item .m{ color:var(--muted) !important; }
+  #page-overview .pill,#page-overview .pill.stamp{ background:var(--accent-soft) !important; color:var(--accent) !important; border:none !important; border-radius:999px !important; font-weight:700 !important; }
+
+  /* Buttons -> grüne Pille (Akzent) + Glas-Ghost */
+  .btn{ background:var(--accent) !important; color:var(--accent-ink) !important; border-radius:999px !important; font-weight:700 !important; box-shadow:0 8px 24px rgba(47,212,122,.28) !important; }
+  .btn:hover:not(:disabled){ filter:brightness(1.06) !important; box-shadow:0 10px 30px rgba(47,212,122,.36) !important; }
+  .btn.ghost{ background:var(--glass-2) !important; -webkit-backdrop-filter:blur(14px) !important; backdrop-filter:blur(14px) !important; border:1px solid var(--glass-border) !important; color:var(--text) !important; box-shadow:none !important; }
+
+  /* andere Seiten: Glas-Karten + helle Schrift */
+  .form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl,.panelcard,.seg{ background:var(--glass) !important; -webkit-backdrop-filter:blur(24px) saturate(150%) !important; backdrop-filter:blur(24px) saturate(150%) !important; border:1px solid var(--glass-border) !important; border-radius:var(--r) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 20px 50px rgba(0,0,0,.4) !important; }
+  .seg{ border-radius:16px !important; } .seg button{ color:var(--muted) !important; } .seg button.on{ background:var(--glass-2) !important; color:var(--text) !important; border-radius:12px !important; } .seg button.on svg{ stroke:var(--accent) !important; }
+  input,textarea{ background:rgba(255,255,255,.05) !important; border:1px solid var(--glass-border) !important; border-radius:14px !important; color:var(--text) !important; }
+  input::placeholder,textarea::placeholder{ color:var(--muted-2) !important; }
+  input:focus,textarea:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important; }
+  label,.gk,.lead,.typehint,.scanhint{ color:var(--muted) !important; }
+  .ph1,.kn,.cpStat,.cpTitle,.rwName,.tpl .lbl,.modalcard h3,.cm-card h3{ color:var(--text) !important; font-weight:800 !important; }
+  .tpl .sub,.cpBiz{ color:var(--muted) !important; }
+  .tpl .big{ color:var(--accent) !important; -webkit-text-fill-color:var(--accent) !important; }
+  .empty{ color:var(--muted) !important; border-color:var(--glass-border) !important; }
+
+  /* Welcome */
+  #welcome{ background:transparent !important; }
+  .w-hello{ color:var(--text) !important; } .w-hello em{ color:var(--accent) !important; -webkit-text-fill-color:var(--accent) !important; } .w-sub{ color:var(--muted) !important; }
+  .go{ background:var(--accent) !important; color:var(--accent-ink) !important; box-shadow:0 12px 34px rgba(47,212,122,.34) !important; }
+  #wave{ background:radial-gradient(circle at 50% 55%, rgba(47,212,122,.18), transparent 70%) !important; }
+  .scanresult.ok,.cpType{ color:var(--accent) !important; }
+  .rewardCard{ background:var(--accent-soft) !important; border:1px solid var(--accent-line) !important; }
+  .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:var(--accent) !important; stroke:var(--accent) !important; }
+  #toast{ background:var(--text) !important; color:#0a0b0f !important; }
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
@@ -661,23 +760,23 @@
 
     <div class="main">
       <section class="page active" id="page-overview">
-        <div class="ov-eyebrow">Übersicht</div>
-        <div class="ov-hero">
+        <div class="glasscard herocard">
+          <div class="hc-head"><span class="ov-eyebrow">Karten im Umlauf</span><span class="hc-badge"><i></i>live</span></div>
           <div class="ov-num" id="statActive">0</div>
-          <div class="ov-cap">Karten aktuell im Umlauf</div>
+          <div class="ov-cap">Aktive Stempelkarten &amp; Gutscheine</div>
         </div>
 
-        <div class="ov-chart">
+        <div class="glasscard ov-chart">
           <div class="ov-chart-head"><span>Aktivität · letzte 14 Tage</span><span class="ov-tot" id="chartTotal">–</span></div>
           <div id="activityChart" class="chart"><div class="chart-empty">Lädt …</div></div>
         </div>
 
         <div class="ov-metrics">
-          <div class="ov-m"><span class="ov-mn" id="statIssued">0</span><span class="ov-ml">Ausgegeben</span></div>
-          <div class="ov-m"><span class="ov-mn" id="statRedemptions">0</span><span class="ov-ml">Einlösungen</span></div>
-          <div class="ov-m"><span class="ov-mn" id="statRedeemed">0</span><span class="ov-ml">Belohnungen</span></div>
-          <div class="ov-m"><span class="ov-mn" id="statCampaigns">0</span><span class="ov-ml">Aktionen</span></div>
-          <div class="ov-m"><span class="ov-mn" id="statAvg">0</span><span class="ov-ml">Ø / Karte</span></div>
+          <div class="glasscard ov-m"><span class="ov-mn" id="statIssued">0</span><span class="ov-ml">Ausgegeben</span></div>
+          <div class="glasscard ov-m"><span class="ov-mn" id="statRedemptions">0</span><span class="ov-ml">Einlösungen</span></div>
+          <div class="glasscard ov-m"><span class="ov-mn" id="statRedeemed">0</span><span class="ov-ml">Belohnungen</span></div>
+          <div class="glasscard ov-m"><span class="ov-mn" id="statCampaigns">0</span><span class="ov-ml">Aktionen</span></div>
+          <div class="glasscard ov-m"><span class="ov-mn" id="statAvg">0</span><span class="ov-ml">Ø / Karte</span></div>
         </div>
 
         <div class="ov-feedhead"><span>Letzte Aktivität</span><button class="ov-link" id="exportBtn">CSV&nbsp;↓</button></div>
