@@ -257,6 +257,20 @@
   button{ background:var(--accent) !important; color:var(--accent-ink) !important; box-shadow:0 10px 30px rgba(47,212,122,.3) !important; }
   button:hover:not(:disabled){ filter:brightness(1.06) !important; }
 </style>
+<!-- ===== FlowState v9 — Proton Pass exakt: MONOCHROM, kein Grün ===== -->
+<style>
+  :root{ --accent:#ffffff; --accent-ink:#0a0a0b; --glass-border:rgba(255,255,255,.10); }
+  body::before{ background:radial-gradient(58% 42% at 50% -6%, rgba(255,255,255,.07), transparent 72%),
+      radial-gradient(40% 38% at 100% 100%, rgba(255,255,255,.035), transparent 70%) !important; filter:blur(46px) !important; }
+  .pitch h1 span{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+  .kicker::before,.badge .lk{ background:#fff !important; }
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.022)) !important; border:1px solid var(--glass-border) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 34px 74px rgba(0,0,0,.55) !important; }
+  input:focus{ border-color:rgba(255,255,255,.5) !important; box-shadow:0 0 0 3px rgba(255,255,255,.08) !important; }
+  button{ background:linear-gradient(180deg, #ffffff, #e4e4e9) !important; color:#0a0a0b !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 12px 30px rgba(0,0,0,.45) !important; }
+  button:hover:not(:disabled){ filter:brightness(1.03) !important; }
+</style>
 </head>
 <body>
   <aside class="brand">

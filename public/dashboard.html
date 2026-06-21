@@ -729,6 +729,58 @@
   .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:var(--accent) !important; stroke:var(--accent) !important; }
   #toast{ background:var(--text) !important; color:#0a0b0f !important; }
 </style>
+<!-- ===== FlowState v9 — Proton Pass exakt: MONOCHROM, dunkles Glas, glänzend weiß. KEIN Grün. ===== -->
+<style>
+  :root{
+    --bg:#09090b; --text:#f5f5f7; --muted:#9a9aa3; --muted-2:#5e5e67;
+    --accent:#ffffff; --accent-ink:#0a0a0b; --accent-soft:rgba(255,255,255,.10); --accent-line:rgba(255,255,255,.22);
+    --glass-border:rgba(255,255,255,.10);
+  }
+  body{ background:#09090b !important; }
+  /* neutrales Licht von oben (kein Farbschimmer) */
+  body::before{
+    background:
+      radial-gradient(60% 42% at 50% -6%, rgba(255,255,255,.07), transparent 72%),
+      radial-gradient(40% 38% at 100% 102%, rgba(255,255,255,.035), transparent 70%),
+      radial-gradient(36% 34% at 0% 60%, rgba(255,255,255,.025), transparent 70%) !important;
+    filter:blur(44px) !important;
+  }
+  /* Glas: dunkel, mit vertikalem Glanz + heller Oberkante (Proton-Look) */
+  .glasscard,#page-overview .item,.form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl,.panelcard,.seg{
+    background:linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022)) !important;
+    border:1px solid var(--glass-border) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 30px 70px rgba(0,0,0,.55) !important;
+  }
+  .side{ background:rgba(9,9,11,.4) !important; }
+  .nav.active{ background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.14) !important; }
+  .nav.active svg{ stroke:#fff !important; }
+  .wm .dot{ background:#fff !important; box-shadow:none !important; }
+
+  /* Akzent -> WEISS (kein Grün mehr) */
+  .hc-badge{ background:rgba(255,255,255,.10) !important; color:#fff !important; }
+  .hc-badge i{ background:#fff !important; box-shadow:0 0 8px rgba(255,255,255,.55) !important; }
+  .ov-chart .chart{ color:#fff !important; }
+  .areachart .aline{ stroke:#fff !important; } .areachart .adot{ fill:#fff !important; }
+  .areachart .axis{ stroke:rgba(255,255,255,.16) !important; }
+  .ov-link,.scanresult.ok,.cpType{ color:#fff !important; }
+  #page-overview .pill,#page-overview .pill.stamp{ background:rgba(255,255,255,.09) !important; color:#fff !important; }
+  .tpl .big{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+
+  /* glänzend-weiße Pillen-Buttons (Proton „Get Started") */
+  .btn{ background:linear-gradient(180deg, #ffffff, #e4e4e9) !important; color:#0a0a0b !important; border-radius:999px !important; font-weight:700 !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 10px 26px rgba(0,0,0,.45) !important; }
+  .btn:hover:not(:disabled){ filter:brightness(1.03) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 12px 30px rgba(0,0,0,.5) !important; }
+  .btn.ghost{ background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)) !important; color:var(--text) !important; border:1px solid var(--glass-border) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.12) !important; }
+  .go{ background:linear-gradient(180deg, #ffffff, #e4e4e9) !important; color:#0a0a0b !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 14px 34px rgba(0,0,0,.5) !important; }
+  #wave{ background:radial-gradient(circle at 50% 55%, rgba(255,255,255,.12), transparent 70%) !important; }
+  .w-hello em{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+
+  /* Inputs / Reward monochrom */
+  input:focus,textarea:focus{ border-color:rgba(255,255,255,.5) !important; box-shadow:0 0 0 3px rgba(255,255,255,.08) !important; }
+  .seg button.on{ background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)) !important; color:#fff !important; } .seg button.on svg{ stroke:#fff !important; }
+  .rewardCard{ background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important; border:1px solid rgba(255,255,255,.14) !important; }
+  .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:#fff !important; stroke:#fff !important; }
+</style>
 </head>
 <body>
   <div id="loading"><span class="spin"></span> Lädt …</div>
