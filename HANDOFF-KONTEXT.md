@@ -1,6 +1,58 @@
 # 🤝 ÜBERGABE-KONTEXT — FlowState Wallet (für neue Session)
 
-> Stand: 21.06.2026. Dieses Dokument enthält ALLES, um nahtlos weiterzumachen. In einer neuen Session: **„Lies HANDOFF-KONTEXT.md im Projektordner und mach dort weiter."**
+> Älterer Stand: 21.06.2026. **AKTUELLER STAND siehe direkt unten (28.06.2026).** In einer neuen Session: **„Lies HANDOFF-KONTEXT.md im Projektordner und mach dort weiter."**
+
+---
+
+## ⭐ STAND 28.06.2026 (Abend) — GOOGLE WALLET gebaut & live (gated) — zuerst lesen!
+
+**Google-Wallet-Integration ist vollständig gebaut, deployed & live verifiziert.** Apple-Pfad unverändert (kein Regress, live geprüft: `/api/pass?demo=stamp10` → `application/vnd.apple.pkpass`).
+
+**Neuer Flow:** Dashboard-QR zeigt jetzt auf **`/api/card`** (Dispatcher) statt direkt `/api/pass`. Der Dispatcher erkennt das OS per User-Agent: **iPhone → 302 auf Apple-`/api/pass`** (wie immer), **Android → „In Google Wallet"-Landing** (Save-Link), Desktop → Hinweis. Live getestet (alle 3 Pfade ok). Alte gedruckte Apple-QRs (`/api/pass`) laufen weiter.
+
+**Neue Dateien:** `api/_google.mjs` (dependency-frei: RS256-Save-JWT + OAuth2-SA-Token + GenericClass/Object via REST), `lib/googleview.mjs` (GenericObject aus `cardView()` → Apple & Google nie divergent), `lib/mint.mjs` (geteilte Mint-Logik, aus `pass.mjs` herausgezogen — Apple identisch + Drossel greift auf Google-Pfad), `api/card.mjs` (Dispatcher), `lib/walletpush.mjs` (`notifyWallets()` = APNs **und** Google-Patch beim Stempeln; `redeem.mjs` ruft das jetzt). `db/google-wallet.sql` (Spalte `passes.google_object_id`). `GOOGLE-WALLET-SETUP.md` (Klick-Anleitung). Design-Spec + Plan unter `docs/superpowers/`.
+- Hero-Bild = bestehendes Strip-Design des Betriebs direkt (sharp-Resize verworfen — natives Binary sprengt das 250-MB-Function-Limit). Stempelzahl läuft als **eigenes Live-Textfeld** (`3/10`), unabhängig vom Bild.
+- 5 Offline-Tests grün (`scripts/test-mint|google-jwt|googleview|wallet-target.mjs`), alle Module laden sauber.
+
+**❗ ZUM SCHARFSCHALTEN (Android) fehlen NUR 2 User-Aktionen** (alles andere ist fertig & inaktiv ohne Crash):
+1. **Migration anwenden:** `db/google-wallet.sql` im Supabase-SQL-Editor (Projekt „voucher flow") ausführen. (Supabase-JS kann kein DDL.)
+2. **Google-Credentials holen** per `GOOGLE-WALLET-SETUP.md` → 2 Env-Vars in Vercel setzen (`GOOGLE_WALLET_ISSUER_ID`, `GOOGLE_WALLET_SA_JSON_B64`) → neu deployen. ⏳ Issuer-Freigabe dauert ggf. Tage.
+
+Solange Schritt 2 offen ist: Android zeigt freundlich „Google Wallet kommt in Kürze", iPhone unverändert. Danach: Android-Karte + Live-Stempel-Update automatisch (Code steht, `notifyWallets` patcht Google bei jedem Stempel).
+
+**Noch nicht live-getestet:** echter Android-Save + echtes Live-Stempel-Update (brauchen Credentials). Empfehlung: nach Schritt 1+2 einmal auf echtem Android durchspielen.
+
+**Git:** Diese Session NICHT committet (Working-Tree voll mit unfertigen Assets aus Vorsessions) — Deploy kam aus dem Ordner. Google-Wallet-Dateien chirurgisch committen, wenn gewünscht.
+
+---
+
+## ⭐ STAND 28.06.2026 — was zuletzt lief (zuerst lesen!)
+
+**Live & funktioniert** (https://qr-voucher-customer-app.vercel.app). Deploy IMMER aus dem Ordner: `cd <projekt> && npx vercel --prod --yes` und dann **`npx vercel promote <neue-deploy-url> --yes`** — WICHTIG: nach einem früheren `vercel rollback` ist Production „eingefroren", ein neuer `--prod`-Deploy übernimmt die Haupt-Domain NICHT automatisch → immer `promote` hinterher (oder es kommt „already current" = passt auch). Live-Check per `curl …/dashboard.html | grep <marker>`.
+
+**Diese Session umgesetzt (alles live, Dashboard = `public/dashboard.html`, Login = `public/index.html`):**
+- **Design-Richtung final = DUNKEL** (heller v17-Versuch wurde verworfen → per `<style media="not all">` deaktiviert). Übersicht komplett neu nach Referenz `dngynfd.png` umgebaut = Layer **v18** (`.ov2.ov3`-Wrapper): fette „Balance"-Hero-Karte mit Riesen-Zahl (Karten im Umlauf) + 3 integrierte Actions (QR ausgeben · zentraler Scan-FAB · Verwalten) + Hint-Zeile, Gäste-Avatarreihe, KPI-Kacheln, Chart+Aktivität zweispaltig. **Solide Karten (KEIN Glas-Blur — User fand Glas „vibe-coded").** Hero leicht indigo getönt („gesplittet" wie dngynfd).
+- **GO/Welcome**: Welcome bleibt UNSER Design (dunkel, „Herzlich willkommen, {Betrieb}", zentriert). NUR das **GO-Feature** von `unbenannt.png` übernommen: Kapsel mit Doppelpfeil ^^ + weißer „Go"-Kreis unten am Daumen; **echtes Ziehen nach oben** (reine Pointer-Events + requestAnimationFrame + `touch-action:none` → flüssig, kein Flackern; Tap geht auch). Kein Teal mehr.
+- **Echtes Karten-Design** im „Deine Karten"-Strip: zeigt das reale Apple-Wallet-Strip-Bild pro Aktion via `/api/card-image?campaign=<id>` (nur LIVE testbar; lokaler python-Server hat keine API → Fallback-Verlaufskarte). Strip = flex-wrap, `.o3-realcard`.
+- **Aktionen löschen**: 🗑 in „Meine Aktionen" → `campaigns.delete()` (tenant-scoped `.eq('business_id',biz.id)`), FK-Fallback `update active=false`; loadCampaigns filtert `.eq('active',true)`.
+- **Neues App-Icon**: User-generiert (ChatGPT), Quelle `C:\Users\maykt\Downloads\socialmedia\appicon\flowset_wallet_app_icon_final.png` (nur 237px!). Per PIL randlos zugeschnitten → alle Größen `public/icons/icon-{120..512}.png` + `maskable-512.png` ersetzt. **Wenn User 1024px-Export liefert → 512er neu generieren (aktuell leicht weich).**
+- **Splash + Lade-Animation**: `public/index.html` hat `#splash` (verdeckt Login-Blitz bei aktiver Session → leitet weiter; sonst Login). Beide Ladescreens (`#splash` + Dashboard `#loading`) = **freigestelltes „F"** (`/assets/f-mark.png`, weiß/transparent, aus dem Icon extrahiert) + weicher Indigo-Glow-Halo + drehender Lade-Ring (conic-mask) + „FLOWSTATE". Min-Anzeigedauer ~1,4–1,5s.
+- **Verifikation diese Session:** lokaler Server `python -m http.server 8123 --directory public` + MCP-Playwright (390×844 mobil / 1440 desktop), Login `cinnamood-8f6@kunden.flowstate.app` / `Cinna-326M`. Cache-Buster `?v=` nutzen; bei „stale" Service-Worker deregistrieren.
+
+**Rollback (dunkel, vor v18-Umbau) = Vercel dpl `ofzxf0w1z`** (`npx vercel rollback <url> --yes`).
+
+**User-Standing-Regeln:** (1) Nichts Gebautes rückbauen. (2) **Cyber-Security MUSS immer erhalten bleiben & bei jeder Änderung mitgepflegt werden** (tenant-scoping, kein innerHTML mit User-Daten, keine offenen Endpoints). (3) Verbotene Farben: Teal/Cyan, Gold, Grün, Lila-auf-Weiß. (4) Antworten auf Deutsch, Tempo, weniger Rückfragen, immer live deployen + Screenshots.
+
+## 🎯 NÄCHSTE SCHRITTE (Reihenfolge vom User)
+**1) Google Wallet-Integration** ✅ **GEBAUT & LIVE (gated) — siehe Stand 28.06. Abend oben. Nur noch: Migration + Credentials.** (Ursprüngliche Notiz unten als Referenz):
+   - User muss bereitstellen: Google-Cloud-Projekt + Google Wallet API aktivieren + Service-Account (JSON-Key) + Wallet-**Issuer-ID** (Freigabe durch Google, dauert ggf. Tage).
+   - Bauen (dependency-frei, analog `_apns.mjs`/`theme.mjs`): Loyalty/Generic-Class + Object definieren, **RS256-signierter JWT** „Save to Google Wallet"-Link (`https://pay.google.com/gp/v/save/<jwt>`). Karten-Optik aus `lib/theme.mjs` (color_bg/color_text/strip) übernehmen.
+   - Flow: Gast scannt QR → Plattform erkennt Android → „In Google Wallet" Button/Link; **„Auto-Öffnen nach Hinzufügen": ein Tap auf den Save-Link öffnet die Google-Wallet-App** (vollautomatisch ohne Tap ist durch Browser-Security NICHT möglich — so kommunizieren).
+   - Sicherheit mitnehmen: Mint-Drossel/Token-Logik wie bei Apple-Pfad.
+
+**2) Apple App Store** (danach): Capacitor-Hülle um die Web-App (lädt Live-Inhalte von Vercel → Frontend-Änderungen bleiben ohne Store-Update sofort live; nur native Hülle/Listing braucht Review). Apple Developer **hat der User bereits** (99$/J). Store-Assets aus neuem App-Icon ableiten.
+
+**3) Google Play Store** (zuletzt, **Anfang nächster Monat wenn Budget da** — Play-Console 25$ einmalig): damit auch Betriebe mit NUR Android-Geräten die App offiziell installieren können. **Hinweis/Zwischenlösung:** Android-Betriebe können die App schon JETZT als **PWA** nutzen (Chrome → „Zum Startbildschirm hinzufügen") — Play Store ist die offizielle/auffindbare Version, blockiert aber nichts in der Zwischenzeit. Reihenfolge bestätigt vom User: Google Wallet → Apple Store → (nächster Monat) Google Play.
 
 ---
 

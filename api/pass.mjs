@@ -5,18 +5,9 @@
 //   /api/pass?demo=coupon|stamp5|stamp10  -> ohne DB (Test)
 import { PKPass } from 'passkit-generator';
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
-import { themeFor, assetKey, loadAssets, campaignDir } from '../lib/theme.mjs';
-import { campaignMintAllowed } from '../lib/security.mjs';
-import { initialRemaining } from '../lib/cards.mjs';
+import { assetKey, loadAssets } from '../lib/theme.mjs';
 import { cardView } from '../lib/passview.mjs';
-
-// ISO-Datum -> "DD.MM.YYYY" (für Gültig-bis auf dem Pass). Leer bei ungültig.
-function fmtDate(iso) {
-  if (!iso) return '';
-  const d = new Date(iso); if (isNaN(d)) return '';
-  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
+import { mintCard, newSerial } from '../lib/mint.mjs';
 
 const PASS_TYPE_ID = 'pass.com.lila.gutschein';
 const TEAM_ID = '4X4Z2XA87V';
@@ -32,14 +23,6 @@ function certs() {
 function supa() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 }
-// Karten-Code-Präfix aus dem Betrieb (NINI-…, TRAU-…, LILA-… für Lila). Fallback FS.
-function serialPrefix(slug) {
-  return (slug || '').replace(/[^a-z0-9]/gi, '').slice(0, 4).toUpperCase() || 'FS';
-}
-function newSerial(slug) {
-  return serialPrefix(slug) + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
-}
-
 function buildPass({ key, serial, type, data }) {
   // Layout + Strip kommen aus der gemeinsamen Quelle (lib/passview.mjs) — gleiche Logik wie v1.mjs.
   const campLike = { type, config: data.config || {}, stamp_goal: data.stampGoal, reward: data.reward, value: data.value, title: data.title };
@@ -67,23 +50,6 @@ function buildPass({ key, serial, type, data }) {
   return pass.getAsBuffer();
 }
 
-// data-Felder + initialer Restzähler für eine aus DB gemintete Karte (enroll + campaign teilen das).
-function mintFor(camp, theme, authToken) {
-  const type = camp.type;
-  const config = camp.config || {};
-  const remaining = initialRemaining(type, config);
-  let validUntil = config.valid_until ? fmtDate(config.valid_until) : null;
-  if (type === 'coupon' && !validUntil) validUntil = '31.12.2026';   // Bestandsverhalten beibehalten
-  const data = {
-    title: camp.title, authToken, ...theme,
-    stampGoal: camp.stamp_goal, stamps: 0,
-    reward: camp.reward, value: camp.value,
-    remaining, config, validUntil,
-    startMs: null,   // Zeit-Pass: bei Ausgabe noch NICHT gestartet -> leere Karte (0 Kreuze)
-  };
-  return { remaining, data };
-}
-
 export default async function handler(req, res) {
   try {
     const url = new URL(req.url, `https://${req.headers.host}`);
@@ -101,51 +67,14 @@ export default async function handler(req, res) {
       data = type === 'stampcard'
         ? { stampGoal: goal, stamps: 0, reward: 'Dein Lieblingsdrink', title: 'lila. Stempelkarte' }
         : { value: '20%', validUntil: '31.12.2026', title: 'lila. Gutschein' };
-    } else if (enroll) {
+    } else if (enroll || campaign) {
       const db = supa();
-      const { data: camp, error } = await db.from('campaigns').select('*').eq('enroll_token', enroll).single();
-      if (error || !camp) return res.status(404).json({ error: 'Kampagne nicht gefunden' });
-      // Missbrauchsschutz: zu viele Karten in kurzer Zeit für diese Kampagne -> stoppen.
-      if (!(await campaignMintAllowed(db, camp.id))) {
-        res.setHeader('Retry-After', '600');
-        return res.status(429).json({ error: 'Zu viele Anfragen. Bitte später erneut versuchen.' });
+      const m = await mintCard(db, { campaign, enroll });
+      if (!m.ok) {
+        if (m.status === 429) res.setHeader('Retry-After', '600');
+        return res.status(m.status).json({ error: m.error });
       }
-      const { data: biz } = await db.from('businesses').select('name,slug,color_bg,color_text').eq('id', camp.business_id).maybeSingle();
-      const theme = themeFor(biz);
-      type = camp.type;
-      key = campaignDir(biz?.slug, camp.id) || assetKey(type, camp.stamp_goal, theme.prefix);
-      serial = newSerial(biz?.slug);
-      const authToken = crypto.randomBytes(16).toString('hex');
-      const minted = mintFor(camp, theme, authToken);
-      // neuen pass-Datensatz anlegen
-      await db.from('passes').insert({
-        campaign_id: camp.id, business_id: camp.business_id, serial,
-        auth_token: authToken, stamps: 0, status: 'active',
-        ...(minted.remaining != null ? { remaining: minted.remaining } : {}),
-      });
-      data = minted.data;
-    } else if (campaign) {
-      const db = supa();
-      const { data: camp, error } = await db.from('campaigns').select('*').eq('id', campaign).single();
-      if (error || !camp) return res.status(404).json({ error: 'Kampagne nicht gefunden' });
-      // Missbrauchsschutz: zu viele Karten/Gutscheine in kurzer Zeit -> stoppen.
-      if (!(await campaignMintAllowed(db, camp.id))) {
-        res.setHeader('Retry-After', '600');
-        return res.status(429).json({ error: 'Zu viele Anfragen. Bitte später erneut versuchen.' });
-      }
-      const { data: biz } = await db.from('businesses').select('name,slug,color_bg,color_text').eq('id', camp.business_id).maybeSingle();
-      const theme = themeFor(biz);
-      type = camp.type;
-      key = campaignDir(biz?.slug, camp.id) || assetKey(type, camp.stamp_goal, theme.prefix);
-      serial = newSerial(biz?.slug);
-      const authToken = crypto.randomBytes(16).toString('hex');
-      const minted = mintFor(camp, theme, authToken);
-      await db.from('passes').insert({
-        campaign_id: camp.id, business_id: camp.business_id, serial,
-        auth_token: authToken, stamps: 0, status: 'active',
-        ...(minted.remaining != null ? { remaining: minted.remaining } : {}),
-      });
-      data = minted.data;
+      key = m.key; serial = m.serial; type = m.type; data = m.data;
     } else {
       return res.status(400).json({ error: 'Parameter fehlt: demo, campaign oder enroll' });
     }

@@ -4,7 +4,7 @@
 //  - Stempelkarte (stampcard): stamps +1. Bei stamps>=stamp_goal -> 'completed' (Belohnung frei) + reset auf 0.
 // Antwort: { ok, action, message, pass:{serial,stamps,goal,status} }
 import { createClient } from '@supabase/supabase-js';
-import { pushUpdate } from './_apns.mjs';
+import { notifyWallets } from '../lib/walletpush.mjs';
 import { setCors } from '../lib/security.mjs';
 import { withinValidity, mechanicLabel, MECHANICS } from '../lib/cards.mjs';
 
@@ -106,7 +106,7 @@ export default async function handler(req, res) {
       const next = left - 1;
       await touchPass({ remaining: next, ...(next <= 0 ? { status: 'depleted' } : {}) });
       await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'use', note: `${next} übrig` });
-      try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+      try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
       return res.status(200).json({
         ok: true, action: 'use',
         message: next > 0 ? `Einlösung ok — ${next}× übrig.` : 'Letzte Einlösung — Karte aufgebraucht.',
@@ -129,7 +129,7 @@ export default async function handler(req, res) {
       const next = Math.round((left - amt) * 100) / 100;
       await touchPass({ remaining: next, ...(next <= 0 ? { status: 'depleted' } : {}) });
       await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'debit', note: `-${amt} ${unit} (${next} übrig)` });
-      try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+      try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
       return res.status(200).json({
         ok: true, action: 'debit',
         message: `${amt} ${unit} abgebucht — ${next} ${unit} übrig.`,
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
         const dayNum = Math.min(cfg.tage, Math.floor((Date.now() - startMs) / 86400000) + 1);
         await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'entry', note: `Tag ${dayNum}/${cfg.tage}` });
         await touchPass({});   // updated_at anstoßen -> Wallet-Push zeigt aktuellen Tag
-        try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+        try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
         return res.status(200).json({ ok: true, action: 'entry', message: `Zutritt bestätigt — Tag ${dayNum}/${cfg.tage}.`, pass: { serial, status: 'active' } });
       }
       // klassischer Zugang (feste Daten / einmalig)
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
       const repeat = !!cfg.repeat;
       await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'entry', note: camp.title });
       if (!repeat) await touchPass({ status: 'redeemed' });
-      try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+      try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
       return res.status(200).json({
         ok: true, action: 'entry',
         message: repeat ? `Zutritt bestätigt: ${camp.title}` : `Zutritt bestätigt (einmalig): ${camp.title}`,
@@ -180,7 +180,7 @@ export default async function handler(req, res) {
       }
       await db.from('passes').update({ status: 'redeemed', updated_at: new Date().toISOString() }).eq('id', pass.id);
       await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'redeem', note: camp.title });
-      try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+      try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
       return res.status(200).json({
         ok: true, action: 'redeemed',
         message: `Gutschein eingelöst: ${camp.title}`,
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
       await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'redeem', note: 'Belohnung: ' + reward });
       const { error: uErr } = await touch({ stamps: 0 });
       if (uErr) { console.error('redeem reward update:', uErr.message); return res.status(500).json({ ok: false, message: 'Aktion fehlgeschlagen. Bitte erneut versuchen.' }); }
-      try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+      try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
       return res.status(200).json({
         ok: true, action: 'reward_redeemed', reward,
         message: `Belohnung eingelöst: ${reward}. Karte zurückgesetzt.`,

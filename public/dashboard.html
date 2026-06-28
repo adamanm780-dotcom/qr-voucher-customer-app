@@ -746,11 +746,14 @@
     filter:blur(44px) !important;
   }
   /* Glas: dunkel, mit vertikalem Glanz + heller Oberkante (Proton-Look) */
-  .glasscard,#page-overview .item,.form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl,.panelcard,.seg{
+  .glasscard,.list .item,#page-overview .item,.form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl,.panelcard,.seg{
     background:linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022)) !important;
     border:1px solid var(--glass-border) !important;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 30px 70px rgba(0,0,0,.55) !important;
   }
+  /* Listen-Karten (alle Seiten, nicht nur Übersicht) — Text lesbar auf Glas */
+  .list .item .t{ color:var(--text) !important; }
+  .list .item .m{ color:var(--muted) !important; }
   .side{ background:rgba(9,9,11,.4) !important; }
   .nav.active{ background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.14) !important; }
   .nav.active svg{ stroke:#fff !important; }
@@ -763,7 +766,7 @@
   .areachart .aline{ stroke:#fff !important; } .areachart .adot{ fill:#fff !important; }
   .areachart .axis{ stroke:rgba(255,255,255,.16) !important; }
   .ov-link,.scanresult.ok,.cpType{ color:#fff !important; }
-  #page-overview .pill,#page-overview .pill.stamp{ background:rgba(255,255,255,.09) !important; color:#fff !important; }
+  .pill,.pill.stamp{ background:rgba(255,255,255,.09) !important; color:#fff !important; border:1px solid var(--glass-border) !important; }
   .tpl .big{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
 
   /* glänzend-weiße Pillen-Buttons (Proton „Get Started") */
@@ -781,16 +784,896 @@
   .rewardCard{ background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important; border:1px solid rgba(255,255,255,.14) !important; }
   .rewardCard .rwLbl,.rewardCard .rwIcon svg{ color:#fff !important; stroke:#fff !important; }
 </style>
+
+<!-- ===== v11 — GLAS-SYSTEM (Proton Pass): atmosphärischer Hintergrund + frosted glass mit Tiefe, Glossy-Chips, Material-Hierarchie ===== -->
+<style>
+  :root{
+    --r-card:28px; --r-tile:24px; --r-row:20px;
+    --edge:rgba(255,255,255,.13);
+    --sh:0 34px 80px rgba(0,0,0,.55);
+  }
+  /* ===== ATMOSPHÄRE — reicher Hintergrund mit Lichtstimmung (KEIN totes Schwarz) ===== */
+  body{ background:#0a0a0e !important; }
+  body::before{
+    content:"" !important; position:fixed !important; inset:-18% !important; z-index:0 !important; pointer-events:none !important;
+    background:
+      radial-gradient(46% 40% at 16% 6%, rgba(186,200,224,.20), transparent 62%),
+      radial-gradient(44% 38% at 90% -2%, rgba(150,162,190,.16), transparent 60%),
+      radial-gradient(58% 52% at 78% 110%, rgba(120,136,172,.18), transparent 64%),
+      radial-gradient(42% 42% at -4% 72%, rgba(160,172,198,.12), transparent 66%) !important;
+    filter:blur(64px) saturate(118%) !important;
+  }
+  /* feines Raster für Tiefe (Proton-Tech-Feel) — sehr subtil, weich ausmaskiert */
+  body::after{
+    content:"" !important; position:fixed !important; inset:0 !important; z-index:0 !important; pointer-events:none !important;
+    background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px) !important;
+    background-size:56px 56px !important;
+    -webkit-mask-image:radial-gradient(82% 72% at 50% 26%,#000,transparent 86%) !important;
+    mask-image:radial-gradient(82% 72% at 50% 26%,#000,transparent 86%) !important;
+  }
+  #app,#welcome,.main,.side{ position:relative; z-index:1; }
+
+  /* ===== GLAS-BASIS — frosted, mit Glanzkante + Tiefe (zeigt den Hintergrund durch) ===== */
+  .glasscard,.ov-chart,.ov-m,.form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl,.panelcard{
+    background:linear-gradient(180deg, rgba(255,255,255,.085) 0%, rgba(255,255,255,.035) 100%) !important;
+    -webkit-backdrop-filter:blur(34px) saturate(180%) !important; backdrop-filter:blur(34px) saturate(180%) !important;
+    border:1px solid var(--edge) !important; border-radius:var(--r-card) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(255,255,255,.03), var(--sh) !important;
+  }
+
+  /* ---- HERO: hellstes, dickstes Glas + Riesen-Zahl (Nina) ---- */
+  .glasscard.herocard{
+    background:linear-gradient(180deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.04) 100%) !important;
+    border-radius:32px !important; padding:36px 38px 32px !important; position:relative; overflow:hidden;
+  }
+  .glasscard.herocard::after{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(130% 90% at 85% -12%, rgba(255,255,255,.10), transparent 58%); }
+  .ov-num{ font-size:clamp(80px,11vw,136px) !important; font-weight:800 !important; line-height:.88 !important;
+    letter-spacing:-.05em !important; color:#fff !important; font-variant-numeric:tabular-nums; margin:6px 0 6px !important;
+    text-shadow:0 2px 30px rgba(0,0,0,.4); }
+  .ov-cap{ color:var(--muted) !important; font-size:14px !important; }
+  .ov-eyebrow{ color:var(--muted) !important; font-size:12.5px !important; }
+  /* „live" — glänzender Glas-Chip */
+  .hc-badge{ background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.05)) !important;
+    -webkit-backdrop-filter:blur(12px) !important; backdrop-filter:blur(12px) !important;
+    border:1px solid rgba(255,255,255,.18) !important; color:#fff !important; border-radius:999px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35) !important; padding:7px 13px !important; font-size:12px !important; font-weight:600 !important; }
+  .hc-badge i{ background:#fff !important; box-shadow:0 0 9px rgba(255,255,255,.75) !important; }
+
+  .ov-chart{ border-radius:var(--r-card) !important; padding:26px 28px !important; }
+  .ov-tot{ font-weight:800 !important; color:#fff !important; }
+  .ov-m{ border-radius:var(--r-tile) !important; padding:22px 22px 20px !important; }
+  .ov-mn{ font-weight:800 !important; letter-spacing:-.04em !important; color:#fff !important; }
+  .ov-ml{ color:var(--muted) !important; }
+
+  /* ---- LISTEN-REIHEN: leichteres, dünneres Glas (Hierarchie) + Glossy-3D-Icon-Chip ---- */
+  .list .item{
+    background:rgba(255,255,255,.04) !important;
+    -webkit-backdrop-filter:blur(18px) saturate(160%) !important; backdrop-filter:blur(18px) saturate(160%) !important;
+    border:1px solid rgba(255,255,255,.08) !important; border-radius:var(--r-row) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07) !important;
+    padding:13px 15px !important; gap:14px !important; align-items:center !important;
+  }
+  .list .item:hover{ background:rgba(255,255,255,.07) !important; border-color:rgba(255,255,255,.13) !important; transform:none !important; }
+  .ico-chip{ flex:0 0 auto; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; color:#fff;
+    background:radial-gradient(120% 120% at 30% 22%, rgba(255,255,255,.32) 0%, rgba(255,255,255,.07) 46%, rgba(255,255,255,.02) 100%);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.45), inset 0 -3px 8px rgba(0,0,0,.45), 0 8px 18px rgba(0,0,0,.5); }
+  .ico-chip svg{ width:20px; height:20px; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45)); }
+  /* Pille als frosted Glas-Chip */
+  .pill,.pill.stamp{ background:rgba(255,255,255,.10) !important; color:#ececf2 !important;
+    border:1px solid rgba(255,255,255,.15) !important; border-radius:999px !important; padding:5px 11px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18) !important; }
+
+  /* ---- Vorlagen / Toggle ---- */
+  .tpl{ border-radius:var(--r-tile) !important; }
+  .tpl:hover{ background:linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.05)) !important; border-color:rgba(255,255,255,.2) !important; transform:translateY(-3px) !important; }
+  .seg{ background:rgba(255,255,255,.05) !important; -webkit-backdrop-filter:blur(20px) !important; backdrop-filter:blur(20px) !important;
+    border:1px solid var(--edge) !important; border-radius:16px !important; }
+  .seg button.on{ background:linear-gradient(180deg,#ffffff,#e4e4e9) !important; color:#0a0a0b !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 4px 12px rgba(0,0,0,.4) !important; border-radius:12px !important; }
+  .seg button.on svg{ stroke:#0a0a0b !important; }
+
+  /* ---- Sidebar: Glas, aktiver Tab = glänzender Glas-Chip ---- */
+  .side{ background:rgba(11,11,15,.45) !important; -webkit-backdrop-filter:blur(26px) saturate(150%) !important; backdrop-filter:blur(26px) saturate(150%) !important;
+    border-right:1px solid rgba(255,255,255,.07) !important; }
+  .nav.active{ background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)) !important;
+    border:1px solid rgba(255,255,255,.12) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.2) !important; border-radius:12px !important; }
+  .avatar{ border-radius:13px !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 6px 14px rgba(0,0,0,.45) !important; }
+
+  @media(max-width:760px){
+    .glasscard.herocard{ padding:26px 22px !important; border-radius:26px !important; }
+    .ov-num{ font-size:clamp(64px,22vw,104px) !important; }
+    .ov-chart{ padding:20px 18px !important; }
+  }
+</style>
+
+<!-- ===== v12 — EDITORIAL PREMIUM OVERVIEW (ground-up neu): Typo-Held, bunte Pass-Karten als Bild, Material-Mix ===== -->
+<style>
+  /* TOPLINE */
+  #page-overview .ov-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:28px; }
+  .ov-kick{ font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:9px; }
+  .ov-title{ font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(26px,3vw,40px); font-weight:800; letter-spacing:-.035em; color:#fff; line-height:1; }
+
+  /* HERO-STAGE — Typografie als Held (kein Foto), cinematisch, dunkle Bühne (Material-Kontrast zum Glas) */
+  .stage{ position:relative; overflow:hidden; border-radius:32px; padding:42px 42px 38px; margin-bottom:36px;
+    background:
+      radial-gradient(120% 130% at 10% -15%, rgba(255,255,255,.12), transparent 46%),
+      radial-gradient(95% 130% at 102% 125%, rgba(150,172,212,.20), transparent 55%),
+      linear-gradient(180deg,#18181d 0%,#0d0d11 100%);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 44px 96px rgba(0,0,0,.6); }
+  .stage::after{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.55;
+    background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-size:42px 42px;
+    -webkit-mask-image:radial-gradient(72% 90% at 82% -5%,#000,transparent 70%); mask-image:radial-gradient(72% 90% at 82% -5%,#000,transparent 70%); }
+  .stage-eyebrow{ position:relative; z-index:1; display:block; font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .stage .ov-num{ position:relative; z-index:1; }
+  .stage .ov-cap{ position:relative; z-index:1; color:#b9b9c2 !important; }
+
+  /* SECTION-HEAD */
+  .sec-head{ display:flex; align-items:baseline; justify-content:space-between; margin:0 2px 16px; }
+  .sec-head>span{ font-size:14px; font-weight:700; color:#fff; letter-spacing:-.01em; }
+  .sec-head .ov-link{ background:none !important; border:none !important; color:var(--muted) !important; font:inherit; font-size:12.5px; cursor:pointer; padding:0 !important; }
+  .sec-head .ov-link:hover{ color:#fff !important; }
+
+  /* PASS-STRIP — bunte Wallet-Karten als „Bild" der Übersicht */
+  .passstrip{ display:flex; gap:16px; overflow-x:auto; padding:4px 2px 20px; margin-bottom:30px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+  .passstrip::-webkit-scrollbar{ height:0; }
+  .pass-empty{ color:var(--muted); font-size:13px; padding:28px 4px; }
+  .passcard{ scroll-snap-align:start; flex:0 0 auto; width:264px; min-height:166px; text-align:left; cursor:pointer; font-family:inherit;
+    border:none; border-radius:22px; padding:18px; position:relative; overflow:hidden; color:#fff; background:var(--pg); display:flex; flex-direction:column;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 18px 42px rgba(0,0,0,.52); transition:transform .18s ease, box-shadow .25s ease; }
+  .passcard:hover{ transform:translateY(-5px); box-shadow:inset 0 1px 0 rgba(255,255,255,.26), 0 28px 60px rgba(0,0,0,.62); }
+  .pc-sheen{ position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+    background:radial-gradient(120% 85% at 86% -12%, rgba(255,255,255,.24), transparent 55%); }
+  .pc-top{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .pc-brand{ width:36px; height:36px; border-radius:11px; overflow:hidden; background:rgba(255,255,255,.18); display:grid; place-items:center; flex:0 0 auto; box-shadow:inset 0 1px 0 rgba(255,255,255,.34); }
+  .pc-brand img{ width:100%; height:100%; object-fit:cover; }
+  .pc-init{ font-weight:800; font-size:15px; color:#fff; }
+  .pc-type{ font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:rgba(255,255,255,.85);
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.2); padding:5px 9px; border-radius:999px; }
+  .pc-title{ position:relative; z-index:1; margin-top:auto; padding-top:26px; font-size:21px; font-weight:800; letter-spacing:-.025em; line-height:1.08; }
+  .pc-foot{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px; }
+  .pc-meta{ font-size:11.5px; color:rgba(255,255,255,.74); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pc-qr{ font-size:11px; font-weight:800; color:#0a0a0b; background:linear-gradient(180deg,#fff,#e4e4e9); padding:5px 11px; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,.3); white-space:nowrap; }
+  .pc-add{ background:rgba(255,255,255,.04) !important; border:1px dashed rgba(255,255,255,.2) !important; align-items:center; justify-content:center; color:var(--muted); }
+  .pc-plus{ font-size:32px; font-weight:200; line-height:1; }
+  .pc-addlbl{ font-size:12.5px; margin-top:8px; }
+
+  /* STAT-Reihe (Glas, mit Trennlinien — Profil-Stil 521/345/566) */
+  .statrow{ display:grid; grid-template-columns:repeat(5,1fr); margin-bottom:36px; border:1px solid var(--edge); border-radius:22px; overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.022)); -webkit-backdrop-filter:blur(30px) saturate(160%); backdrop-filter:blur(30px) saturate(160%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.13), 0 22px 50px rgba(0,0,0,.42); }
+  .stat-cell{ padding:22px 18px; }
+  .stat-cell+.stat-cell{ border-left:1px solid rgba(255,255,255,.07); }
+  .stat-cell .ov-mn{ display:block; font-size:clamp(26px,2.4vw,32px); font-weight:800; letter-spacing:-.04em; color:#fff; line-height:1; font-variant-numeric:tabular-nums; }
+  .stat-cell .ov-ml{ display:block; margin-top:9px; font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); }
+
+  .ov-feedhead{ display:flex; align-items:baseline; justify-content:space-between; margin:0 2px 14px; }
+  .ov-feedhead>span{ font-size:14px; font-weight:700; color:#fff; }
+  .ov-feedhead .ov-link{ background:none !important; border:none !important; color:var(--muted) !important; font-size:12.5px; cursor:pointer; padding:0 !important; }
+  .ov-feedhead .ov-link:hover{ color:#fff !important; }
+
+  @media(max-width:760px){
+    .stage{ padding:30px 24px; border-radius:26px; margin-bottom:28px; }
+    .statrow{ grid-template-columns:repeat(2,1fr); }
+    .stat-cell:nth-child(odd){ border-left:none; }
+    .stat-cell{ border-top:1px solid rgba(255,255,255,.07); }
+    .stat-cell:nth-child(1),.stat-cell:nth-child(2){ border-top:none; }
+    .passcard{ width:230px; }
+  }
+</style>
+
+<!-- ===== v13 — Bugfixes + echte Pass-Visuals + schwebende Glas-Bottom-Nav (Referenz-Signature) ===== -->
+<style>
+  /* QR-Modal GARANTIERT zentriert über allem (Bug: war position:relative -> rutschte ans Seitenende) */
+  #modal,.cm-overlay{ position:fixed !important; inset:0 !important; z-index:1000 !important; }
+  #modal.show,.cm-overlay.show{ display:flex !important; align-items:center !important; justify-content:center !important; }
+  #toast{ position:fixed !important; z-index:1001 !important; }
+  .modalcard,.cm-card{ max-height:88vh; overflow:auto; }
+  body.modal-open{ overflow:hidden; }
+
+  /* ECHTE Pass-Karten: größer + typ-spezifische Visuals (Stempel-Punkte, Wert, Guthaben …) */
+  .passcard{ width:300px !important; min-height:190px !important; padding:20px !important; justify-content:flex-start !important; }
+  .passcard .pc-title{ margin-top:0 !important; padding-top:15px !important; font-size:18px !important; }
+  .pc-visual{ position:relative; z-index:1; margin-top:14px; }
+  .pc-big{ font-size:42px; font-weight:800; letter-spacing:-.04em; line-height:1; color:#fff; }
+  .pc-big-sm{ font-size:26px; }
+  .pc-unit{ font-size:20px; font-weight:700; opacity:.82; margin-left:3px; }
+  .pc-stamps{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pc-stamps i{ width:19px; height:19px; border-radius:50%; border:1.5px solid rgba(255,255,255,.6); background:rgba(255,255,255,.10); box-shadow:inset 0 1px 0 rgba(255,255,255,.3); }
+  .passcard .pc-foot{ margin-top:auto !important; }
+  @media(max-width:760px){ .passcard{ width:264px !important; } }
+
+  /* ===== Schwebende Glas-Bottom-Nav ===== */
+  .dock{ display:none; }
+  @media(max-width:760px){
+    .dock{ display:flex; position:fixed; left:50%; transform:translateX(-50%);
+      bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:95; gap:6px; padding:8px;
+      border-radius:999px; background:rgba(18,18,24,.62);
+      -webkit-backdrop-filter:blur(30px) saturate(170%); backdrop-filter:blur(30px) saturate(170%);
+      border:1px solid rgba(255,255,255,.14); box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 22px 54px rgba(0,0,0,.62); }
+    .dock-btn{ width:52px; height:52px; border:none; background:transparent; border-radius:50%;
+      color:rgba(255,255,255,.6); display:grid; place-items:center; cursor:pointer; transition:color .15s, background .15s, box-shadow .2s; }
+    .dock-btn svg{ width:22px; height:22px; }
+    .dock-btn.on{ color:#fff; background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.32), 0 0 20px rgba(255,255,255,.16); }
+    /* Scanner = leuchtender weißer Haupt-Button (wie der zentrale Action-Knopf in den Referenzen) */
+    .dock-scan{ color:#0a0a0b; background:linear-gradient(180deg,#ffffff,#dcdce2); box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 8px 22px rgba(0,0,0,.55); }
+    .dock-scan.on{ color:#0a0a0b; background:linear-gradient(180deg,#ffffff,#dcdce2); }
+    .main{ padding-bottom:116px !important; }
+    .side .nav[data-page]{ display:none !important; }  /* Top-Pills weg, Dock übernimmt */
+  }
+</style>
+
+<!-- ===== v14 — GO-Swipe, Desktop-Komposition, Glas-Feinschliff, Overflow-Guard ===== -->
+<style>
+  /* GO per Swipe-up (Travel-Referenz) */
+  .w-enter{ display:flex; flex-direction:column; align-items:center; gap:16px; transition:transform .25s cubic-bezier(.2,.7,.2,1); }
+  .w-chev{ color:rgba(255,255,255,.6); display:grid; place-items:center; animation:chevB 1.9s ease-in-out infinite; }
+  .w-chev svg{ width:30px; height:30px; }
+  @keyframes chevB{ 0%,100%{ transform:translateY(5px); opacity:.45 } 50%{ transform:translateY(-5px); opacity:1 } }
+  .w-swipe{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.42); }
+
+  /* Glas-Feinschliff: weicher, luminöser, mehr Frost (näher an den Referenzen) */
+  .glasscard,.ov-chart,.stat-cell,.form,.scanwrap,.cardPreview,.modalcard,.cm-card,.tpl{
+    -webkit-backdrop-filter:blur(40px) saturate(190%) !important; backdrop-filter:blur(40px) saturate(190%) !important;
+  }
+  .statrow{ -webkit-backdrop-filter:blur(40px) saturate(190%) !important; backdrop-filter:blur(40px) saturate(190%) !important; }
+
+  /* ===== DESKTOP-KOMPOSITION — füllt den Raum, nicht mehr schmale Säule ===== */
+  .ov-lower{ display:block; }
+  @media(min-width:961px){
+    .main{ max-width:1180px !important; padding:46px 56px 84px !important; }
+    .stage{ padding:52px 54px 46px !important; border-radius:34px !important; }
+    .stage .ov-num{ font-size:clamp(100px,9vw,156px) !important; }
+    .ov-title{ font-size:clamp(32px,2.6vw,44px); }
+    .passcard{ width:324px !important; min-height:202px !important; }
+    .pc-big{ font-size:46px; }
+    /* unterer Bereich 2-spaltig: Chart breit | Aktivität schmal */
+    .ov-lower{ display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; }
+    .ov-feed .list{ display:flex; flex-direction:column; gap:10px; }
+    .ov-feed .item{ padding:12px 14px !important; }
+  }
+  @media(min-width:1280px){ .main{ max-width:1280px !important; } }
+
+  /* ===== OVERFLOW-GUARD (mobil): keine horizontale Seiten-Scroll mehr ===== */
+  @media(max-width:760px){
+    html,body{ overflow-x:hidden !important; max-width:100% !important; }
+    .main,.ov-lower,.statrow,.stage,.ov-top{ min-width:0 !important; max-width:100% !important; }
+    /* Pass-Strip = bewusste Karten-Galerie, zeigt Peek der nächsten Karte */
+    .passstrip{ scroll-padding-left:16px; padding-left:2px; }
+  }
+</style>
+
+<!-- ===== v15 — AURORA Übersicht (gewähltes Design, in echte App integriert) ===== -->
+<style>
+  /* globaler atmosphärischer Aurora-Hintergrund (ersetzt alte Atmosphäre) */
+  body::before, body::after{ display:none !important; }
+  body{ background:#080a10 !important; }
+  .aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .aurora::before,.aurora::after{content:"";position:absolute;border-radius:50%;filter:blur(80px);opacity:.6}
+  .aurora::before{width:780px;height:780px;left:-180px;top:-220px;background:radial-gradient(circle at 30% 30%, rgba(150,170,210,.55), rgba(90,110,170,.18) 45%, transparent 70%);animation:auroraDrift1 26s ease-in-out infinite}
+  .aurora::after{width:680px;height:680px;right:-160px;top:120px;background:radial-gradient(circle at 60% 40%, rgba(120,135,180,.42), rgba(70,90,150,.14) 50%, transparent 72%);animation:auroraDrift2 32s ease-in-out infinite}
+  .aurora-3{position:absolute;width:620px;height:620px;left:42%;bottom:-280px;border-radius:50%;filter:blur(90px);opacity:.45;background:radial-gradient(circle, rgba(170,185,220,.4), rgba(80,95,150,.12) 55%, transparent 75%);animation:auroraDrift1 38s ease-in-out infinite reverse}
+  .grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 20%,#000 30%,transparent 85%);mask-image:radial-gradient(ellipse 90% 70% at 50% 20%,#000 30%,transparent 85%)}
+  @keyframes auroraDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.08)}}
+  @keyframes auroraDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,30px) scale(1.1)}}
+  #app,#welcome,#wave,.main,.side{ position:relative; z-index:1; }
+
+  /* ===== OV2 — Übersicht-Inhalt (gescopt, isoliert von alten Layern) ===== */
+  .ov2{ --ink:#f4f6fb; --ink-soft:rgba(244,246,251,.66); --ink-faint:rgba(244,246,251,.42);
+    --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.14); --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.07);
+    --rxl:34px; --rlg:28px; --sh-deep:0 40px 90px -40px rgba(0,0,0,.85); --sh-card:0 30px 60px -34px rgba(0,0,0,.9);
+    color:var(--ink); min-width:0; max-width:100%; }
+  .ov2 .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .ov2 .greeting{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:12px 0 6px}
+  .ov2 .greeting span{background:linear-gradient(110deg,#fff 30%,#aab6e0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .ov2 .greeting-sub{color:var(--ink-soft);font-size:15px;max-width:46ch;line-height:1.5}
+  .ov2 .ovh{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:8px}
+  .ov2 .live-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);color:var(--ink);white-space:nowrap}
+  .ov2 .live-pill .pulse{width:8px;height:8px;border-radius:50%;background:#eef1ff;box-shadow:0 0 0 0 rgba(205,214,255,.6);animation:ovPulse 2s infinite}
+  @keyframes ovPulse{0%{box-shadow:0 0 0 0 rgba(205,214,255,.55)}70%{box-shadow:0 0 0 9px rgba(205,214,255,0)}100%{box-shadow:0 0 0 0 rgba(205,214,255,0)}}
+  .ov2 .sec-head{display:flex;align-items:center;justify-content:space-between;margin:34px 0 16px;gap:16px}
+  .ov2 .sec-title{font-size:13px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--ink-soft)}
+  .ov2 .sec-title b{color:var(--ink);font-weight:800;letter-spacing:-.01em;font-size:18px;text-transform:none;display:block;margin-top:4px}
+  .ov2 .sec-link{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-faint);background:none;border:none;cursor:pointer}
+  .ov2 .sec-link:hover{color:var(--ink)} .ov2 .sec-link svg{width:14px;height:14px}
+  .ov2 .stories{display:flex;gap:18px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+  .ov2 .stories::-webkit-scrollbar{display:none}
+  .ov2 .story{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 auto;width:66px}
+  .ov2 .story-ring{width:62px;height:62px;border-radius:50%;padding:2.5px;position:relative;background:conic-gradient(from 140deg,#cdd6ff,#6f86c9,#aab6e0,#cdd6ff)}
+  .ov2 .story-ring.muted{background:var(--line-strong)}
+  .ov2 .story-av{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px;color:#fff;border:3px solid #080a10}
+  .ov2 .story-online{position:absolute;bottom:3px;right:3px;width:13px;height:13px;border-radius:50%;background:linear-gradient(150deg,#fff,#cdd6ff);border:2.5px solid #080a10;box-shadow:0 0 9px rgba(205,214,255,.85)}
+  .ov2 .story-name{font-size:11px;color:var(--ink-soft);max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ov2 .hero-grid{display:grid;grid-template-columns:1fr;gap:22px;align-items:stretch}
+  .ov2 .hero-rail{display:flex;flex-direction:column;gap:18px;min-width:0}
+  .ov2 .rail-card{border-radius:var(--rlg);border:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--sh-card),inset 0 1px 0 rgba(255,255,255,.07);padding:22px}
+  .ov2 .rc-eyebrow{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .ov2 .rail-metric{display:flex;align-items:baseline;gap:12px;margin-top:12px}
+  .ov2 .rail-metric b{font-size:52px;font-weight:800;letter-spacing:-.035em;line-height:.9;background:linear-gradient(120deg,#fff,#aeb9e2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .ov2 .rail-metric span{font-size:13px;color:var(--ink-soft);line-height:1.3;max-width:16ch}
+  .ov2 .rail-mini{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .ov2 .rm-cell{padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .ov2 .rm-cell b{display:block;font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1}
+  .ov2 .rm-cell span{display:block;margin-top:6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .ov2 .quickscan{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .ov2 .qs-t{font-size:15px;font-weight:700;margin-top:8px;letter-spacing:-.01em}
+  .ov2 .featured{position:relative;border-radius:var(--rxl);overflow:hidden;min-height:300px;height:100%;padding:28px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:var(--sh-deep);border:1px solid var(--line-strong);background:radial-gradient(120% 120% at 80% 0%, rgba(120,90,160,.55), transparent 55%),linear-gradient(150deg,#2a2150,#171430 55%,#0f1020)}
+  .ov2 .featured::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%, rgba(8,9,16,.78));pointer-events:none}
+  .ov2 .featured-deco{position:absolute;inset:0;opacity:.5;pointer-events:none;background:radial-gradient(40% 60% at 18% 18%, rgba(200,180,255,.4), transparent 60%),radial-gradient(50% 70% at 95% 30%, rgba(150,170,230,.3), transparent 60%)}
+  .ov2 .featured-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .ov2 .feat-logo{display:flex;align-items:center;gap:12px}
+  .ov2 .feat-logo .lm{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);font-weight:800;font-size:17px}
+  .ov2 .feat-logo .lm img{width:100%;height:100%;object-fit:cover}
+  .ov2 .feat-logo .lt{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600}
+  .ov2 .featured-body{position:relative;z-index:2}
+  .ov2 .feat-type{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:10px}
+  .ov2 .feat-title{font-size:clamp(26px,4.5vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+  .ov2 .feat-reward{color:rgba(255,255,255,.78);font-size:14px;margin-bottom:20px}
+  .ov2 .stamps{display:flex;gap:14px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+  .ov2 .stamp{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.5);font-weight:700}
+  .ov2 .stamp.filled{background:linear-gradient(150deg,#fff,#d6deff);color:#1a1530;border-color:transparent;box-shadow:0 6px 16px -6px rgba(255,255,255,.5),inset 0 1px 0 #fff}
+  .ov2 .stamp.filled svg{width:20px;height:20px}
+  .ov2 .feat-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .ov2 .feat-meta{display:flex;align-items:center;gap:18px;color:rgba(255,255,255,.7);font-size:13px}
+  .ov2 .feat-meta .fm{display:flex;align-items:center;gap:7px} .ov2 .feat-meta svg{width:15px;height:15px} .ov2 .feat-meta b{font-weight:800;color:#fff}
+  .ov2 .qr-pill{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:999px;font-weight:700;font-size:13.5px;color:#0a0d14;background:linear-gradient(150deg,#fff,#e2e8fb);box-shadow:0 10px 26px -10px rgba(255,255,255,.55),inset 0 1px 0 #fff;border:none;cursor:pointer;transition:transform .18s}
+  .ov2 .qr-pill:hover{transform:translateY(-2px)} .ov2 .qr-pill svg{width:16px;height:16px}
+  .ov2 .strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,1fr);gap:18px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x mandatory;margin-top:18px}
+  .ov2 .strip::-webkit-scrollbar{height:6px} .ov2 .strip::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px}
+  .ov2 .pass{position:relative;border-radius:var(--rlg);overflow:hidden;min-height:218px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;scroll-snap-align:start;border:1px solid var(--line-strong);box-shadow:var(--sh-card);min-width:0;cursor:pointer;text-align:left;color:#fff;font-family:inherit}
+  .ov2 .pass::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.1),transparent 40%);pointer-events:none}
+  .ov2 .pass-a{background:linear-gradient(155deg,#3a2a5e,#211a3a 60%,#14112a)}
+  .ov2 .pass-b{background:linear-gradient(155deg,#1f3a52,#15293f 60%,#0f1a2c)}
+  .ov2 .pass-c{background:linear-gradient(155deg,#52324a,#3a2236 60%,#241726)}
+  .ov2 .pass-d{background:linear-gradient(155deg,#3a3550,#262238 60%,#181626)}
+  .ov2 .pass-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+  .ov2 .pass-logo .pm{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);font-weight:800;font-size:13px}
+  .ov2 .pass-logo .pm img{width:100%;height:100%;object-fit:cover}
+  .ov2 .type-chip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.92)}
+  .ov2 .pass-mid{position:relative;z-index:2}
+  .ov2 .pass-name{font-size:15px;font-weight:600;letter-spacing:-.01em;margin-bottom:14px;color:rgba(255,255,255,.95)}
+  .ov2 .pass-value{font-size:42px;font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff}
+  .ov2 .pass-value small{font-size:20px;font-weight:700;color:rgba(255,255,255,.75)}
+  .ov2 .mini-stamps{display:flex;gap:7px;align-items:center;margin-top:6px}
+  .ov2 .mini-stamps i{width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,.32)}
+  .ov2 .mini-stamps i.f{background:#fff;border-color:#fff}
+  .ov2 .pass-foot{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+  .ov2 .pass-meta{font-size:11.5px;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ov2 .qr-mini{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;font-weight:700;font-size:12px;color:#0a0d14;background:linear-gradient(150deg,#fff,#e2e8fb);box-shadow:inset 0 1px 0 #fff;border:none;cursor:pointer}
+  .ov2 .qr-mini svg{width:14px;height:14px}
+  .ov2 .stat-card{border-radius:var(--rlg);border:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--sh-card),inset 0 1px 0 rgba(255,255,255,.08);padding:26px 8px;display:grid;grid-template-columns:repeat(5,1fr)}
+  .ov2 .stat-card .stat{padding:4px 18px !important;text-align:center;position:relative;background:none !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;overflow:visible !important}
+  .ov2 .stat-card .stat::after{display:none !important}
+  .ov2 .stat-card .stat::before{display:none !important}
+  .ov2 .stat-card .stat+.stat::before{display:block !important;content:"" !important;position:absolute;left:0;top:12%;height:76%;width:1px;background:var(--line)}
+  .ov2 .stat-card .stat b{display:block;font-size:clamp(26px,2.4vw,34px);font-weight:800;letter-spacing:-.03em;line-height:1;color:#fff;-webkit-text-fill-color:#fff}
+  .ov2 .stat-card .stat span{display:block;margin-top:9px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  .ov2 .two-col{display:grid;grid-template-columns:1fr;gap:22px;margin-top:24px}
+  .ov2 .panel{border-radius:var(--rlg);border:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:var(--sh-card),inset 0 1px 0 rgba(255,255,255,.06);padding:24px}
+  .ov2 .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .ov2 .panel-head h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .ov2 .panel-head .sum{font-size:12px;color:var(--ink-faint)} .ov2 .panel-head .sum b{color:var(--ink);font-weight:700}
+  .ov2 .panel-head .ov-link{background:none !important;border:none !important;color:var(--ink-faint) !important;font-size:12.5px;cursor:pointer;padding:0 !important}
+  .ov2 .feed{display:flex;flex-direction:column;gap:6px}
+  .ov2 .feed .row{display:flex;align-items:center;gap:14px;padding:13px 12px;border-radius:16px;transition:background .2s;grid-template-columns:none}
+  .ov2 .feed .row:hover{background:var(--glass)}
+  .ov2 .row-ic{width:44px;height:44px;flex:0 0 44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid var(--line-strong);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);color:var(--ink)}
+  .ov2 .row-ic svg{width:20px;height:20px}
+  .ov2 .row-main{flex:1 1 auto;min-width:0}
+  .ov2 .row-main .rt{font-size:14px;font-weight:600;letter-spacing:-.005em}
+  .ov2 .row-main .rs{font-size:12px;color:var(--ink-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ov2 .row-chip{flex:0 0 auto;font-size:10.5px;letter-spacing:.04em;font-weight:700;padding:6px 11px;border-radius:999px;background:var(--glass-2);border:1px solid var(--line);color:var(--ink-soft)}
+  .ov2 .empty{color:var(--ink-faint);font-size:13.5px;padding:24px;text-align:center}
+  .ov2 .pass-empty{color:var(--ink-faint);font-size:13px;padding:28px 4px}
+  .ov2 .chart-wrap .chart{margin-top:0}
+  @media(min-width:1100px){
+    .ov2 .hero-grid{grid-template-columns:1.55fr .9fr}
+    .ov2 .two-col{grid-template-columns:1.35fr 1fr}
+    .ov2 .strip{grid-auto-flow:initial;grid-template-columns:repeat(4,1fr);grid-auto-columns:1fr;overflow-x:visible}
+  }
+  @media(max-width:560px){
+    .ov2 .stat-card{grid-template-columns:repeat(3,1fr);gap:18px 0}
+    .ov2 .stat-card .stat:nth-child(3)::before,.ov2 .stat-card .stat:nth-child(4)::before{display:none}
+    .ov2 .stat-card .stat:nth-child(n+4){padding-top:4px}
+  }
+  @media(max-width:420px){
+    .ov2 .featured{padding:22px} .ov2 .stamp{width:38px;height:38px} .ov2 .stamps{gap:10px} .ov2 .feat-foot{gap:12px}
+  }
+  @media(max-width:760px){ html,body{overflow-x:hidden} .ov2{max-width:100%} }
+  @media (prefers-reduced-motion:reduce){ .aurora::before,.aurora::after,.aurora-3,.ov2 .live-pill .pulse{animation:none!important} }
+</style>
+
+<!-- ===== v16 — ATELIER: pralles Material (weiche Tiefe), chunky Pillen + Icon-Insets, kompromissloser Mobile-Fit ===== -->
+<style>
+  /* ============================================================
+     A) ATMOSPHÄRE — tiefer, edler Grund (kühl-monochrom, kein totes Schwarz)
+     ============================================================ */
+  body{ background:#070810 !important; }
+  .aurora::before{ opacity:.72 !important; }
+  .aurora::after{ opacity:.6 !important; }
+  .aurora-3{ opacity:.55 !important; }
+  /* feine Vignette: zieht Blick auf die Karten, gibt Bühnen-Tiefe */
+  .ov2-stage-vignette{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(120% 90% at 50% -10%, transparent 40%, rgba(0,0,0,.45) 100%); }
+
+  /* ============================================================
+     B) MATERIAL — Karten als weiche, von oben belichtete Objekte
+        (prall statt flach: hellere Oberkante, Doppel-Schatten, mehr Radius)
+     ============================================================ */
+  .ov2{
+    --rxl:34px; --rlg:30px;
+    --card-bg:linear-gradient(177deg, rgba(255,255,255,.085) 0%, rgba(255,255,255,.028) 46%, rgba(255,255,255,.02) 100%);
+    --card-line:rgba(255,255,255,.13);
+    /* Doppel-Schatten: kurzer Kontakt + weite Ambient-Tiefe + Glanzkante innen */
+    --sh-soft:0 2px 4px rgba(0,0,0,.4), 0 26px 50px -28px rgba(0,0,0,.9), 0 60px 100px -60px rgba(0,0,0,.85);
+    --hl:inset 0 1px 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .ov2 .rail-card,
+  .ov2 .panel,
+  .ov2 .stat-card{
+    background:var(--card-bg) !important;
+    border:1px solid var(--card-line) !important;
+    border-radius:var(--rlg) !important;
+    -webkit-backdrop-filter:blur(30px) saturate(180%) !important; backdrop-filter:blur(30px) saturate(180%) !important;
+    box-shadow:var(--hl), var(--sh-soft) !important;
+  }
+  /* sanfter Top-Glanz-Streifen auf den großen Karten (Lichtkante wie in den Refs) */
+  .ov2 .rail-card, .ov2 .panel, .ov2 .featured{ position:relative; }
+  .ov2 .rail-card::after, .ov2 .panel::after{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(130% 70% at 50% -20%, rgba(255,255,255,.10), transparent 60%); }
+  .ov2 .rail-card > *, .ov2 .panel > *{ position:relative; z-index:1; }
+
+  /* Mini-Kacheln (Im Umlauf) — eigene kleine Material-Stufe, prall */
+  .ov2 .rm-cell{ background:linear-gradient(177deg, rgba(255,255,255,.07), rgba(255,255,255,.02)) !important;
+    border:1px solid rgba(255,255,255,.10) !important; border-radius:18px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12) !important; padding:15px 16px !important; }
+
+  /* Hero-Zahl „Im Umlauf" — dominanter, tactiler (Ref #4-Gefühl) */
+  .ov2 .rail-metric b{ font-size:clamp(58px,7vw,72px) !important; letter-spacing:-.04em !important;
+    background:linear-gradient(150deg,#ffffff 28%, #c3cdf0) !important; -webkit-background-clip:text !important; background-clip:text !important;
+    -webkit-text-fill-color:transparent !important; }
+  .ov2 .rm-cell b{ font-size:28px !important; }
+
+  /* Story-Ringe: vornehmer Silberverlauf statt bunt (monochrom, premium) */
+  .ov2 .story-ring{ background:conic-gradient(from 130deg,#eef1ff,#9aa6d4,#cdd6ff,#7e8cc0,#eef1ff) !important; }
+
+  /* ============================================================
+     C) CHUNKY PILLEN-BUTTONS mit rundem Icon-Inset (Signature der Refs)
+     ============================================================ */
+  .ov2 .qr-pill{ padding:9px 20px 9px 9px !important; gap:11px !important; font-size:14px !important; font-weight:800 !important;
+    border-radius:999px !important; box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 12px 26px -10px rgba(0,0,0,.7) !important;
+    transition:transform .16s ease, box-shadow .2s ease !important; }
+  .ov2 .qr-pill:hover{ transform:translateY(-2px) !important; box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 18px 34px -12px rgba(0,0,0,.8) !important; }
+  .ov2 .qr-pill:active{ transform:translateY(0) scale(.98) !important; }
+  /* Icon als dunkle runde Scheibe im Pill (Send/Request-Look) */
+  .ov2 .qr-pill svg{ width:32px !important; height:32px !important; padding:8px !important; box-sizing:border-box !important;
+    border-radius:50% !important; background:#13111d !important; color:#fff !important; flex:0 0 auto !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18) !important; }
+  /* Mini-QR auf Pass-Karten ebenfalls chunky mit Disc */
+  .ov2 .qr-mini{ padding:7px 14px 7px 7px !important; gap:9px !important; font-weight:800 !important; }
+  .ov2 .qr-mini svg{ width:26px !important; height:26px !important; padding:6px !important; box-sizing:border-box !important;
+    border-radius:50% !important; background:#13111d !important; color:#fff !important; }
+
+  /* ============================================================
+     D) FEATURED-KARTE — tiefer, edler, mit weichem Innen-Glow + besseren Stempeln
+     ============================================================ */
+  .ov2 .featured{ border-radius:var(--rxl) !important;
+    box-shadow:var(--hl), 0 3px 6px rgba(0,0,0,.45), 0 40px 80px -34px rgba(0,0,0,.95) !important;
+    background:radial-gradient(120% 130% at 82% -10%, rgba(150,116,205,.6), transparent 52%),
+      radial-gradient(90% 90% at 10% 110%, rgba(70,86,150,.4), transparent 60%),
+      linear-gradient(155deg,#2b2256 0%,#191636 52%,#100f22 100%) !important; }
+  .ov2 .stamp{ border-width:1.5px !important; }
+  .ov2 .stamp.filled{ box-shadow:0 8px 18px -8px rgba(255,255,255,.6), inset 0 1px 0 #fff !important; }
+
+  /* ============================================================
+     E) GETEILTE SEITEN (Aktionen-Liste) — gleiche Material-Sprache, sauberer Mobile-Umbruch
+     ============================================================ */
+  .list .item{ border-radius:22px !important; padding:15px 16px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 18px 40px -28px rgba(0,0,0,.9) !important; }
+  .list .item .grow{ min-width:0 !important; }
+  .list .item .t{ overflow:hidden; text-overflow:ellipsis; }
+
+  /* ============================================================
+     F) MOBILE-FIT — kompromissloser 0-Overflow (minmax(0,1fr) + min-width:0)
+        Das war der Bug: 1fr-Tracks wuchsen über die Viewport-Breite.
+     ============================================================ */
+  .ov2 .hero-grid{ grid-template-columns:minmax(0,1fr) !important; }
+  .ov2 .two-col{ grid-template-columns:minmax(0,1fr) !important; }
+  .ov2 .rail-mini{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .ov2 .stat-card{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; }
+  .ov2 .panel, .ov2 .featured, .ov2 .rail-card, .ov2 .hero-rail,
+  .ov2 .stat-card, .ov2 .stat-card .stat, .ov2 .feed, .ov2 .feed .row,
+  .ov2 .rm-cell, .ov2 .two-col, .ov2 .hero-grid{ min-width:0 !important; max-width:100% !important; }
+
+  @media(min-width:1100px){
+    .ov2 .hero-grid{ grid-template-columns:minmax(0,1.55fr) minmax(0,.92fr) !important; }
+    .ov2 .two-col{ grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) !important; }
+  }
+
+  @media(max-width:760px){
+    /* Header: Live-Pill nicht neben den Titel quetschen → sauber oben rechts, Titel volle Breite */
+    .ov2 .ovh{ position:relative; }
+    .ov2 .ovh .live-pill{ position:absolute; top:0; right:0; }
+    .ov2 .ovh > div{ min-width:0; }
+    .ov2 .ovh .eyebrow{ padding-right:74px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ov2 .greeting{ font-size:clamp(28px,8.5vw,38px) !important; margin-top:30px; }
+    /* Dock geerdet: weicher Scrim am unteren Rand, damit Inhalt bewusst darunter wegfadet */
+    .dock::before{ content:""; position:fixed; left:0; right:0; bottom:0; height:148px; z-index:-1; pointer-events:none;
+      background:linear-gradient(180deg, transparent, rgba(5,6,12,.55) 55%, rgba(5,6,12,.82)); }
+    .ov2 .sec-head{ flex-wrap:wrap; }
+    /* Aktionen-Liste bricht sauber: Pill+QR wandern in zweite Zeile, Titel volle Breite */
+    .list .item{ flex-wrap:wrap !important; }
+    .list .item .grow{ flex:1 1 100%; order:2; }
+    .list .item .ico-chip{ order:1; }
+    .list .item .pill{ order:3; }
+    .list .item .btn{ order:4; margin-left:auto; }
+  }
+  @media(max-width:560px){
+    .ov2 .stat-card{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:20px 6px !important; padding:22px 10px !important; }
+    .ov2 .stat-card .stat span{ font-size:9.5px !important; letter-spacing:.08em !important; }
+    .ov2 .rail-metric b{ font-size:clamp(50px,15vw,64px) !important; }
+  }
+  @media(max-width:380px){
+    .ov2 .rm-cell b{ font-size:24px !important; }
+  }
+</style>
+
+<!-- ===== v17 — LIGHT EDITION (DEAKTIVIERT — User wollte zurück ins Dunkle; ersetzt durch v18) ===== -->
+<style media="not all">
+  :root{
+    --l-bg:#eaecf2; --l-card:#ffffff; --l-ink:#191c26; --l-soft:#5d6374; --l-faint:#9aa0ae;
+    --l-line:rgba(22,25,42,.08); --l-line-2:rgba(22,25,42,.12);
+    --l-acc:#4b4f7a; --l-acc-soft:#eef0fa;
+    --l-ink-card:linear-gradient(158deg,#272641 0%,#1a1830 52%,#121120 100%);
+    --l-sh:0 1px 2px rgba(22,25,42,.05), 0 22px 48px -26px rgba(22,25,42,.22);
+    --l-sh-ink:0 2px 6px rgba(22,25,42,.12), 0 36px 72px -34px rgba(22,25,42,.55);
+  }
+  /* ---------- BASIS: heller, ruhiger Grund ---------- */
+  .aurora, .grid-overlay, .ov2-stage-vignette{ display:none !important; }
+  body::before, body::after{ display:none !important; }
+  html, body{ background:#eaecf2 !important; }
+  body{ color:var(--l-ink) !important;
+    background:
+      radial-gradient(120% 70% at 50% -8%, #ffffff, transparent 56%),
+      linear-gradient(180deg,#f1f2f7 0%, #e7e9f0 100%) !important;
+    background-attachment:fixed !important; }
+  #loading{ background:#eef0f5 !important; color:var(--l-soft) !important; }
+  #loading .spin{ border-color:rgba(22,25,42,.12) !important; border-top-color:var(--l-acc) !important; }
+
+  /* ---------- SIDEBAR ---------- */
+  .side{ background:#ffffff !important; border-right:1px solid var(--l-line) !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  .fslogo{ color:var(--l-ink) !important; -webkit-text-fill-color:var(--l-ink) !important; }
+  .fslogo b{ background:none !important; -webkit-text-fill-color:var(--l-acc) !important; color:var(--l-acc) !important; }
+  .bn{ color:var(--l-ink) !important; -webkit-text-fill-color:var(--l-ink) !important; } .br{ color:var(--l-faint) !important; -webkit-text-fill-color:var(--l-faint) !important; }
+  .brandrow{ border-top:1px solid var(--l-line) !important; }
+  .avatar{ background:var(--l-acc-soft) !important; color:var(--l-acc) !important; box-shadow:none !important; }
+  .nav{ color:var(--l-soft) !important; }
+  .nav:hover{ background:rgba(22,25,42,.04) !important; color:var(--l-ink) !important; }
+  .nav.active{ background:var(--l-acc-soft) !important; border:1px solid rgba(75,79,122,.18) !important;
+    color:#2c2f52 !important; box-shadow:none !important; border-radius:12px !important; }
+  .nav.active svg{ stroke:var(--l-acc) !important; }
+  .nav.active::before{ background:var(--l-acc) !important; }
+  .wm{ color:var(--l-faint) !important; border-top:1px solid var(--l-line) !important; }
+  .wm b{ color:var(--l-soft) !important; } .wm .dot{ background:var(--l-acc) !important; box-shadow:0 0 8px rgba(75,79,122,.5) !important; }
+  .logout{ color:var(--l-faint) !important; }
+  .logout:hover{ color:#e0524f !important; background:rgba(224,82,79,.07) !important; }
+
+  /* ---------- ÜBERSICHT (.ov2) hell ---------- */
+  .ov2{ color:var(--l-ink) !important; --ink:var(--l-ink); --ink-soft:var(--l-soft); --ink-faint:var(--l-faint); }
+  .ov2 .eyebrow, .ov2 .rc-eyebrow, .ov2 .sec-title{ color:var(--l-faint) !important; }
+  /* FEATURED ist dunkle Karte → Texte bleiben hell */
+  .ov2 .feat-type{ color:rgba(255,255,255,.7) !important; }
+  .ov2 .feat-title{ color:#ffffff !important; }
+  .ov2 .feat-reward{ color:rgba(255,255,255,.8) !important; }
+  .ov2 .feat-logo .lt{ color:rgba(255,255,255,.8) !important; }
+  .ov2 .featured .live-pill{ background:rgba(255,255,255,.14) !important; border:1px solid rgba(255,255,255,.22) !important; color:#fff !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.25) !important; }
+  .ov2 .featured .live-pill .pulse{ background:#fff !important; }
+  .ov2 .greeting{ color:var(--l-ink) !important; }
+  .ov2 .greeting span{ background:linear-gradient(110deg,#2c2f52,#5a5f93) !important;
+    -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .ov2 .greeting-sub{ color:var(--l-soft) !important; }
+  .ov2 .sec-title b{ color:var(--l-ink) !important; }
+  .ov2 .sec-link{ color:var(--l-faint) !important; } .ov2 .sec-link:hover{ color:var(--l-ink) !important; }
+  .ov2 .live-pill{ background:#ffffff !important; border:1px solid var(--l-line-2) !important; color:#2c2f52 !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important; box-shadow:0 2px 8px rgba(22,25,42,.07) !important; }
+  .ov2 .live-pill .pulse{ background:var(--l-acc) !important; box-shadow:0 0 0 0 rgba(75,79,122,.5) !important; }
+
+  /* weiße Karten + weiche Schatten (dngynfd) */
+  .ov2 .rail-card, .ov2 .panel, .ov2 .stat-card{
+    background:var(--l-card) !important; border:1px solid var(--l-line) !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important; box-shadow:var(--l-sh) !important; }
+  .ov2 .rail-card::after, .ov2 .panel::after{ display:none !important; }
+  .ov2 .rm-cell{ background:#f4f5f9 !important; border:1px solid rgba(22,25,42,.05) !important; box-shadow:none !important; }
+  .ov2 .rm-cell b{ color:var(--l-ink) !important; } .ov2 .rm-cell span{ color:var(--l-faint) !important; }
+  .ov2 .rail-metric b{ background:linear-gradient(150deg,#191c26,#5a5f93) !important;
+    -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .ov2 .rail-metric span{ color:var(--l-soft) !important; }
+  .ov2 .qs-t{ color:var(--l-ink) !important; }
+
+  /* KPI-Reihe */
+  .ov2 .stat-card .stat b{ color:var(--l-ink) !important; -webkit-text-fill-color:var(--l-ink) !important; }
+  .ov2 .stat-card .stat span{ color:var(--l-faint) !important; }
+  .ov2 .stat-card .stat+.stat::before{ background:var(--l-line) !important; }
+
+  /* FEATURED bleibt dunkle Ink-Bühne (Kontrast-Held auf hell) — Text weiß */
+  .ov2 .featured{ border:1px solid rgba(22,25,42,.10) !important; box-shadow:var(--l-sh-ink) !important; }
+
+  /* Aktivität + Chart */
+  .ov2 .panel-head h3{ color:var(--l-ink) !important; }
+  .ov2 .panel-head .sum{ color:var(--l-faint) !important; } .ov2 .panel-head .sum b{ color:var(--l-ink) !important; }
+  .ov2 .panel-head .ov-link{ color:var(--l-faint) !important; }
+  .ov2 .feed .row:hover{ background:#f4f5f9 !important; }
+  .ov2 .row-ic{ background:var(--l-acc-soft) !important; border:1px solid rgba(75,79,122,.14) !important; color:var(--l-acc) !important; box-shadow:none !important; }
+  .ov2 .row-main .rt{ color:var(--l-ink) !important; } .ov2 .row-main .rs{ color:var(--l-faint) !important; }
+  .ov2 .row-chip{ background:var(--l-acc-soft) !important; border:1px solid rgba(75,79,122,.14) !important; color:var(--l-acc) !important; }
+  .ov2 .empty, .ov2 .pass-empty{ color:var(--l-faint) !important; }
+  .ov2 .chart, #activityChart{ color:var(--l-acc) !important; }
+  #activityChart .axis{ stroke:rgba(22,25,42,.10) !important; }
+  .chart-xlabels span, .chart-empty{ color:var(--l-faint) !important; }
+
+  /* Story-Ringe: Rand = heller Grund */
+  .ov2 .story-av{ border-color:#ffffff !important; }
+  .ov2 .story-online{ border-color:#ffffff !important; }
+  .ov2 .story-name{ color:var(--l-soft) !important; }
+
+  /* QR-Pille auf weißer rail-card = dunkle Ink-Pille (poppt auf hell) */
+  .ov2 .rail-card .qr-pill{ background:var(--l-ink-card) !important; color:#fff !important;
+    box-shadow:0 10px 22px -10px rgba(22,25,42,.5) !important; }
+  .ov2 .rail-card .qr-pill svg{ background:rgba(255,255,255,.16) !important; color:#fff !important; }
+
+  /* ---------- GETEILTE SEITEN (Erstellen/Scanner/Aktionen) ---------- */
+  .gk{ color:var(--l-faint) !important; } .gk::before{ background:var(--l-acc) !important; }
+  .ph1{ color:var(--l-ink) !important; } .lead{ color:var(--l-soft) !important; }
+  .form, .scanwrap, .cardPreview, .modalcard, .cm-card, .tpl{
+    background:var(--l-card) !important; border:1px solid var(--l-line) !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important; box-shadow:var(--l-sh) !important; color:var(--l-ink) !important; }
+  .tpl, .tpl .lbl{ color:var(--l-ink) !important; } .tpl .sub{ color:var(--l-faint) !important; }
+  .tpl:hover{ background:#f7f8fb !important; border-color:rgba(75,79,122,.25) !important; }
+  .tplHead, .tplDivider span{ color:var(--l-faint) !important; }
+  .typehint{ color:var(--l-soft) !important; }
+  label{ color:var(--l-soft) !important; }
+  input, textarea{ background:#f4f5f9 !important; border:1px solid var(--l-line-2) !important; color:var(--l-ink) !important; }
+  input:focus, textarea:focus{ border-color:var(--l-acc) !important; box-shadow:0 0 0 3px rgba(75,79,122,.13) !important; }
+  input::placeholder, textarea::placeholder{ color:#aeb3c0 !important; }
+  .seg{ background:#e9ebf1 !important; border:1px solid var(--l-line) !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  .seg button{ color:var(--l-soft) !important; }
+  .seg button.on{ background:#ffffff !important; color:var(--l-ink) !important; box-shadow:0 2px 8px rgba(22,25,42,.12) !important; }
+  .seg button.on svg{ stroke:var(--l-ink) !important; }
+
+  /* Buttons: Primär = Ink-Pille, Ghost = weiß */
+  .btn{ background:var(--l-ink-card) !important; color:#fff !important; border-radius:999px !important;
+    box-shadow:0 10px 24px -12px rgba(22,25,42,.55) !important; }
+  .btn:hover:not(:disabled){ filter:brightness(1.1) !important; transform:translateY(-1px) !important; }
+  .btn.ghost{ background:#ffffff !important; color:var(--l-ink) !important; border:1px solid var(--l-line-2) !important; box-shadow:0 1px 2px rgba(22,25,42,.05) !important; }
+  .btn.ghost:hover:not(:disabled){ background:#f4f5f9 !important; }
+
+  /* Aktionen-Liste */
+  .list .item{ background:var(--l-card) !important; border:1px solid var(--l-line) !important;
+    box-shadow:var(--l-sh) !important; }
+  .list .item:hover{ background:#f7f8fb !important; border-color:var(--l-line-2) !important; }
+  .list .item .t{ color:var(--l-ink) !important; } .list .item .m{ color:var(--l-faint) !important; }
+  .ico-chip{ background:var(--l-acc-soft) !important; border:1px solid rgba(75,79,122,.14) !important; color:var(--l-acc) !important; box-shadow:none !important; }
+  .ico-chip svg{ filter:none !important; }
+  .pill, .pill.stamp{ background:var(--l-acc-soft) !important; color:var(--l-acc) !important; border:1px solid rgba(75,79,122,.14) !important; box-shadow:none !important; }
+
+  /* Modal / Toast / Scanner-Texte */
+  .modalcard h3, .cm-card h3{ color:var(--l-ink) !important; }
+  #qrSub, .cm-card p{ color:var(--l-soft) !important; }
+  .scanhint{ color:var(--l-soft) !important; }
+
+  /* Dock (mobile): dunkle schwebende Insel auf hell — clean, iOS-Gefühl */
+  .dock{ background:rgba(24,24,34,.86) !important; border:1px solid rgba(255,255,255,.10) !important; }
+  .dock::before{ background:linear-gradient(180deg, transparent, rgba(220,223,232,.0) 35%, rgba(200,204,214,.55)) !important; }
+
+  /* ---------- WELCOME: dunkle cinematic Bühne (bleibt dunkel → Übergang in helle App), neutrale Akzente statt Teal ---------- */
+  #welcome{ background-color:#0b0d16 !important;
+    background-image:radial-gradient(120% 80% at 50% -6%, rgba(70,82,140,.45), transparent 62%) !important;
+    min-height:100dvh !important; height:100% !important; }
+  #welcome .orb.a{ background:rgba(124,134,205,.30) !important; }
+  #welcome .grid{ opacity:.22 !important; }
+  .w-logo{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+  .w-logo b{ background:linear-gradient(110deg,#cfd6ff,#8b93cf) !important; -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .w-hello{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+  .w-hello em{ background:linear-gradient(110deg,#ffffff,#aab2e6) !important; -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .w-sub{ color:rgba(255,255,255,.66) !important; }
+  .w-swipe{ color:rgba(255,255,255,.46) !important; }
+  .w-chev{ color:rgba(255,255,255,.6) !important; }
+  .go{ background:linear-gradient(160deg,#ffffff,#e6e8f5) !important; color:#1a1830 !important;
+    box-shadow:0 16px 46px rgba(35,38,70,.5) !important; }
+  .go::after{ border-color:rgba(180,188,230,.55) !important; }
+  #wave{ background:radial-gradient(circle at 50% 58%, #eef0ff 0%, rgba(200,206,240,.45) 36%, transparent 72%) !important; }
+</style>
+
+<!-- ===== v18 — dngynfd-STRUKTUR in DUNKEL + Glas (ybSB): Balance-Hero, integrierte Pillen, kompakt-technisch ===== -->
+<style>
+  /* WELCOME: dunkle cinematic Bühne, kein Teal (bleibt aktiv, da v17 deaktiviert) */
+  #welcome{ background-color:#0b0d16 !important;
+    background-image:radial-gradient(120% 80% at 50% -6%, rgba(72,84,142,.42), transparent 62%) !important; }
+  .w-logo b{ background:linear-gradient(110deg,#cfd6ff,#8b93cf) !important; -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .w-hello em{ background:linear-gradient(110deg,#ffffff,#aab2e6) !important; -webkit-background-clip:text !important; background-clip:text !important; -webkit-text-fill-color:transparent !important; }
+  .go{ background:linear-gradient(160deg,#ffffff,#e6e8f5) !important; color:#16151f !important; box-shadow:0 16px 46px rgba(20,22,48,.6) !important; }
+  .go::after{ border-color:rgba(180,188,230,.5) !important; }
+  #wave{ background:radial-gradient(circle at 50% 58%, #cdd4ff 0%, rgba(150,160,220,.4) 36%, transparent 72%) !important; }
+  /* Welcome-Layout: Inhalt oben, GO als Greifpunkt unten (Daumen-Zone) */
+  #welcome{ top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; height:100dvh !important; min-height:100dvh !important;
+    justify-content:flex-start !important; padding-top:13vh !important; padding-bottom:calc(8vh + env(safe-area-inset-bottom,0px)) !important;
+    touch-action:none !important; -webkit-user-select:none; user-select:none; }
+  #welcome #wEnter{ will-change:transform; }
+  #welcome .go{ will-change:transform; }
+  /* Welcome bleibt UNSER Design (zentriert, dunkel) — NUR die GO-Kapsel + flüssiges Ziehen sind von unbenannt.png übernommen */
+  #welcome{ align-items:center !important; text-align:center !important; padding-top:12vh !important; }
+  #welcome .w-hello{ text-align:center !important; margin:0 auto 12px !important; }
+  #welcome .w-sub{ text-align:center !important; margin:0 auto !important; }
+  #welcome .w-swipe{ width:100%; text-align:center; }
+  #welcome .w-logo{ margin-bottom:22px !important; }
+  #welcome #wEnter{ margin-top:auto !important; gap:14px !important; }
+  /* GO-Kapsel exakt wie unbenannt.png: transluzente vertikale Pille, Pfeil oben, weißer Go-Kreis unten */
+  .go-cap{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:13px 13px 14px;
+    border-radius:999px; background:rgba(255,255,255,.10); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.20); box-shadow:0 22px 50px -16px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.28); }
+  #welcome .w-chev{ color:rgba(255,255,255,.72) !important; display:grid; place-items:center; margin:0 !important; }
+  #welcome .w-chev svg{ width:24px; height:24px; }
+  #welcome .go{ width:62px !important; height:62px !important; border-radius:50% !important; padding:0 !important;
+    background:linear-gradient(180deg,#ffffff,#e9ebf5) !important; color:#16151f !important; font-family:'Sora',sans-serif !important; font-size:16px !important; font-weight:700 !important;
+    touch-action:none !important; cursor:grab !important; box-shadow:0 8px 22px -6px rgba(0,0,0,.5), inset 0 1px 0 #fff !important; }
+  #welcome .go:active{ cursor:grabbing !important; }
+  #welcome .go::after{ display:none !important; }
+
+  /* Bottom-Nav: hässlichen abgeschnittenen Radiant entfernen */
+  .dock::before{ display:none !important; }
+
+  /* Dashboard-Ladescreen = gleicher Ring-Loader wie der Splash (nahtlose Öffnung) */
+  #loading{ flex-direction:column !important; gap:26px !important; z-index:60 !important;
+    background:radial-gradient(120% 85% at 50% 20%, #15171f 0%, #0a0b0e 62%) !important; }
+  #loading .sp-wrap{ position:relative; width:200px; height:200px; display:grid; place-items:center; }
+  #loading .sp-glow{ position:absolute; width:200px; height:200px; border-radius:50%;
+    background:radial-gradient(circle, rgba(130,146,226,.34), rgba(130,146,226,.08) 45%, transparent 66%); animation:spBreath 2.6s ease-in-out infinite; }
+  #loading .sp-ring{ position:absolute; width:132px; height:132px; border-radius:50%;
+    background:conic-gradient(from 90deg, #ffffff 0deg, rgba(255,255,255,.05) 120deg, rgba(255,255,255,0) 300deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+    animation:spSpin 1s linear infinite; }
+  #loading .sp-icon{ position:relative; display:grid; place-items:center; animation:spFloat 2.6s ease-in-out infinite; }
+  #loading .sp-icon img{ height:66px; width:auto; display:block; filter:drop-shadow(0 6px 20px rgba(140,154,235,.5)); }
+  #loading .sp-word{ font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.42); font-weight:600; }
+  @keyframes spSpin{ to{ transform:rotate(360deg) } }
+  @keyframes spBreath{ 0%,100%{ transform:scale(.92); opacity:.55 } 50%{ transform:scale(1.06); opacity:.95 } }
+  @keyframes spFloat{ 0%,100%{ transform:translateY(0) scale(1) } 50%{ transform:translateY(-2px) scale(1.025) } }
+  @media (prefers-reduced-motion:reduce){ #loading .sp-glow,#loading .sp-ring,#loading .sp-icon{ animation:none } }
+
+  /* ===== ov3 — neue Übersicht-Struktur (Wrapper hat class="ov2 ov3", erbt dunkles Glas-Basics von .ov2) ===== */
+  .ov3{ --c:#eef1f8; --c-soft:rgba(238,241,248,.64); --c-faint:rgba(238,241,248,.4);
+    --g2:rgba(255,255,255,.085); --gl:rgba(255,255,255,.12); --rl:30px; --rm:22px;
+    --sh:0 2px 4px rgba(0,0,0,.4), 0 34px 64px -32px rgba(0,0,0,.92);
+    --hl:inset 0 1px 0 rgba(255,255,255,.16);
+    color:var(--c) !important; }
+  /* SOLIDE App-Karten (kein Glas-Blur — weniger „vibe-coded", mehr echte App) */
+  .ov3 .o3-hero, .ov3 .o3-kpi, .ov3 .o3-chartcard, .ov3 .o3-feedcard{
+    background:#15171f !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    border:1px solid rgba(255,255,255,.06) !important;
+    box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 16px 40px -28px rgba(0,0,0,.95) !important; }
+
+  /* TOPBAR */
+  .ov3 .o3-bar{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:22px; }
+  .ov3 .o3-kick{ font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--c-faint); font-weight:600; }
+  .ov3 .o3-name{ font-size:clamp(26px,3.4vw,38px); font-weight:800; letter-spacing:-.03em; line-height:1.05; margin-top:7px; color:var(--c); }
+  .ov3 .o3-name span{ background:linear-gradient(110deg,#fff,#aeb8e6); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ov3 .o3-live{ display:inline-flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--c); background:var(--g2); border:1px solid var(--gl); white-space:nowrap; }
+  .ov3 .o3-live i{ width:8px; height:8px; border-radius:50%; background:#eaf0ff; box-shadow:0 0 10px rgba(220,228,255,.9); animation:ovPulse 2s infinite; }
+
+  /* HERO BALANCE — die eine prominente Karte (leicht erhöht, dezenter Akzent-Schimmer) */
+  .ov3 .o3-hero{ border-radius:var(--rl); padding:30px 28px 26px; position:relative; overflow:hidden; margin-bottom:28px;
+    background:linear-gradient(158deg,#2b2f50 0%, #1e2134 48%, #16182111 100%), #15171f !important;
+    border:1px solid rgba(150,160,225,.18) !important;
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 24px 60px -30px rgba(40,46,110,.7) !important; }
+  .ov3 .o3-hero::after{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(130% 95% at 88% -25%, rgba(150,165,255,.28), transparent 50%); }
+  .ov3 .o3-hero > *{ position:relative; z-index:1; }
+  .ov3 .o3-hero-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .ov3 .o3-hlabel{ font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--c-soft); font-weight:600; }
+  .ov3 .o3-trend{ display:inline-flex; align-items:center; gap:7px; padding:7px 13px; border-radius:999px; font-size:11.5px; font-weight:700; color:var(--c); background:var(--g2); border:1px solid var(--gl); }
+  .ov3 .o3-trend b{ font-weight:800; }
+  .ov3 .o3-balance{ display:flex; align-items:baseline; gap:16px; margin:14px 0 26px; flex-wrap:wrap; }
+  .ov3 .o3-balance b{ font-size:clamp(66px,11vw,108px); font-weight:800; letter-spacing:-.05em; line-height:.82;
+    background:linear-gradient(150deg,#ffffff 32%, #aab6e6); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ov3 .o3-balance span{ font-size:14px; color:var(--c-soft); max-width:17ch; line-height:1.35; }
+  .ov3 .o3-acts{ display:flex; align-items:center; gap:12px; }
+  .ov3 .o3-pill{ flex:1; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 14px; border-radius:16px; font-family:inherit; font-size:13.5px; font-weight:700; color:var(--c); cursor:pointer; white-space:nowrap;
+    background:#222637; border:1px solid rgba(255,255,255,.08); box-shadow:0 1px 0 rgba(255,255,255,.05) inset; transition:transform .16s, background .18s; }
+  .ov3 .o3-pill:hover{ transform:translateY(-2px); background:#2a2f44; }
+  .ov3 .o3-pill:active{ transform:translateY(0) scale(.98); }
+  .ov3 .o3-pic{ display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,.3); flex:0 0 auto; }
+  .ov3 .o3-pic svg{ width:16px; height:16px; }
+  .ov3 .o3-fab{ flex:0 0 auto; width:60px; height:60px; border-radius:50%; display:grid; place-items:center; cursor:pointer; color:#15131f;
+    background:linear-gradient(180deg,#ffffff,#dfe3f4); border:none; box-shadow:0 12px 30px -8px rgba(0,0,0,.7), inset 0 1px 0 #fff; transition:transform .16s; }
+  .ov3 .o3-fab:hover{ transform:translateY(-2px) scale(1.05); }
+  .ov3 .o3-fab svg{ width:26px; height:26px; }
+  .ov3 .o3-hint{ margin-top:16px; font-size:11.5px; line-height:1.5; color:var(--c-faint); text-align:center; }
+  .ov3 .o3-hint b{ color:var(--c-soft); font-weight:700; }
+
+  /* Lösch-Button in „Meine Aktionen" */
+  .o3-del{ flex:0 0 auto !important; padding:11px !important; width:42px; }
+  .o3-del svg{ width:17px; height:17px; }
+  .o3-del:hover:not(:disabled){ background:rgba(224,82,79,.14) !important; border-color:rgba(224,82,79,.4) !important; color:#ff7b78 !important; }
+
+  /* Strip: flexibel wrappen statt starres 4er-Grid (einzelne Karte nicht winzig) */
+  .ov2 .strip{ display:flex !important; flex-wrap:wrap !important; gap:16px !important; grid-template-columns:none !important; overflow:visible !important; }
+  .ov2 .strip .o3-realcard{ flex:1 1 300px; max-width:440px; }
+  .ov2 .strip .pass-empty{ flex:1 1 100%; }
+  /* ECHTE Karten im „Deine Karten"-Strip — reales Apple-Wallet-Strip-Bild pro Aktion */
+  .ov2 .strip .o3-realcard{ position:relative; display:block; padding:0 !important; border:1px solid rgba(255,255,255,.08) !important;
+    border-radius:18px; overflow:hidden; cursor:pointer; aspect-ratio:1125/432; min-height:0 !important;
+    box-shadow:0 16px 40px -26px rgba(0,0,0,.95); scroll-snap-align:start; font-family:inherit; }
+  .ov2 .strip .o3-rc-img{ display:block; width:100%; height:100%; object-fit:cover; }
+  .ov2 .strip .o3-rc-qr{ position:absolute; right:11px; bottom:11px; display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.94); color:#15131f; border:none;
+    box-shadow:0 6px 16px -4px rgba(0,0,0,.55), inset 0 1px 0 #fff; }
+  .ov2 .strip .o3-rc-qr svg{ width:17px; height:17px; }
+  .ov2 .strip .o3-rc-fallback{ display:none; }
+  /* Fallback (Bild lädt nicht, z.B. lokal): Verlauf der pass-Klasse + Text */
+  .ov2 .strip .o3-realcard.img-failed{ aspect-ratio:auto; min-height:150px !important; padding:18px !important; display:flex; }
+  .ov2 .strip .o3-realcard.img-failed .o3-rc-img{ display:none; }
+  .ov2 .strip .o3-realcard.img-failed .o3-rc-fallback{ display:flex; flex-direction:column; gap:9px; align-items:flex-start; justify-content:center; color:#fff; text-align:left; }
+  .ov2 .strip .o3-rc-name{ font-size:15px; font-weight:700; letter-spacing:-.01em; }
+
+  /* SECTION HEADER */
+  .ov3 .o3-sec{ display:flex; align-items:center; justify-content:space-between; margin:30px 0 14px; }
+  .ov3 .o3-seclabel{ font-size:14px; letter-spacing:-.01em; font-weight:800; color:var(--c); }
+  .ov3 .o3-seclink{ background:none; border:none; color:var(--c-faint); font-size:12.5px; cursor:pointer; font-family:inherit; }
+  .ov3 .o3-seclink:hover{ color:var(--c); }
+
+  /* KPI TILES */
+  .ov3 .o3-kpis{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+  .ov3 .o3-kpi{ border-radius:var(--rm); padding:18px 16px; min-width:0; }
+  .ov3 .o3-kpi b{ display:block; font-size:clamp(24px,2.3vw,30px); font-weight:800; letter-spacing:-.03em; line-height:1; color:var(--c); }
+  .ov3 .o3-kpi span{ display:block; margin-top:8px; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--c-faint); font-weight:600; }
+
+  /* LOW: chart + activity */
+  .ov3 .o3-low{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; margin-top:16px; }
+  .ov3 .o3-chartcard, .ov3 .o3-feedcard{ border-radius:var(--rl); padding:22px; min-width:0; }
+  .ov3 .o3-cc-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .ov3 .o3-cc-sub{ font-size:11.5px; color:var(--c-faint); margin-top:3px; }
+  .ov3 .o3-chart{ margin-top:2px; color:#cdd6ff; }
+  .ov3 .o3-feed .empty{ color:var(--c-faint); padding:18px 4px; }
+
+  /* RESPONSIVE */
+  @media(min-width:1000px){ .ov3 .o3-low{ grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); } }
+  @media(max-width:560px){
+    .ov3 .o3-kpis{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .ov3 .o3-hero{ padding:24px 22px 22px; }
+    .ov3 .o3-balance b{ font-size:clamp(60px,20vw,88px); }
+    .ov3 .o3-pill span:not(.o3-pic){ } /* labels bleiben */
+  }
+  @media(max-width:380px){
+    .ov3 .o3-acts{ flex-wrap:wrap; } .ov3 .o3-fab{ order:-1; }
+    .ov3 .o3-pill{ flex:1 1 100%; }
+  }
+</style>
 </head>
 <body>
-  <div id="loading"><span class="spin"></span> Lädt …</div>
+  <div class="aurora"><div class="aurora-3"></div></div>
+  <div class="grid-overlay"></div>
+  <div class="ov2-stage-vignette"></div>
+  <div id="loading"><div class="sp-wrap"><div class="sp-glow"></div><div class="sp-ring"></div><div class="sp-icon"><img src="/assets/f-mark.png" alt="FlowState"></div></div><div class="sp-word">FlowState</div></div>
 
   <section id="welcome">
     <span class="orb a"></span><span class="grid"></span>
     <div class="w-logo"><img src="./assets/logo-mark.png" alt="FlowState">Flow<b>State</b> Wallet</div>
     <h1 class="w-hello">Herzlich willkommen, <em id="wName">—</em></h1>
     <p class="w-sub">Schön, dass du da bist. Viel Spaß mit deinem persönlichen Dashboard.</p>
-    <button class="go" id="goBtn">GO</button>
+    <div class="w-enter" id="wEnter">
+      <div class="go-cap">
+        <span class="w-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l7-6 7 6"/><path d="M5 18l7-6 7 6"/></svg></span>
+        <button class="go" id="goBtn">Go</button>
+      </div>
+      <span class="w-swipe">Nach oben ziehen</span>
+    </div>
   </section>
   <div id="wave"></div>
 
@@ -811,29 +1694,66 @@
     </aside>
 
     <div class="main">
-      <section class="page active" id="page-overview">
-        <div class="glasscard herocard">
-          <div class="hc-head"><span class="ov-eyebrow">Karten im Umlauf</span><span class="hc-badge"><i></i>live</span></div>
-          <div class="ov-num" id="statActive">0</div>
-          <div class="ov-cap">Aktive Stempelkarten &amp; Gutscheine</div>
+      <section class="page active" id="page-overview"><div class="ov2 ov3">
+        <!-- TOPBAR -->
+        <header class="o3-bar">
+          <div>
+            <div class="o3-kick">Betriebs-Dashboard · <span id="ovBizKick">—</span></div>
+            <h1 class="o3-name">Hallo, <span id="ovBiz">—</span></h1>
+          </div>
+          <span class="o3-live"><i></i> Live</span>
+        </header>
+
+        <!-- HERO BALANCE CARD (dngynfd: Riesen-Zahl + integrierte Pillen-Actions + Trend) -->
+        <section class="o3-hero">
+          <div class="o3-hero-head">
+            <span class="o3-hlabel">Karten im Umlauf</span>
+            <span class="o3-trend"><b data-stat="issued">0</b>&nbsp;ausgegeben</span>
+          </div>
+          <div class="o3-balance"><b data-stat="active" id="statActive">0</b><span>aktive Stempelkarten &amp; Gutscheine in den Wallets deiner Gäste</span></div>
+          <div class="o3-acts">
+            <button class="o3-pill" id="featQr" data-qr="" data-token="" data-title="">
+              <span class="o3-pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3"/></svg></span> QR ausgeben
+            </button>
+            <button class="o3-fab" data-jump="scan" aria-label="Scannen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V5a1 1 0 011-1h2M17 4h2a1 1 0 011 1v2M20 17v2a1 1 0 01-1 1h-2M7 20H5a1 1 0 01-1-1v-2"/><path d="M4 12h16"/></svg>
+            </button>
+            <button class="o3-pill" data-jump="manage">
+              <span class="o3-pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span> Verwalten
+            </button>
+          </div>
+          <div class="o3-hint"><b>QR ausgeben</b> – Gast scannt, Karte landet in seiner Wallet&nbsp;·&nbsp; <b>Scannen</b> – Stempeln &amp; Einlösen&nbsp;·&nbsp; <b>Verwalten</b> – Aktionen ansehen &amp; löschen</div>
+        </section>
+
+        <!-- GÄSTE -->
+        <div class="o3-sec"><span class="o3-seclabel">Neueste Gäste</span><button class="o3-seclink" data-jump="manage">Alle Aktionen →</button></div>
+        <div id="stories" class="stories"></div>
+
+        <!-- KPI-KACHELN -->
+        <div class="o3-sec"><span class="o3-seclabel">Performance im Überblick</span></div>
+        <div class="o3-kpis">
+          <div class="o3-kpi"><b data-stat="issued">0</b><span>Ausgegeben</span></div>
+          <div class="o3-kpi"><b data-stat="redemptions">0</b><span>Einlösungen</span></div>
+          <div class="o3-kpi"><b data-stat="redeemed">0</b><span>Belohnungen</span></div>
+          <div class="o3-kpi"><b data-stat="campaigns">0</b><span>Aktionen</span></div>
         </div>
 
-        <div class="glasscard ov-chart">
-          <div class="ov-chart-head"><span>Aktivität · letzte 14 Tage</span><span class="ov-tot" id="chartTotal">–</span></div>
-          <div id="activityChart" class="chart"><div class="chart-empty">Lädt …</div></div>
+        <!-- CHART + AKTIVITÄT (dngynfd „Your Income"-Stil) -->
+        <div class="o3-low">
+          <section class="o3-chartcard">
+            <div class="o3-cc-head"><div><span class="o3-hlabel">Aktivität</span><div class="o3-cc-sub">Letzte 14 Tage</div></div><span class="o3-trend">Σ&nbsp;<b id="chartTotal">–</b></span></div>
+            <div class="chart-wrap"><div id="activityChart" class="chart o3-chart"><div class="chart-empty">Lädt …</div></div></div>
+          </section>
+          <section class="o3-feedcard">
+            <div class="o3-cc-head"><div><span class="o3-hlabel">Letzte Aktivität</span><div class="o3-cc-sub">Stempel &amp; Einlösungen</div></div><button class="o3-seclink" id="exportBtn">CSV ↓</button></div>
+            <div id="activityList" class="feed o3-feed"><div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div></div>
+          </section>
         </div>
 
-        <div class="ov-metrics">
-          <div class="glasscard ov-m"><span class="ov-mn" id="statIssued">0</span><span class="ov-ml">Ausgegeben</span></div>
-          <div class="glasscard ov-m"><span class="ov-mn" id="statRedemptions">0</span><span class="ov-ml">Einlösungen</span></div>
-          <div class="glasscard ov-m"><span class="ov-mn" id="statRedeemed">0</span><span class="ov-ml">Belohnungen</span></div>
-          <div class="glasscard ov-m"><span class="ov-mn" id="statCampaigns">0</span><span class="ov-ml">Aktionen</span></div>
-          <div class="glasscard ov-m"><span class="ov-mn" id="statAvg">0</span><span class="ov-ml">Ø / Karte</span></div>
-        </div>
-
-        <div class="ov-feedhead"><span>Letzte Aktivität</span><button class="ov-link" id="exportBtn">CSV&nbsp;↓</button></div>
-        <div id="activityList" class="list"><div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div></div>
-      </section>
+        <!-- KARTEN-STRIP (echte Karten) -->
+        <div class="o3-sec"><span class="o3-seclabel">Deine Karten</span><button class="o3-seclink" data-jump="create">Neu erstellen +</button></div>
+        <div id="passStrip" class="strip"><div class="pass-empty">Lädt …</div></div>
+      </div></section>
 
       <section class="page" id="page-create">
         <div class="gk">Neu</div>
@@ -970,6 +1890,14 @@
         </div>
       </section>
     </div>
+
+    <!-- Schwebende Glas-Bottom-Nav (mobile) — Signature aus den Referenzen -->
+    <nav class="dock">
+      <button class="dock-btn on" data-page="overview" aria-label="Übersicht"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+      <button class="dock-btn" data-page="create" aria-label="Erstellen"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></button>
+      <button class="dock-btn dock-scan" data-page="scan" aria-label="Scanner"><svg fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path d="M4 7V5a1 1 0 011-1h2M17 4h2a1 1 0 011 1v2M20 17v2a1 1 0 01-1 1h-2M7 20H5a1 1 0 01-1-1v-2"/><path d="M4 12h16"/></svg></button>
+      <button class="dock-btn" data-page="manage" aria-label="Meine Aktionen"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </nav>
   </div>
 
   <div id="modal"><div class="modalcard">
@@ -998,6 +1926,8 @@
     document.documentElement.style.setProperty('--brand', biz.color_bg || '#7a4fb5');
     document.getElementById('wName').textContent = biz.name;
     document.getElementById('bizName').textContent = biz.name;
+    { const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+      set('ovBiz', biz.name); set('ovBizKick', biz.name); set('featBiz', biz.name); }
 
     // Admin-Ansicht: schwebender "Zurück zum Cockpit"-Knopf — NUR wenn du als Admin hierher gewechselt bist.
     const adminRaw = localStorage.getItem('fs_admin_session');
@@ -1094,18 +2024,67 @@
         supabase.from('passes').select('*',{count:'exact',head:true}).eq('business_id',biz.id),               // ausgegeben gesamt
         supabase.from('redemptions').select('*',{count:'exact',head:true}).eq('business_id',biz.id),           // Einlösungen gesamt (alle Aktionen)
       ]);
-      document.getElementById('statActive').textContent=a??0;
-      document.getElementById('statRedeemed').textContent=r??0;
-      document.getElementById('statCampaigns').textContent=c??0;
-      document.getElementById('statIssued').textContent=issued??0;
-      document.getElementById('statRedemptions').textContent=reds??0;
-      document.getElementById('statAvg').textContent = issued ? (Math.round((reds/issued)*10)/10).toString().replace('.',',') : '0';
+      const setStat=(k,v)=>document.querySelectorAll('[data-stat="'+k+'"]').forEach(e=>{e.textContent=v;});
+      setStat('active', a??0);
+      setStat('redeemed', r??0);
+      setStat('campaigns', c??0);
+      setStat('issued', issued??0);
+      setStat('redemptions', reds??0);
+      setStat('avg', issued ? (Math.round((reds/issued)*10)/10).toString().replace('.',',') : '0');
     }
     async function loadCampaigns(){
-      const { data:camps }=await supabase.from('campaigns').select('id,type,title,value,stamp_goal,reward,enroll_token,config,created_at').eq('business_id',biz.id).order('created_at',{ascending:false});
+      const { data:camps }=await supabase.from('campaigns').select('id,type,title,value,stamp_goal,reward,enroll_token,config,created_at').eq('business_id',biz.id).eq('active',true).order('created_at',{ascending:false});
       const list=document.getElementById('campaignList');
-      if(!camps||!camps.length){ list.innerHTML='<div class="empty">Noch keine Aktionen. Erstelle deine erste unter „Erstellen".</div>'; return; }
-      list.innerHTML=camps.map(c=>`<div class="item"><div class="grow"><div class="t">${esc(c.title)}</div><div class="m">${campDesc(c)}</div></div><span class="pill ${MECH[c.type]?.stamp?'stamp':''}">${esc(mechLabel(c.type))}</span><button class="btn ghost" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}">QR</button></div>`).join('');
+      const strip=document.getElementById('passStrip');
+      if(!camps||!camps.length){
+        list.innerHTML='<div class="empty">Noch keine Aktionen. Erstelle deine erste unter „Erstellen".</div>';
+        if(strip) strip.innerHTML='<div class="pass-empty">Noch keine Aktionen — erstelle deine erste unter „Erstellen".</div>';
+        const ft=document.getElementById('featTitle'); if(ft) ft.textContent='Noch keine Aktion';
+        const fty=document.getElementById('featType'); if(fty) fty.textContent='Jetzt erstellen';
+        return;
+      }
+      // FEATURED-Karte + bunter Pass-Strip (Aurora) — die Pass-Karten sind das „Bild" der Übersicht
+      const _logo=(biz.logo_url && /^https?:\/\//i.test(String(biz.logo_url).trim()))?String(biz.logo_url).trim():'';
+      const brandMark=_logo?`<img src="${esc(_logo)}" alt="">`:esc((biz.name||'?').charAt(0).toUpperCase());
+      const valueOf=c=>{ const cf=c.config||{};
+        if(c.type==='balance') return `${esc(String(cf.start_amount||0))}<small>${esc(cf.unit||'€')}</small>`;
+        if(c.type==='multipass') return `${esc(String(cf.max_uses||'?'))}<small>×</small>`;
+        if(c.type==='access') return `Zutritt`;
+        return esc(c.value||'Gutschein'); };
+      const metaOf=c=> c.type==='stampcard' ? ('Belohnung: '+esc(c.reward||'—')) : (c.reward?esc(c.reward):mechLabel(c.type));
+      const PCLS=['pass-a','pass-b','pass-c','pass-d'];
+      const midOf=c=> c.type==='stampcard'
+        ? `<div class="mini-stamps">${(()=>{const g=Math.max(3,Math.min(parseInt(c.stamp_goal,10)||5,10));let s='';for(let i=0;i<g;i++)s+='<i></i>';return s;})()}</div>`
+        : `<div class="pass-value"${c.type!=='balance'&&c.type!=='multipass'?' style="font-size:28px"':''}>${valueOf(c)}</div>`;
+      if(strip){
+        // ECHTES Karten-Design: das reale Apple-Wallet-Strip-Bild pro Aktion (/api/card-image).
+        // Fällt sauber auf die Verlaufs-Karte zurück, falls das Bild (z.B. lokal ohne API) nicht lädt.
+        strip.innerHTML=camps.map((c,i)=>`<button class="o3-realcard ${PCLS[i%PCLS.length]}" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}"><img class="o3-rc-img" src="/api/card-image?campaign=${c.id}" alt="${esc(c.title)}" loading="lazy"><span class="o3-rc-fallback"><span class="type-chip">${esc(mechLabel(c.type))}</span><span class="o3-rc-name">${esc(c.title)}</span>${midOf(c)}</span><span class="o3-rc-qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3"/></svg></span></button>`).join('');
+        strip.querySelectorAll('.o3-rc-img').forEach(img=>img.addEventListener('error',()=>{ const c=img.closest('.o3-realcard'); if(c) c.classList.add('img-failed'); }));
+      }
+      // Featured: bevorzugt eine Stempelkarte, sonst erste Aktion
+      const feat=camps.find(c=>c.type==='stampcard')||camps[0];
+      if(feat){
+        const setH=(id,v)=>{const e=document.getElementById(id); if(e) e.innerHTML=v;};
+        const lm=document.getElementById('featLogo'); if(lm) lm.innerHTML=brandMark;
+        setH('featType', esc(mechLabel(feat.type)));
+        setH('featTitle', esc(feat.title));
+        setH('featReward', feat.type==='stampcard' ? ('Belohnung: '+esc(feat.reward||'—')+(feat.stamp_goal?` bei ${esc(String(feat.stamp_goal))} Stempeln`:'')) : (feat.reward?esc(feat.reward):''));
+        const fs=document.getElementById('featStamps');
+        if(fs){
+          if(feat.type==='stampcard'){ const g=Math.max(3,Math.min(parseInt(feat.stamp_goal,10)||5,8)); let s=''; for(let i=0;i<g;i++) s+=`<div class="stamp">${i+1}</div>`; fs.innerHTML=s; }
+          else { fs.innerHTML=`<div class="pass-value" style="font-size:48px">${valueOf(feat)}</div>`; }
+        }
+        const fq=document.getElementById('featQr'); if(fq){ fq.dataset.qr=feat.id; fq.dataset.token=feat.enroll_token||''; fq.dataset.title=feat.title; }
+      }
+      const cIco = t => t==='stampcard'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7" cy="8" r="2.2"/><circle cx="14" cy="8" r="2.2"/><circle cx="7" cy="15" r="2.2"/><circle cx="14" cy="15" r="2.2"/></svg>'
+          : t==='balance'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="16" cy="12" r="2"/></svg>'
+          : t==='access'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 4v5c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 000-4z"/></svg>';
+      list.innerHTML=camps.map(c=>`<div class="item"><span class="ico-chip">${cIco(c.type)}</span><div class="grow"><div class="t">${esc(c.title)}</div><div class="m">${campDesc(c)}</div></div><span class="pill ${MECH[c.type]?.stamp?'stamp':''}">${esc(mechLabel(c.type))}</span><button class="btn ghost" data-qr="${c.id}" data-token="${c.enroll_token||''}" data-title="${esc(c.title)}">QR</button><button class="btn ghost o3-del" data-del="${c.id}" data-title="${esc(c.title)}" title="Aktion löschen" aria-label="Aktion löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg></button></div>`).join('');
     }
     // Letzte Aktivität: die jüngsten Stempel/Einlösungen/Karten — war vorher immer leer.
     async function loadActivity(){
@@ -1114,7 +2093,12 @@
         .eq('business_id',biz.id)
         .order('created_at',{ascending:false}).limit(8);
       const list=document.getElementById('activityList');
-      if(!acts||!acts.length){ list.innerHTML='<div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div>'; return; }
+      const stories=document.getElementById('stories');
+      if(!acts||!acts.length){
+        list.innerHTML='<div class="empty">Noch keine Aktivität. Erstelle deine erste Aktion unter „Erstellen".</div>';
+        if(stories) stories.innerHTML='<div class="pass-empty">Noch keine Gäste.</div>';
+        return;
+      }
       const fmt=ts=>{
         const d=new Date(ts), m=(Date.now()-d.getTime())/60000;
         if(m<1) return 'gerade eben';
@@ -1122,6 +2106,18 @@
         if(m<1440) return 'vor '+Math.floor(m/60)+' Std.';
         return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr';
       };
+      // Story-Circles „Neueste Gäste" aus den jüngsten eindeutigen Karten-Serials
+      if(stories){
+        const seen=new Set(), guests=[];
+        for(const a of acts){ const s=a.passes?.serial; if(s&&!seen.has(s)){ seen.add(s); guests.push({serial:s, online:(a.action==='stamp'||a.action==='enroll')}); } if(guests.length>=8) break; }
+        const grads=['#4a5a8c,#6f86c9','#7a4a6e,#b46a9a','#5a5170,#8a7ab4','#6e5a4a,#b4956a','#5a4a6e,#956ab4','#4a5a6e,#6a95b4'];
+        stories.innerHTML = guests.length ? guests.map((g,i)=>{
+          const init=esc(g.serial.replace(/^[A-Za-z]+-/,'').slice(0,2).toUpperCase());
+          const short=esc(g.serial.slice(0,9));
+          return `<div class="story"><div class="story-ring${g.online?'':' muted'}"><div class="story-av" style="background:linear-gradient(150deg,${grads[i%grads.length]})">${init}</div>${g.online?'<span class="story-online"></span>':''}</div><span class="story-name">${short}</span></div>`;
+        }).join('') : '<div class="pass-empty">Noch keine Gäste.</div>';
+      }
+      // Aktivitäts-Feed (Aurora-Reihen mit Glossy-Icon-Chip)
       list.innerHTML=acts.map(a=>{
         const serial=a.passes?.serial||'';
         const reward=(a.note||'').startsWith('Belohnung:');
@@ -1129,19 +2125,52 @@
                 : a.action==='stamp'  ? 'Stempel vergeben · '+esc(a.note||'')
                 : reward              ? esc(a.note)
                 :                       'Gutschein eingelöst'+(a.note?' · '+esc(a.note):'');
-        const pill = a.action==='enroll' ? '+ Karte' : a.action==='stamp' ? 'Stempel' : 'Einlösung';
-        return `<div class="item"><div class="grow"><div class="t">${t}</div><div class="m">${esc(serial)}${serial?' · ':''}${fmt(a.created_at)}</div></div><span class="pill ${a.action==='stamp'?'stamp':''}">${pill}</span></div>`;
+        const chip = a.action==='enroll' ? '+ Karte' : a.action==='stamp' ? 'Stempel' : 'Einlösung';
+        const ic = a.action==='enroll'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6" stroke-linecap="round"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        return `<div class="row"><div class="row-ic">${ic}</div><div class="row-main"><div class="rt">${t}</div><div class="rs">${esc(serial)}${serial?' · ':''}${fmt(a.created_at)}</div></div><span class="row-chip">${chip}</span></div>`;
       }).join('');
     }
     await Promise.all([loadStats(), loadChart(), loadCampaigns(), loadActivity()]);
 
-    document.getElementById('loading').style.display='none';
-    document.getElementById('welcome').style.display='flex';
-    document.getElementById('goBtn').addEventListener('click',()=>{
+    // Ladescreen mind. ~1,5s zeigen (Animation soll sichtbar sein), dann Welcome
+    const __wait = Math.max(0, 1500 - (performance.now ? performance.now() : 1500));
+    setTimeout(()=>{
+      document.getElementById('loading').style.display='none';
+      document.getElementById('welcome').style.display='flex';
+    }, __wait);
+    let entered=false;
+    function enterApp(){
+      if(entered) return; entered=true;
       document.getElementById('wave').classList.add('flood');
       document.getElementById('welcome').classList.add('exit');
       setTimeout(()=>{document.getElementById('welcome').style.display='none';const app=document.getElementById('app');app.style.display='grid';requestAnimationFrame(()=>app.classList.add('show'));},700);
-    });
+    }
+    // ===== GO: butterweiches Ziehen — REINE Pointer-Events + requestAnimationFrame (kein Touch/Pointer-Doppelfeuern) =====
+    (function(){
+      const wel=document.getElementById('welcome'), go=document.getElementById('goBtn'), wEnter=document.getElementById('wEnter');
+      if(!wel||!go) return;
+      const THRESH=110; let dragging=false, startY=0, dy=0, raf=0;
+      const render=()=>{ raf=0; const d=Math.max(0,dy), p=Math.min(1,d/THRESH);
+        wEnter.style.transform=`translate3d(0,${(-d).toFixed(1)}px,0)`;
+        go.style.transform=`scale(${(1+p*0.06).toFixed(3)})`; };
+      const schedule=()=>{ if(!raf) raf=requestAnimationFrame(render); };
+      const reset=()=>{ dy=0; wEnter.style.transition='transform .34s cubic-bezier(.22,.9,.3,1)';
+        wEnter.style.transform='translate3d(0,0,0)'; go.style.transform='';
+        setTimeout(()=>{ wEnter.style.transition=''; },360); };
+      const end=()=>{ if(!dragging) return; dragging=false; if(raf){cancelAnimationFrame(raf);raf=0;}
+        if(dy>THRESH || dy<6){ enterApp(); } else { reset(); } };
+      wel.addEventListener('pointerdown',e=>{ dragging=true; startY=e.clientY; dy=0; wEnter.style.transition='none';
+        try{wel.setPointerCapture(e.pointerId);}catch{} });
+      wel.addEventListener('pointermove',e=>{ if(!dragging) return; dy=startY-e.clientY; if(dy<0) dy=0; schedule(); });
+      wel.addEventListener('pointerup',end);
+      wel.addEventListener('pointercancel',end);
+      wel.addEventListener('lostpointercapture',end);
+      // Desktop-Komfort
+      wel.addEventListener('wheel',e=>{ if(e.deltaY<-8) enterApp(); },{passive:true});
+      window.addEventListener('keydown',e=>{ if((e.key==='ArrowUp'||e.key==='Enter')&&wel.style.display!=='none') enterApp(); });
+    })();
 
     document.querySelectorAll('.nav[data-page]').forEach(btn=>btn.addEventListener('click',()=>{
       document.querySelectorAll('.nav[data-page]').forEach(b=>b.classList.remove('active'));
@@ -1149,6 +2178,13 @@
       const p=btn.dataset.page;
       document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
       document.getElementById('page-'+p).classList.add('active');
+      // schwebende Bottom-Nav synchron halten
+      document.querySelectorAll('.dock-btn').forEach(d=>d.classList.toggle('on', d.dataset.page===p));
+      try{ document.querySelector('.main').scrollTo({top:0,behavior:'smooth'}); window.scrollTo({top:0,behavior:'smooth'}); }catch{}
+    }));
+    // schwebende Glas-Bottom-Nav -> leitet an die echten Nav-Buttons weiter
+    document.querySelectorAll('.dock-btn[data-page]').forEach(d=>d.addEventListener('click',()=>{
+      const n=document.querySelector('.nav[data-page="'+d.dataset.page+'"]'); if(n) n.click();
     }));
 
     // --- Mechanik-Umschalter (Gutschein / Stempelkarte / Mehrfachkarte / Guthaben / Zugang) ---
@@ -1302,16 +2338,15 @@
     });
 
     const modal=document.getElementById('modal');
-    document.getElementById('campaignList').addEventListener('click',(e)=>{
-      const b=e.target.closest('[data-qr]');if(!b)return;
+    function openQrFor(b){
       document.getElementById('qrTitle').textContent=b.dataset.title;
       const token=b.dataset.token;
       const campId=b.dataset.qr;
       // Echter Pass-Link: Stempelkarte = Dauer-QR (enroll-Token), Gutschein = campaign-ID.
-      // Gast scannt -> /api/pass erzeugt signierten .pkpass -> landet in Wallet.
+      // Gast scannt -> /api/card erkennt iOS/Android -> richtige Wallet (Apple-Pass bleibt unter /api/pass).
       const url = token
-        ? `${location.origin}/api/pass?enroll=${token}`
-        : `${location.origin}/api/pass?campaign=${campId}`;
+        ? `${location.origin}/api/card?enroll=${token}`
+        : `${location.origin}/api/card?campaign=${campId}`;
       document.getElementById('qrBox').innerHTML=`<img src="/api/qr?size=240&data=${encodeURIComponent(url)}" alt="QR">`;
       document.getElementById('qrSub').textContent = token
         ? `Dauer-QR: ${term()} scannen → eigene Karte landet in der Wallet. (Druck ihn aus für den Tresen!)`
@@ -1323,9 +2358,34 @@
         document.getElementById('qrSub').after(tl); }
       tl.href=url; tl.textContent='Direkt testen: '+url;
       modal.classList.add('show');
+      document.body.classList.add('modal-open');
+    }
+    const onQrClick=(e)=>{ if(e.target.closest('[data-del]')) return; const b=e.target.closest('[data-qr]'); if(b && b.dataset.qr) openQrFor(b); };
+    document.getElementById('campaignList').addEventListener('click',onQrClick);
+    document.getElementById('page-overview').addEventListener('click',onQrClick);
+
+    // --- Aktion löschen ---
+    document.getElementById('campaignList').addEventListener('click', async (e)=>{
+      const d=e.target.closest('[data-del]'); if(!d) return;
+      e.preventDefault(); e.stopPropagation();
+      const id=d.dataset.del, title=d.dataset.title||'diese Aktion';
+      if(!confirm(`„${title}" wirklich löschen?\n\nBereits ausgegebene Karten bleiben in den Wallets der Gäste — die Aktion verschwindet nur aus deinem Dashboard.`)) return;
+      d.disabled=true; d.style.opacity='.5';
+      let { error }=await supabase.from('campaigns').delete().eq('id',id).eq('business_id',biz.id);
+      if(error){ // FK: aktive Karten hängen dran -> stattdessen deaktivieren (verschwindet ebenfalls)
+        const r=await supabase.from('campaigns').update({active:false}).eq('id',id).eq('business_id',biz.id);
+        if(r.error){ toast('Löschen fehlgeschlagen: '+(r.error.message||error.message)); d.disabled=false; d.style.opacity=''; return; }
+      }
+      toast('Aktion gelöscht ✓');
+      await Promise.all([loadStats(), loadChart(), loadCampaigns(), loadActivity()]);
     });
-    document.getElementById('qrClose').addEventListener('click',()=>modal.classList.remove('show'));
-    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show');});
+    // „Alle ansehen" -> zur Aktionen-Seite springen
+    document.querySelectorAll('[data-jump]').forEach(el=>el.addEventListener('click',()=>{
+      const target=el.dataset.jump; const nav=document.querySelector(`.nav[data-page="${target}"]`); if(nav) nav.click();
+    }));
+    const closeModal=()=>{ modal.classList.remove('show'); document.body.classList.remove('modal-open'); };
+    document.getElementById('qrClose').addEventListener('click',closeModal);
+    modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 
     let stream=null,scanning=false,detector=null,processing=false;
     const video=document.getElementById('video'),scanResult=document.getElementById('scanResult');
