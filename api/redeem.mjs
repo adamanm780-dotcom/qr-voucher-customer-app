@@ -224,7 +224,7 @@ export default async function handler(req, res) {
     const { error: uErr } = await touch({ stamps });
     if (uErr) { console.error('redeem stamp update:', uErr.message); return res.status(500).json({ ok: false, message: 'Aktion fehlgeschlagen. Bitte erneut versuchen.' }); }
     await db.from('redemptions').insert({ pass_id: pass.id, business_id: pass.business_id, action: 'stamp', note: `${stamps}/${goal}` });
-    try { await pushUpdate(db, serial); } catch (e) { console.error('push:', e); }
+    try { await notifyWallets(db, serial); } catch (e) { console.error('push:', e); }
     if (stamps >= goal) {
       // Karte ist JETZT voll -> Belohnung anbieten (NICHT zuruecksetzen, Belohnung wartet).
       return res.status(200).json({

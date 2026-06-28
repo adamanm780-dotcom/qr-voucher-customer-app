@@ -1909,7 +1909,7 @@
   <div id="toast"></div>
 
   <!-- QR-Decoder (funktioniert auch auf iPhone/Safari, wo BarcodeDetector fehlt) -->
-  <script src="./js/jsQR.js"></script>
+  <script defer src="./js/jsQR.js"></script>
   <script type="module">
     import { supabase } from './js/supabase-client.js';
     const { data:{ session } } = await supabase.auth.getSession();

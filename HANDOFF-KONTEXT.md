@@ -14,11 +14,19 @@
 - Hero-Bild = bestehendes Strip-Design des Betriebs direkt (sharp-Resize verworfen — natives Binary sprengt das 250-MB-Function-Limit). Stempelzahl läuft als **eigenes Live-Textfeld** (`3/10`), unabhängig vom Bild.
 - 5 Offline-Tests grün (`scripts/test-mint|google-jwt|googleview|wallet-target.mjs`), alle Module laden sauber.
 
-**❗ ZUM SCHARFSCHALTEN (Android) fehlen NUR 2 User-Aktionen** (alles andere ist fertig & inaktiv ohne Crash):
-1. **Migration anwenden:** `db/google-wallet.sql` im Supabase-SQL-Editor (Projekt „voucher flow") ausführen. (Supabase-JS kann kein DDL.)
-2. **Google-Credentials holen** per `GOOGLE-WALLET-SETUP.md` → 2 Env-Vars in Vercel setzen (`GOOGLE_WALLET_ISSUER_ID`, `GOOGLE_WALLET_SA_JSON_B64`) → neu deployen. ⏳ Issuer-Freigabe dauert ggf. Tage.
+**✅ GOOGLE WALLET IST SCHARF & GETESTET (28.06. Abend):** Credentials live in Vercel + lokaler `.env`. Werte: Issuer-ID `3388000000023163712`, Service-Account `wallet-signer@flowstatewallet.iam.gserviceaccount.com`, Google-Cloud-Projekt `flowstatewallet`, SA-Key als `GOOGLE_WALLET_SA_JSON_B64` (komplette JSON base64). Echte Karte erscheint in Google Wallet (als Testkonto im Browser/Handy geprüft: caia — Creme-Farbe, Design als Hero-Bild, STEMPEL-Feld, QR). Diagnose-Skript: `node scripts/diag-google.mjs` (200 = SA berechtigt).
+- **Demo-Modus** aktiv → Karten tragen „[TEST ONLY]", nur Testkonten können speichern.
+- **Offen für ECHTE Kunden:** in der Google Pay & Wallet Console „Veröffentlichungszugriff" beantragen (3-Schritte-Flow, Schritt 1 „Klasse anlegen" ist durch, da unser Code Klassen erzeugt) → Google-Review (Tage).
+- **Offen für Live-Stempel-Update auf Google:** `db/google-wallet.sql` im Supabase-SQL-Editor (Projekt „voucher flow") ausführen (Spalte `passes.google_object_id`; Supabase-JS kann kein DDL). Ohne sie: Karte erscheint, aktualisiert sich aber nicht beim Stempeln.
+- **Preview ohne Android-Gerät:** `node scripts/test-google-live.mjs <campaignId> [stamps]` → baut Karte + gibt „Save to Google Wallet"-Link aus. (Der Browser-Preview via `/api/card?...&go=1` ist aus Sicherheitsgründen jetzt auf Android-UA beschränkt.)
 
-Solange Schritt 2 offen ist: Android zeigt freundlich „Google Wallet kommt in Kürze", iPhone unverändert. Danach: Android-Karte + Live-Stempel-Update automatisch (Code steht, `notifyWallets` patcht Google bei jedem Stempel).
+**🔎 SICHERHEITS-/QUALITÄTS-AUDIT + FIXES (28.06. Abend):** Multi-Agent-Audit gelaufen (20 verifizierte Funde, meist low; KEINE offenen kritischen Lücken). Gefixt & live:
+- (a) **Regression behoben:** `redeem.mjs` Z.227 hing beim Umbau auf altem `pushUpdate` (andere Einrückung → `replace_all` übersprang sie) → Live-Update brach beim NORMALEN Stempeln (Apple+Google). Jetzt `notifyWallets`, heil.
+- (b) Preview-Mint-Lücke geschlossen (Google-`go`-Flow nur noch Android-UA).
+- (c) `loadAssets`-Memo-Cache (weniger fs-Reads). (d) `jsQR`-Script `defer`. (e) Login-Ping mit 2,5s-Timeout. (f) Provision-Passwörter stärker (3×4 aus 32er-Satz statt `FS-`+7).
+- **Deferred/dokumentiert (nicht kritisch):** redeem awaitet Wallet-Push synchron → Scanner-Latenz (sauberer Fix = Vercel `waitUntil`); `jsQR` dekodiert iOS-Kamera in voller Auflösung pro Frame → Downscale/Throttle (braucht Geräte-Test); Mint-Drossel fail-open + TOCTOU-Race (pre-existing, durch Drossel begrenzt); diverse low/Dead-Code-Cleanups. Vollreport: Task-Output des Workflows / `docs/superpowers/`.
+
+**NÄCHSTE PRIO (vom User 28.06.):** App **flüssig + alle Buttons + sicher** (Audit ✅, Hands-on-Runtime-Durchklick noch offen) → dann **Apple App Store**. ⚠️ App Store braucht **Cloud-Mac-Build-Dienst** (User ist auf Windows; Apple-Tools laufen nicht auf Windows) — z.B. Codemagic. Google-Wallet-Design-Feinschliff macht User pro unterschriebenem Kunden (geparkt).
 
 **Noch nicht live-getestet:** echter Android-Save + echtes Live-Stempel-Update (brauchen Credentials). Empfehlung: nach Schritt 1+2 einmal auf echtem Android durchspielen.
 

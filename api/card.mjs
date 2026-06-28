@@ -50,25 +50,11 @@ export default async function handler(req, res) {
     const query = enroll ? `enroll=${encodeURIComponent(enroll)}` : `campaign=${encodeURIComponent(campaign)}`;
     const target = walletTarget(req.headers['user-agent']);
 
-    // iOS: unverändert auf den Apple-Pfad.
-    if (target === 'apple') {
-      res.setHeader('Location', `/api/pass?${query}`);
-      return res.status(302).end();
-    }
-
-    // Android ohne Google-Config: freundlicher Platzhalter (kein Crash, bevor Credentials da sind).
-    if (target === 'android' && !googleConfigured()) {
-      return res.status(200).send(page('Bald verfügbar',
-        `<h1>Google Wallet kommt in Kürze</h1>
-         <p>Diese Karte lässt sich gleich in Google Wallet speichern. Bis dahin: über ein iPhone hinzufügen oder die Web-App nutzen (Chrome-Menü → „Zum Startbildschirm hinzufügen").</p>`));
-    }
-
-    // Android + go=1: minten, Google-Objekt anlegen, zum Save-Link weiterleiten.
-    if (target === 'android' && go) {
+    // Google-Flow nur für Android (über den Landing-Button). Kein offener Mint-Endpoint für jeden Browser.
+    if (go && target === 'android' && googleConfigured()) {
       const db = supa();
       const m = await mintCard(db, { campaign, enroll });
       if (!m.ok) return res.status(m.status).send(page('Fehler', `<h1>Karte nicht verfügbar</h1><p>${esc(m.error)}</p>`));
-      // Hero = das echte Karten-Design des Betriebs (Strip); Google skaliert es verzerrungsfrei.
       const heroUrl = `${PUBLIC_BASE}/api/card-image?campaign=${encodeURIComponent(m.camp.id)}`;
       const logoUrl = m.biz?.logo_url || null;
       const { classObj, object, oid } = buildGoogleCard({
@@ -80,6 +66,19 @@ export default async function handler(req, res) {
       try { await db.from('passes').update({ google_object_id: oid }).eq('serial', m.serial); } catch (e) { console.error('set google_object_id:', e); }
       res.setHeader('Location', saveLink({ id: oid, classId: classObj.id }));
       return res.status(302).end();
+    }
+
+    // iOS: unverändert auf den Apple-Pfad.
+    if (target === 'apple') {
+      res.setHeader('Location', `/api/pass?${query}`);
+      return res.status(302).end();
+    }
+
+    // Android ohne Google-Config: freundlicher Platzhalter (kein Crash, bevor Credentials da sind).
+    if (target === 'android' && !googleConfigured()) {
+      return res.status(200).send(page('Bald verfügbar',
+        `<h1>Google Wallet kommt in Kürze</h1>
+         <p>Diese Karte lässt sich gleich in Google Wallet speichern. Bis dahin: über ein iPhone hinzufügen oder die Web-App nutzen (Chrome-Menü → „Zum Startbildschirm hinzufügen").</p>`));
     }
 
     // Android Landing (Tipp -> &go=1) ODER Desktop (Hinweis).

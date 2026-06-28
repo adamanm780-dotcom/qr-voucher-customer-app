@@ -264,15 +264,66 @@
       radial-gradient(40% 38% at 100% 100%, rgba(255,255,255,.035), transparent 70%) !important; filter:blur(46px) !important; }
   .pitch h1 span{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
   .kicker::before,.badge .lk{ background:#fff !important; }
-  .card{ background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.022)) !important; border:1px solid var(--glass-border) !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 34px 74px rgba(0,0,0,.55) !important; }
+  /* ===== v11 — Glas richtig: atmosphärischer Hintergrund + frosted Karte (Proton) ===== */
+  body::before{
+    background:
+      radial-gradient(46% 42% at 16% 6%, rgba(186,200,224,.20), transparent 62%),
+      radial-gradient(48% 44% at 92% 0%, rgba(150,162,190,.16), transparent 60%),
+      radial-gradient(58% 54% at 80% 110%, rgba(120,136,172,.18), transparent 64%) !important;
+    filter:blur(64px) saturate(118%) !important;
+  }
+  /* feines Raster für Tiefe */
+  body::after{ content:"" !important; position:fixed !important; inset:0 !important; z-index:0 !important; pointer-events:none !important;
+    background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px) !important;
+    background-size:56px 56px !important;
+    -webkit-mask-image:radial-gradient(80% 70% at 30% 30%,#000,transparent 86%) !important;
+    mask-image:radial-gradient(80% 70% at 30% 30%,#000,transparent 86%) !important; }
+  .brand,main.auth{ position:relative; z-index:1; }
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.04) 100%) !important;
+    -webkit-backdrop-filter:blur(34px) saturate(180%) !important; backdrop-filter:blur(34px) saturate(180%) !important;
+    border:1px solid rgba(255,255,255,.14) !important; border-radius:30px !important; padding:36px 32px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 36px 84px rgba(0,0,0,.55) !important; }
+  .card input{ background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.12) !important; border-radius:14px !important; color:#fff !important; }
+  .card input::placeholder{ color:rgba(255,255,255,.4) !important; }
   input:focus{ border-color:rgba(255,255,255,.5) !important; box-shadow:0 0 0 3px rgba(255,255,255,.08) !important; }
   button{ background:linear-gradient(180deg, #ffffff, #e4e4e9) !important; color:#0a0a0b !important;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 12px 30px rgba(0,0,0,.45) !important; }
   button:hover:not(:disabled){ filter:brightness(1.03) !important; }
+  /* Kein Serif — gleiche Sans wie das Dashboard (User-Vorgabe) */
+  .logo,.logo b,.pitch h1,.pitch h1 span,.card h2{ font-family:'Plus Jakarta Sans',-apple-system,sans-serif !important; font-weight:800 !important; letter-spacing:-.03em !important; }
+</style>
+
+<!-- ===== Branded Splash (verdeckt den Login-Blitz beim Öffnen einer aktiven Session) ===== -->
+<style>
+  #splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+    background:radial-gradient(120% 85% at 50% 20%, #15171f 0%, #0a0b0e 62%);
+    transition:opacity .55s ease;}
+  #splash.hide{opacity:0;pointer-events:none}
+  .sp-wrap{position:relative;width:200px;height:200px;display:grid;place-items:center}
+  /* weicher, atmender Glow hinter dem Icon -> Icon sticht nicht raus, sondern leuchtet eingebettet */
+  .sp-glow{position:absolute;width:200px;height:200px;border-radius:50%;
+    background:radial-gradient(circle, rgba(130,146,226,.34), rgba(130,146,226,.08) 45%, transparent 66%);
+    animation:spBreath 2.6s ease-in-out infinite}
+  /* drehender Lade-Ring um das Icon */
+  .sp-ring{position:absolute;width:132px;height:132px;border-radius:50%;
+    background:conic-gradient(from 90deg, #ffffff 0deg, rgba(255,255,255,.05) 120deg, rgba(255,255,255,0) 300deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+    animation:spSpin 1s linear infinite}
+  .sp-icon{position:relative;display:grid;place-items:center;animation:spFloat 2.6s ease-in-out infinite}
+  .sp-icon img{height:66px;width:auto;display:block;filter:drop-shadow(0 6px 20px rgba(140,154,235,.5))}
+  .sp-word{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.42);font-weight:600}
+  @keyframes spSpin{to{transform:rotate(360deg)}}
+  @keyframes spBreath{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.06);opacity:.95}}
+  @keyframes spFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.025)}}
+  @media (prefers-reduced-motion:reduce){ .sp-glow,.sp-ring,.sp-icon{animation:none} }
 </style>
 </head>
 <body>
+  <div id="splash" aria-label="Lädt" role="status">
+    <div class="sp-wrap"><div class="sp-glow"></div><div class="sp-ring"></div><div class="sp-icon"><img src="/assets/f-mark.png" alt="FlowState"></div></div>
+    <div class="sp-word">FlowState</div>
+  </div>
   <aside class="brand">
     <span class="orb a"></span><span class="orb b"></span><span class="grid"></span>
     <div class="logo"><img src="./assets/logo-mark.png" alt="FlowState">Flow<b>State</b>&nbsp;Wallet</div>
@@ -314,15 +365,21 @@
       const { data:{ session } } = await supabase.auth.getSession();
       if(!session) return;
       try{
-        // leichter Admin-Check (lädt KEINE Betriebsliste -> Login fühlt sich sofort an)
-        const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token }});
+        // leichter Admin-Check (lädt KEINE Betriebsliste -> Login fühlt sich sofort an).
+        // Timeout: bei hängendem Netz nach 2,5s abbrechen -> sofort weiter ins Dashboard.
+        const ctrl = new AbortController();
+        const to = setTimeout(()=>ctrl.abort(), 2500);
+        const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token }, signal: ctrl.signal });
+        clearTimeout(to);
         if(r.status===200){ location.replace('./cockpit.html'); return; }
       }catch{}
       location.replace('./dashboard.html');
     }
 
+    function hideSplash(){ const s=document.getElementById('splash'); if(s){ s.classList.add('hide'); setTimeout(()=>s.remove(),520); } }
     const { data:{ session } } = await supabase.auth.getSession();
-    if (session) routeAfterLogin();
+    if (session){ setTimeout(routeAfterLogin, 1400); setTimeout(hideSplash, 6000); /* Splash kurz zeigen, dann weiter; Fallback falls Weiterleitung hängt */ }
+    else { setTimeout(hideSplash, 1300); }
 
     const form=document.getElementById('loginForm'), btn=document.getElementById('submitBtn'), msg=document.getElementById('msg');
     // Anmelde-Sperre: 3 Fehlversuche -> 5 Min, danach 1 Versuch, sonst anrufen.

@@ -46,7 +46,9 @@ export default async function handler(req, res) {
     const base = slugify(name);
     const slug = `${base}-${pick('abcdefghijkmnpqrstuvwxyz23456789', 4)}`;       // eindeutig
     const email = `${slug}@kunden.flowstate.app`;
-    const password = 'FS-' + pick('ABCDEFGHJKLMNPQRSTUVWXYZ', 4) + pick('23456789', 3); // z.B. FS-KMPT482
+    // Starkes, aber tippbares Passwort: 3×4 Zeichen aus 32er-Satz (ohne verwechselbare 0/O/1/I). ~1e18 Keyspace.
+    const PWSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const password = `${pick(PWSET, 4)}-${pick(PWSET, 4)}-${pick(PWSET, 4)}`; // z.B. K7MP-3RXQ-9FBT
 
     // 1) Login anlegen
     const { data: userData, error: userErr } = await db.auth.admin.createUser({ email, password, email_confirm: true });
