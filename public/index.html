@@ -366,11 +366,8 @@
       if(!session) return;
       try{
         // leichter Admin-Check (lädt KEINE Betriebsliste -> Login fühlt sich sofort an).
-        // Timeout: bei hängendem Netz nach 2,5s abbrechen -> sofort weiter ins Dashboard.
-        const ctrl = new AbortController();
-        const to = setTimeout(()=>ctrl.abort(), 2500);
-        const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token }, signal: ctrl.signal });
-        clearTimeout(to);
+        // Bewusst OHNE Timeout: Admin MUSS zuverlässig im Cockpit landen (kein Misrouting ins Dashboard).
+        const r = await fetch('/api/admin/ping', { headers:{ 'Authorization':'Bearer '+session.access_token }});
         if(r.status===200){ location.replace('./cockpit.html'); return; }
       }catch{}
       location.replace('./dashboard.html');
