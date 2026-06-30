@@ -52,7 +52,7 @@ async function buildPassForSerial(db, serial) {
     authenticationToken: pass.auth_token,
   };
   const key = campaignDir(biz?.slug, camp.id) || assetKey(camp.type, camp.stamp_goal || 10, theme.prefix);
-  const pkpass = new PKPass({ 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(key, view.stripName) }, certs());
+  const pkpass = new PKPass({ 'pass.json': Buffer.from(JSON.stringify(passJson)), ...(await loadAssets(key, view.stripName)) }, certs());
   return { buf: pkpass.getAsBuffer(), updatedAt: pass.updated_at };
 }
 

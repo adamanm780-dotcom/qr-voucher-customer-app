@@ -1,0 +1,12 @@
+# Pro-Betrieb-Designs (biz-*) liegen jetzt im Supabase-Storage-Bucket `card-assets`,
+# NICHT mehr im Code-Bündel (sonst > Vercels 250-MB-Function-Limit). Skaliert unbegrenzt.
+# Das Manifest (api/_assets/manifest.json) + Standard-/Lila-Designs bleiben gebündelt.
+api/_assets/biz-*
+
+# Lokale Build-/Arbeits-Artefakte (nie serverseitig gebraucht)
+_brand/
+_raw-*.png
+_preview-*.png
+_peek-*.png
+_shots/
+backups/

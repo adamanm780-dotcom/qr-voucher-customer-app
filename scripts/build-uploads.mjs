@@ -4,7 +4,7 @@
 //
 //   node scripts/build-uploads.mjs
 import { createClient } from '@supabase/supabase-js';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import sharp from 'sharp';
@@ -35,6 +35,26 @@ const env = Object.fromEntries(readFileSync('.env', 'utf8').split(/\r?\n/).filte
   .map(l => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; }));
 const db = createClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 const BUCKET = 'design-uploads';
+const CARD_BUCKET = 'card-assets';   // Designs skalieren über Storage, nicht über das Code-Bündel.
+
+// Alle generierten biz-<slug>-* Design-Ordner nach Storage hochladen.
+async function uploadBizForSlug(slug) {
+  const all = readdirSync('api/_assets').filter(d => d.startsWith(`biz-${slug}-`) && statSync(join('api/_assets', d)).isDirectory());
+  for (const dir of all) {
+    for (const f of readdirSync(join('api/_assets', dir))) {
+      if (!f.endsWith('.png')) continue;
+      const { error } = await db.storage.from(CARD_BUCKET).upload(`${dir}/${f}`, readFileSync(join('api/_assets', dir, f)), { contentType: 'image/png', upsert: true });
+      if (error) console.log('  Storage-Upload FAIL', dir + '/' + f, error.message);
+    }
+    console.log(`  ↑ ${dir} -> Storage`);
+  }
+}
+// Manifest neu schreiben (Liste aller biz-Design-Ordner) -> kommt mit ins Deploy-Bündel.
+function rebuildManifest() {
+  const dirs = readdirSync('api/_assets').filter(d => d.startsWith('biz-') && statSync(join('api/_assets', d)).isDirectory());
+  writeFileSync('api/_assets/manifest.json', JSON.stringify({ storageBucket: CARD_BUCKET, dirs: dirs.sort() }));
+  console.log(`manifest.json aktualisiert (${dirs.length} Designs).`);
+}
 
 function slugify(s) {
   return (s || '').toLowerCase().trim().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
@@ -113,6 +133,7 @@ for (const mf of metas) {
     writeFileSync(genCfg, JSON.stringify({ slug, name: meta.name, goal: meta.goal, colorBg,
       colorText, reward: meta.reward, bgPath: imgPath, fillOnly: true, logoPath, stampPositions, stampRfr }));
     execSync(`node scripts/gen-business-assets.mjs "${genCfg}"`, { stdio: 'inherit' });
+    await uploadBizForSlug(slug);   // Design nach Storage (skaliert, nicht ins Bündel)
 
     // 2) Betrieb anlegen
     const email = `${slug}@kunden.flowstate.app`;
@@ -136,6 +157,7 @@ for (const mf of metas) {
 if (built.length) {
   console.log('\n================ FERTIG GEBAUT ================');
   for (const b of built) console.log(`• ${b.name}  (slug ${b.slug})  Login: ${b.email} / ${b.password}`);
+  rebuildManifest();
   console.log('\n>>> Deploye automatisch …');
   try { execSync('npx vercel --prod --yes', { stdio: 'inherit' }); console.log('✅ Deployed — Betrieb(e) jetzt im Cockpit.'); }
   catch (e) { console.error('Deploy-Fehler:', e.message); }

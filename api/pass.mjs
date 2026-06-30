@@ -23,7 +23,7 @@ function certs() {
 function supa() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 }
-function buildPass({ key, serial, type, data }) {
+async function buildPass({ key, serial, type, data }) {
   // Layout + Strip kommen aus der gemeinsamen Quelle (lib/passview.mjs) — gleiche Logik wie v1.mjs.
   const campLike = { type, config: data.config || {}, stamp_goal: data.stampGoal, reward: data.reward, value: data.value, title: data.title };
   const passLike = { stamps: data.stamps, remaining: data.remaining };
@@ -44,7 +44,7 @@ function buildPass({ key, serial, type, data }) {
     } : {}),
   };
   const pass = new PKPass(
-    { 'pass.json': Buffer.from(JSON.stringify(passJson)), ...loadAssets(key, view.stripName) },
+    { 'pass.json': Buffer.from(JSON.stringify(passJson)), ...(await loadAssets(key, view.stripName)) },
     certs()
   );
   return pass.getAsBuffer();
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Parameter fehlt: demo, campaign oder enroll' });
     }
 
-    const buf = buildPass({ key, serial, type, data });
+    const buf = await buildPass({ key, serial, type, data });
     res.setHeader('Content-Type', 'application/vnd.apple.pkpass');
     res.setHeader('Content-Disposition', `attachment; filename="${serial}.pkpass"`);
     res.setHeader('Cache-Control', 'no-store');

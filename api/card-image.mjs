@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     // Eigenes Design pro Aktion bevorzugen, sonst mechanik-gekoppelte Assets.
     const key = campaignDir(slug, campId) || assetKey(type, goal, prefix);
     const stripName = (type === 'stampcard' && !campaignDir(slug, campId)) ? 'strip_0' : 'strip';
-    const assets = loadAssets(key, stripName);
+    const assets = await loadAssets(key, stripName);
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('Cache-Control', 'public, max-age=300');
     return res.status(200).send(assets['strip@3x.png']);
