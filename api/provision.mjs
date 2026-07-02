@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { setCors, safeEqual } from '../lib/security.mjs';
 
-const APP_URL = 'https://qr-voucher-customer-app.vercel.app';
+const APP_URL = 'https://flowstate-wallet.de';
 
 function supa() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {

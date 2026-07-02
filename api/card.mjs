@@ -7,7 +7,7 @@ import { mintCard } from '../lib/mint.mjs';
 import { buildGoogleCard } from '../lib/googleview.mjs';
 import { googleConfigured, ensureClass, upsertObject, saveLink } from './_google.mjs';
 
-const PUBLIC_BASE = 'https://qr-voucher-customer-app.vercel.app';
+const PUBLIC_BASE = 'https://flowstate-wallet.de';
 const supa = () => createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 
 export function walletTarget(ua = '') {

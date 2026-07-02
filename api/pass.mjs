@@ -39,7 +39,7 @@ async function buildPass({ key, serial, type, data }) {
     barcodes: [{ format: 'PKBarcodeFormatQR', message: serial, messageEncoding: 'iso-8859-1', altText: serial }],
     // Web-Service: erlaubt Apple, Updates zu holen (Live-Stempel). Nur wenn authToken vorhanden.
     ...(data.authToken ? {
-      webServiceURL: 'https://qr-voucher-customer-app.vercel.app/api/v1',
+      webServiceURL: 'https://flowstate-wallet.de/api/v1',
       authenticationToken: data.authToken,
     } : {}),
   };

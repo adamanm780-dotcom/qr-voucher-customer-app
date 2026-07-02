@@ -48,7 +48,7 @@ async function buildPassForSerial(db, serial) {
     serialNumber: serial, foregroundColor: theme.fg, labelColor: theme.label, backgroundColor: theme.bg,
     [view.style]: view.structure,
     barcodes:[{ format:'PKBarcodeFormatQR', message:serial, messageEncoding:'iso-8859-1', altText:serial }],
-    webServiceURL:'https://qr-voucher-customer-app.vercel.app/api/v1',
+    webServiceURL:'https://flowstate-wallet.de/api/v1',
     authenticationToken: pass.auth_token,
   };
   const key = campaignDir(biz?.slug, camp.id) || assetKey(camp.type, camp.stamp_goal || 10, theme.prefix);

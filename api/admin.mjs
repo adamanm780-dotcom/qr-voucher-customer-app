@@ -9,7 +9,7 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const APP = 'https://qr-voucher-customer-app.vercel.app';
+const APP = 'https://flowstate-wallet.de';
 
 // Lesbares Passwort, leicht an einer Marke erkennbar: z.B. "Cinnamood" -> "Cinna-7K4P".
 function genPassword(name) {

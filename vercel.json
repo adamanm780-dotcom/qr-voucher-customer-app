@@ -33,6 +33,9 @@
     { "src": "/admin", "dest": "/public/admin.html" },
     { "src": "/cockpit", "dest": "/public/cockpit.html" },
     { "src": "/add", "dest": "/public/add.html" },
+    { "src": "/impressum", "dest": "/public/impressum.html" },
+    { "src": "/datenschutz", "dest": "/public/datenschutz.html" },
+    { "src": "/support", "dest": "/public/support.html" },
     {
       "src": "/pass/(.*\\.pkpass)",
       "headers": {

@@ -385,6 +385,8 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 10px 26px rgba(0,0,0,.45) !important; }
   .btn:hover{ filter:brightness(1.03) !important; }
   input:focus,select:focus,textarea:focus{ border-color:rgba(255,255,255,.5) !important; box-shadow:0 0 0 3px rgba(255,255,255,.08) !important; }
+  /* Kein Serif — gleiche Sans wie Dashboard/Login (User-Vorgabe) */
+  .brandbar,.brandbar b,.head h1,.login h1,.shop .stat .n,.shop .n{ font-family:'Plus Jakarta Sans',-apple-system,sans-serif !important; letter-spacing:-.03em !important; }
 </style>
 </head>
 <body>
@@ -748,7 +750,7 @@ $('uCancel').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
 
 // ---- Zugangsdaten: Passwort serverseitig NEU setzen + anzeigen (kann nicht zurückgelesen werden) ----
-const LOGIN_URL='https://qr-voucher-customer-app.vercel.app';
+const LOGIN_URL='https://flowstate-wallet.de';
 async function copyText(text, btn){
   try{ await navigator.clipboard.writeText(text); }
   catch{ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch{} t.remove(); }

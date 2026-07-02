@@ -8,7 +8,7 @@ import crypto from 'crypto';
 const API = 'https://walletobjects.googleapis.com/walletobjects/v1';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SAVE_SCOPE = 'https://www.googleapis.com/auth/wallet_object.issuer';
-const ORIGIN = 'https://qr-voucher-customer-app.vercel.app';
+const ORIGIN = 'https://flowstate-wallet.de';
 
 export function googleConfigured() {
   return !!(process.env.GOOGLE_WALLET_SA_JSON_B64 && process.env.GOOGLE_WALLET_ISSUER_ID);
